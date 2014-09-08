@@ -12,8 +12,14 @@
 const GLchar* vertexSource =
 "#version 150 core\n"
 "in vec2 position;"
+#if TRANSFORM
+"uniform mat4 transform;"
+"void main() {"
+"   gl_Position = transform * vec4(position, 0.0, 1.0);"
+#else
 "void main() {"
 "   gl_Position = vec4(position, 0.0, 1.0);"
+#endif
 "}";
 const GLchar* fragmentSource =
 "#version 150 core\n"
@@ -23,8 +29,9 @@ const GLchar* fragmentSource =
 "}";
 
 OGL::OGL() {
-    
-    //transform = glm::mat4();
+#if TRANSFORM
+    transform = glm::mat4();
+#endif
     // Create Vertex Array Object
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);

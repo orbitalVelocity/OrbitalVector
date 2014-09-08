@@ -347,6 +347,8 @@ int main(int argc, const char * argv[])
     initFontStash();
     
     OGL triangle;
+        err = glGetError();
+        assert(err==GL_NO_ERROR);
     
     // performance measurement
     glfwSetTime(0);
@@ -359,8 +361,12 @@ int main(int argc, const char * argv[])
     int winWidth, winHeight;
     int fbWidth, fbHeight;
     /* Loop until the user closes the window */
+        err = glGetError();
+        assert(err==GL_NO_ERROR);
     while (!glfwWindowShouldClose(window))
     {
+        err = glGetError();
+        assert(err==GL_NO_ERROR);
         auto t = glfwGetTime();
         auto dt = t - prevt;
         prevt = t;
@@ -381,7 +387,7 @@ int main(int argc, const char * argv[])
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         err = glGetError();
-        //assert(err==GL_NO_ERROR);
+        assert(err==GL_NO_ERROR);
         
         //render text
         stringstream textOut, textOut2, textOut3;
@@ -431,17 +437,26 @@ int main(int argc, const char * argv[])
 		glEnable(GL_DEPTH_TEST);
         err = glGetError();
         assert(err==GL_NO_ERROR);
-#if 0
+
+        //render triangle
+        glUseProgram(triangle.shaderProgram);
+#if TRANSFORM
         //transform triangle
         //set uniform
         triangle.transform = glm::rotate(triangle.transform, 1.0f, glm::vec3(0.0, 0.0, 1.0f));
+        err = glGetError();
+        assert(err==GL_NO_ERROR);
         GLint uTransform = glGetUniformLocation(triangle.shaderProgram, "transform");
+        err = glGetError();
+        assert(err==GL_NO_ERROR);
         glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(triangle.transform));
+        err = glGetError();
+        assert(err==GL_NO_ERROR);
 #endif
-        //render triangle
-        glUseProgram(triangle.shaderProgram);
         glBindVertexArray(triangle.vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
+        err = glGetError();
+        assert(err==GL_NO_ERROR);
         
         renderTime = glfwGetTime() - t;
         /* Swap front and back buffers */

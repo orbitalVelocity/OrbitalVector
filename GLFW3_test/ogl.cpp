@@ -24,6 +24,7 @@ const GLchar* fragmentSource =
 
 OGL::OGL() {
     
+    //transform = glm::mat4();
     // Create Vertex Array Object
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);

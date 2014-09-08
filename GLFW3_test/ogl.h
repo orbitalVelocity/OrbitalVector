@@ -34,6 +34,7 @@ public:
     GLint uniform_tex;
     GLint uniform_color;
     GLint attribute_coord;
+    //glm::mat4 transform;
 };
 
 #endif /* defined(__GLFW3_test__ogl__) */

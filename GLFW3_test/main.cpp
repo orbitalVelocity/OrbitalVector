@@ -32,6 +32,7 @@
 using namespace std;
 
 static PrimInternalData sData;
+glm::mat4 camera;
 
 void errorcb(int error, const char* desc)
 {
@@ -214,70 +215,25 @@ void display() {
     
 }
 
-int main(int argc, const char * argv[])
+struct sth_stash* stash = 0;
+	int droidRegular, droidItalic, droidBold, droidJapanese;
+void initFontStash()
 {
-    GLint err;
-    GLFWwindow* window;
-    
-    /* Initialize the library */
-    if (!glfwInit())
-        return -1;
-
-	glfwSetErrorCallback(errorcb);
-    
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
-
-    /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello world", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        return -1;
-    }
-   	
-    /* Make the window's context current */
-    glfwMakeContextCurrent(window);
-    
-    glfwSwapInterval(1);
-    
-    glewExperimental = GL_TRUE;
-    if(glewInit() != GLEW_OK) {
-		printf("Could not init glew.\n");
-		return -1;
-	}
-    
-    
-    err = glGetError();
-    //assert(err==GL_NO_ERROR);
-    
-    //font rendering init stuff
-    
     loadShader();
     loadBufferData();
     initTestTexture();
     
-	struct sth_stash* stash = 0;
-	float sx,sy,dx,dy;
-	int droidRegular, droidItalic, droidBold, droidJapanese;
-
+    
 	int fontTextureWidth = 512;
 	int fontTextureHeight = 512;
 	SimpleOpenGL2RenderCallbacks* renderCallbacks = new SimpleOpenGL2RenderCallbacks(&sData);
-
-	stash = sth_create(fontTextureWidth,fontTextureHeight,renderCallbacks);
     
-    err = glGetError();
-    assert(err==GL_NO_ERROR);
+	stash = sth_create(fontTextureWidth,fontTextureHeight,renderCallbacks);
     
 	if (!stash)
 	{
 		fprintf(stderr, "Could not create stash.\n");
-		return -1;
+		assert(false);
 	}
     
 	// Load the first truetype font from memory (just because we can).
@@ -299,15 +255,107 @@ int main(int argc, const char * argv[])
     droidJapanese = sth_add_font(stash,fullFontFileName);
     
     //end of font init stuff
+
+}
+
+static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, GL_TRUE);
+#if 0
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+		blowup = !blowup;
+	if (key == GLFW_KEY_S && action == GLFW_PRESS)
+		screenshot = 1;
+	if (key == GLFW_KEY_P && action == GLFW_PRESS)
+		premult = !premult;
+#endif
+}
+
+GLFWwindow* initGraphics()
+{
+    GLint err;
+    GLFWwindow* window;
+    /* Initialize the library */
+    assert(glfwInit());
+
+	glfwSetErrorCallback(errorcb);
     
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
+
+    /* Create a windowed mode window and its OpenGL context */
+    window = glfwCreateWindow(640, 480, "Hello world", NULL, NULL);
+    if (!window)
+    {
+        glfwTerminate();
+        assert(false);
+    }
+   	
+	glfwSetKeyCallback(window, key);
+    
+    /* Make the window's context current */
+    glfwMakeContextCurrent(window);
+    
+    glfwSwapInterval(1);
+    
+    glewExperimental = GL_TRUE;
+    if(glewInit() != GLEW_OK) {
+		printf("Could not init glew.\n");
+		assert(false);
+	}
+    err = glGetError();     //glew throws an error on mac for some reason
+    //assert(err==GL_NO_ERROR);
+ 
+    return window;
+}
+
+template <class T>
+class RingBuffer{
+public:
+    RingBuffer(int size)
+    {
+        data.resize(size, 0);
+        index = 0;
+        _average = 0;
+    }
+    void push(T v)
+    {
+        data[index++%data.size()] = v;
+    }
+    float average()
+    {
+        if (index % data.size() == 0) {
+            _average = (float)std::accumulate(data.begin(), data.end(), 0.0f)/(float)data.size();
+        }
+        return _average;
+    }
+    
+    int index = 0;
+    float _average;
+    vector<T> data;
+};
+int main(int argc, const char * argv[])
+{
+    GLint err;
+    GLFWwindow* window = initGraphics();
+    
+    initFontStash();
     
     OGL triangle;
-    
     
     // performance measurement
     glfwSetTime(0);
     auto prevt = glfwGetTime();
+    float renderTime = 0.0f;
+    auto size = 10;
+    RingBuffer<float> fps(size), renderTimes(size);
     
+	float sx,sy,dx,dy;
     int winWidth, winHeight;
     int fbWidth, fbHeight;
     /* Loop until the user closes the window */
@@ -316,35 +364,34 @@ int main(int argc, const char * argv[])
         auto t = glfwGetTime();
         auto dt = t - prevt;
         prevt = t;
+        fps.push(1.0f/dt);
+        renderTimes.push(renderTime*1000.0f);
         
         //get window size
    		glfwGetWindowSize(window, &winWidth, &winHeight);
 		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-		// Calculate pixel ratio for hi-dpi devices.
-		//auto pxRatio = (float)fbWidth / (float)winWidth;
 		glViewport(0, 0, fbWidth, fbHeight);
 
+		// Calculate pixel ratio for hi-dpi devices.
+		auto pxRatio = (float)fbWidth / (float)winWidth;
+
         /* Render here */
-		glClearColor(0.5,0.5,0.5,1);//.4, .4, 0.4, 1.0);
+		glClearColor(0.5,0.5,0.5,1);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-        
-        //render text
-        stringstream textOut;
-        textOut << "font frame time: " << std::setprecision(4) << dt << "ms";
-        stringstream textFPS;
-        textFPS << "FPS: " << to_string(1.0f/dt);
-        
-        err = glGetError();
-        assert(err==GL_NO_ERROR);
-        
-		glClearColor(0.5,0.5,0.5,1);//.4, .4, 0.4, 1.0);
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-        
-		// Update and render
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         err = glGetError();
-        assert(err==GL_NO_ERROR);
+        //assert(err==GL_NO_ERROR);
+        
+        //render text
+        stringstream textOut, textOut2, textOut3;
+        textOut << "font frame time: " << std::setprecision(4) << dt*1000 << "ms";
+        textOut2  << "FPS: " << std::setprecision(4) << fps.average() << "";
+        textOut3 << "render time: " << std::setprecision(4) <<
+            renderTimes.average() << "ms";
+            //renderTime*1000 << "ms";
+        stringstream textFPS;
+        textFPS << "window size " << fbWidth << " x " << fbHeight;
         
 		sth_begin_draw(stash);
 		
@@ -352,43 +399,51 @@ int main(int argc, const char * argv[])
         
 		sx = 0; sy = fbHeight;
 		dx = sx; dy = sy;
-		int spacing = 512;
+        float size1 = 30.0f * pxRatio;
+        float size2 = 25.0f * pxRatio;
+        float leftMargin = 10 * pxRatio;
+        dy = 0;
 		if (1)
-            //for (int i=20;i<=60;i+=20)
+//        for (int i=20;i<=60;i+=2)
 		{
-			//char txt[512];
 			//sprintf(txt,"%d. The quick brown fox jumper over the lazy dog. 1234567890",i);
             const char *txt = textOut.str().c_str();
-            sth_draw_text(stash, droidRegular,40.f, 10, dy-spacing, txt, &dx,fbWidth,fbHeight);
-            spacing-=20;
+            sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt, &dx, fbWidth,fbHeight);
+            dy +=40 * pxRatio;
+            const char *txt3 = textOut2.str().c_str();
+            sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt3, &dx, fbWidth,fbHeight);
+            dy +=40 * pxRatio;
+            const char *txt4 = textOut3.str().c_str();
+            sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt4, &dx, fbWidth,fbHeight);
+            dy +=40 * pxRatio;
             const char *txt2 = textFPS.str().c_str();
-            sth_draw_text(stash, droidRegular,25.f, 10, dy-spacing, txt2, &dx,fbWidth,fbHeight);
-            spacing-=20;
+            sth_draw_text(stash, droidRegular, size2, leftMargin, dy, txt2, &dx, fbWidth,fbHeight);
+            dy +=20 * pxRatio;
 		}
         
         //sth_flush_draw(stash);
         
         dx = 0;
-        sth_draw_text(stash, droidRegular,16.f, dx, dy-80, "How does this OpenGL True Type font look? ", &dx,fbWidth,fbHeight);
+        sth_draw_text(stash, droidRegular,16.f, dx, sy-80, "How does this OpenGL True Type font look? ", &dx,fbWidth,fbHeight);
         
 		sth_end_draw(stash);
 		
 		glEnable(GL_DEPTH_TEST);
         err = glGetError();
         assert(err==GL_NO_ERROR);
-        
-        
-        
-        
-        
-        
+#if 0
+        //transform triangle
+        //set uniform
+        triangle.transform = glm::rotate(triangle.transform, 1.0f, glm::vec3(0.0, 0.0, 1.0f));
+        GLint uTransform = glGetUniformLocation(triangle.shaderProgram, "transform");
+        glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(triangle.transform));
+#endif
         //render triangle
-#if 1
         glUseProgram(triangle.shaderProgram);
         glBindVertexArray(triangle.vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
-#endif
         
+        renderTime = glfwGetTime() - t;
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
         

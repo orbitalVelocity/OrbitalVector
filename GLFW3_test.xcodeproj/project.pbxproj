@@ -9,6 +9,10 @@
 /* Begin PBXBuildFile section */
 		F159FF4D18DA86650003FF56 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67C18D9396300971791 /* libglfw3.a */; };
 		F15E8E9C19BD406B003E566C /* ogl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8E9A19BD406B003E566C /* ogl.cpp */; };
+		F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EA019BD4696003E566C /* GLPrimitiveRenderer.cpp */; };
+		F15E8EA619BD4696003E566C /* LoadShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EA219BD4696003E566C /* LoadShader.cpp */; };
+		F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB319BD47C9003E566C /* fontstash.cpp */; };
+		F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB519BD47C9003E566C /* opengl_fontstashcallbacks.cpp */; };
 		F1B3C67418D935EC00971791 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1B3C67318D935EC00971791 /* main.cpp */; };
 		F1B3C67618D935EC00971791 /* GLFW3_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1B3C67518D935EC00971791 /* GLFW3_test.1 */; };
 		F1B3C67F18D9397400971791 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67E18D9397400971791 /* IOKit.framework */; };
@@ -34,6 +38,18 @@
 		F15E8E9A19BD406B003E566C /* ogl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ogl.cpp; sourceTree = "<group>"; };
 		F15E8E9B19BD406B003E566C /* ogl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ogl.h; sourceTree = "<group>"; };
 		F15E8E9D19BD40C2003E566C /* includes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = includes.h; sourceTree = "<group>"; };
+		F15E8E9F19BD4696003E566C /* GLPrimInternalData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLPrimInternalData.h; sourceTree = "<group>"; };
+		F15E8EA019BD4696003E566C /* GLPrimitiveRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLPrimitiveRenderer.cpp; sourceTree = "<group>"; };
+		F15E8EA119BD4696003E566C /* GLPrimitiveRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLPrimitiveRenderer.h; sourceTree = "<group>"; };
+		F15E8EA219BD4696003E566C /* LoadShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LoadShader.cpp; sourceTree = "<group>"; };
+		F15E8EA319BD4696003E566C /* LoadShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadShader.h; sourceTree = "<group>"; };
+		F15E8EA419BD4696003E566C /* OpenGLInclude.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLInclude.h; sourceTree = "<group>"; };
+		F15E8EB319BD47C9003E566C /* fontstash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fontstash.cpp; sourceTree = "<group>"; };
+		F15E8EB419BD47C9003E566C /* fontstash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fontstash.h; sourceTree = "<group>"; };
+		F15E8EB519BD47C9003E566C /* opengl_fontstashcallbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = opengl_fontstashcallbacks.cpp; sourceTree = "<group>"; };
+		F15E8EB619BD47C9003E566C /* opengl_fontstashcallbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opengl_fontstashcallbacks.h; sourceTree = "<group>"; };
+		F15E8EB719BD47C9003E566C /* stb_image_write.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
+		F15E8EB819BD47C9003E566C /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
 		F1B3C67018D935EC00971791 /* GLFW3_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GLFW3_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1B3C67318D935EC00971791 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F1B3C67518D935EC00971791 /* GLFW3_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GLFW3_test.1; sourceTree = "<group>"; };
@@ -60,6 +76,32 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F15E8E9E19BD4696003E566C /* rendertest */ = {
+			isa = PBXGroup;
+			children = (
+				F15E8E9F19BD4696003E566C /* GLPrimInternalData.h */,
+				F15E8EA019BD4696003E566C /* GLPrimitiveRenderer.cpp */,
+				F15E8EA119BD4696003E566C /* GLPrimitiveRenderer.h */,
+				F15E8EA219BD4696003E566C /* LoadShader.cpp */,
+				F15E8EA319BD4696003E566C /* LoadShader.h */,
+				F15E8EA419BD4696003E566C /* OpenGLInclude.h */,
+			);
+			path = rendertest;
+			sourceTree = "<group>";
+		};
+		F15E8EB219BD47C9003E566C /* fontstash */ = {
+			isa = PBXGroup;
+			children = (
+				F15E8EB319BD47C9003E566C /* fontstash.cpp */,
+				F15E8EB419BD47C9003E566C /* fontstash.h */,
+				F15E8EB519BD47C9003E566C /* opengl_fontstashcallbacks.cpp */,
+				F15E8EB619BD47C9003E566C /* opengl_fontstashcallbacks.h */,
+				F15E8EB719BD47C9003E566C /* stb_image_write.h */,
+				F15E8EB819BD47C9003E566C /* stb_truetype.h */,
+			);
+			path = fontstash;
+			sourceTree = "<group>";
+		};
 		F1B3C66718D935EC00971791 = {
 			isa = PBXGroup;
 			children = (
@@ -69,6 +111,8 @@
 				F1B3C67E18D9397400971791 /* IOKit.framework */,
 				F1B3C67C18D9396300971791 /* libglfw3.a */,
 				F1B3C67218D935EC00971791 /* GLFW3_test */,
+				F15E8E9E19BD4696003E566C /* rendertest */,
+				F15E8EB219BD47C9003E566C /* fontstash */,
 				F1B3C67118D935EC00971791 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -145,7 +189,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				F15E8E9C19BD406B003E566C /* ogl.cpp in Sources */,
+				F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */,
 				F1B3C67418D935EC00971791 /* main.cpp in Sources */,
+				F15E8EA619BD4696003E566C /* LoadShader.cpp in Sources */,
+				F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */,
+				F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

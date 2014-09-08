@@ -7,8 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F159FF4D18DA86650003FF56 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67C18D9396300971791 /* libglfw3.a */; };
+		F15E8E9C19BD406B003E566C /* ogl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8E9A19BD406B003E566C /* ogl.cpp */; };
 		F1B3C67418D935EC00971791 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1B3C67318D935EC00971791 /* main.cpp */; };
 		F1B3C67618D935EC00971791 /* GLFW3_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1B3C67518D935EC00971791 /* GLFW3_test.1 */; };
+		F1B3C67F18D9397400971791 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67E18D9397400971791 /* IOKit.framework */; };
+		F1B3C68118D9397B00971791 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68018D9397B00971791 /* Cocoa.framework */; };
+		F1B3C68318D9398100971791 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68218D9398100971791 /* OpenGL.framework */; };
+		F1B3C68518D93A5C00971791 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68418D93A5C00971791 /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,9 +31,17 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F15E8E9A19BD406B003E566C /* ogl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ogl.cpp; sourceTree = "<group>"; };
+		F15E8E9B19BD406B003E566C /* ogl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ogl.h; sourceTree = "<group>"; };
+		F15E8E9D19BD40C2003E566C /* includes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = includes.h; sourceTree = "<group>"; };
 		F1B3C67018D935EC00971791 /* GLFW3_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GLFW3_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1B3C67318D935EC00971791 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F1B3C67518D935EC00971791 /* GLFW3_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GLFW3_test.1; sourceTree = "<group>"; };
+		F1B3C67C18D9396300971791 /* libglfw3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglfw3.a; path = ../../../../../usr/local/lib/libglfw3.a; sourceTree = "<group>"; };
+		F1B3C67E18D9397400971791 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		F1B3C68018D9397B00971791 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		F1B3C68218D9398100971791 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		F1B3C68418D93A5C00971791 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -35,6 +49,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F159FF4D18DA86650003FF56 /* libglfw3.a in Frameworks */,
+				F1B3C68518D93A5C00971791 /* QuartzCore.framework in Frameworks */,
+				F1B3C68318D9398100971791 /* OpenGL.framework in Frameworks */,
+				F1B3C68118D9397B00971791 /* Cocoa.framework in Frameworks */,
+				F1B3C67F18D9397400971791 /* IOKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -44,6 +63,11 @@
 		F1B3C66718D935EC00971791 = {
 			isa = PBXGroup;
 			children = (
+				F1B3C68418D93A5C00971791 /* QuartzCore.framework */,
+				F1B3C68218D9398100971791 /* OpenGL.framework */,
+				F1B3C68018D9397B00971791 /* Cocoa.framework */,
+				F1B3C67E18D9397400971791 /* IOKit.framework */,
+				F1B3C67C18D9396300971791 /* libglfw3.a */,
 				F1B3C67218D935EC00971791 /* GLFW3_test */,
 				F1B3C67118D935EC00971791 /* Products */,
 			);
@@ -61,6 +85,9 @@
 			isa = PBXGroup;
 			children = (
 				F1B3C67318D935EC00971791 /* main.cpp */,
+				F15E8E9A19BD406B003E566C /* ogl.cpp */,
+				F15E8E9B19BD406B003E566C /* ogl.h */,
+				F15E8E9D19BD40C2003E566C /* includes.h */,
 				F1B3C67518D935EC00971791 /* GLFW3_test.1 */,
 			);
 			path = GLFW3_test;
@@ -117,6 +144,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F15E8E9C19BD406B003E566C /* ogl.cpp in Sources */,
 				F1B3C67418D935EC00971791 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -197,6 +225,21 @@
 		F1B3C67A18D935EC00971791 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/glm/",
+					"$(SRCROOT)/lib/glew/include/",
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/include/,
+					/usr/local/include/,
+					/usr/local/Cellar/glew/1.10.0/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib/,
+					/usr/local/Cellar/glew/1.10.0/lib,
+				);
+				OTHER_LDFLAGS = "-lGLEW";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -204,6 +247,21 @@
 		F1B3C67B18D935EC00971791 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/glm/",
+					"$(SRCROOT)/lib/glew/include/",
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					/usr/include/,
+					/usr/local/include/,
+					/usr/local/Cellar/glew/1.10.0/include,
+				);
+				LIBRARY_SEARCH_PATHS = (
+					/usr/local/lib/,
+					/usr/local/Cellar/glew/1.10.0/lib,
+				);
+				OTHER_LDFLAGS = "-lGLEW";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -227,6 +285,7 @@
 				F1B3C67B18D935EC00971791 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

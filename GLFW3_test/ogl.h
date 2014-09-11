@@ -11,11 +11,12 @@
 
 #include "includes.h"
 #include <iostream>
+using namespace std;
 
 class OGL
 {
 public:
-    OGL();
+    OGL(glm::mat4 v, glm::mat4 p);
     ~OGL()
     {
         glDeleteProgram(shaderProgram);
@@ -26,6 +27,11 @@ public:
         
         glDeleteVertexArrays(1, &vao);
     }
+    void init();
+    void newProgram(map<GLuint, string> &shaders);
+    void update(float, float);
+    void loadIco();
+    void draw(glm::mat4 &camera);
 public:
     GLuint fragmentShader, shaderProgram, vertexShader;
     GLuint vbo, vao;
@@ -34,8 +40,12 @@ public:
     GLint uniform_tex;
     GLint uniform_color;
     GLint attribute_coord;
+    
+    glm::mat4 position;
+    glm::mat4 orientation;
+    float x,y;
+    int drawCount;
 #if TRANSFORM
-    glm::mat4 transform;
 #endif
 };
 

@@ -9,10 +9,23 @@
 #ifndef GLFW3_test_includes_h
 #define GLFW3_test_includes_h
 
+#include <iostream>
+#include <sstream>
+#include <string>
+#include <numeric>
+#include <vector>
+#include <chrono>
+#include <cassert>
+#include <iomanip>
+#include <map>
+
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "GLError.h"
 
-#define TRANSFORM 1
+#define TRANSFORM 0
+
+
 #endif

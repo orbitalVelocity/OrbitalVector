@@ -6,14 +6,7 @@
 //  Copyright (c) 2014 Si Li. All rights reserved.
 //
 
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <numeric>
-#include <vector>
-#include <chrono>
-#include <cassert>
-#include <iomanip>
+
 
 #define GLFW_INCLUDE_GLCOREARB
 //#include <OpenGL/glu.h>
@@ -272,9 +265,24 @@ static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 #endif
 }
 
-GLFWwindow* initGraphics()
+bool lmbPressed, rmbPressed;
+static void mb(GLFWwindow* window, int button, int action, int mods)
 {
-    GLint err;
+    if (action == GLFW_PRESS) {
+        if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+            rmbPressed = true;
+        }
+        if (button == GLFW_MOUSE_BUTTON_LEFT) {
+            lmbPressed = true;
+        }
+    } else {
+        rmbPressed = false;
+        lmbPressed = false;
+    }
+}
+
+GLFWwindow* initGraphics(int width, int height)
+{
     GLFWwindow* window;
     /* Initialize the library */
     assert(glfwInit());
@@ -285,11 +293,11 @@ GLFWwindow* initGraphics()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
-
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
     /* Create a windowed mode window and its OpenGL context */
-    window = glfwCreateWindow(640, 480, "Hello world", NULL, NULL);
+    window = glfwCreateWindow(width, height, "Hello world", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -297,6 +305,7 @@ GLFWwindow* initGraphics()
     }
    	
 	glfwSetKeyCallback(window, key);
+    glfwSetMouseButtonCallback(window, mb);
     
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
@@ -308,8 +317,7 @@ GLFWwindow* initGraphics()
 		printf("Could not init glew.\n");
 		assert(false);
 	}
-    err = glGetError();     //glew throws an error on mac for some reason
-    //assert(err==GL_NO_ERROR);
+    glGetError(); //throws away benign error from glewInit on mac
  
     return window;
 }
@@ -339,16 +347,62 @@ public:
     float _average;
     vector<T> data;
 };
+
+void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight)
+{
+	float sx,sy,dx,dy;
+   
+    sth_begin_draw(stash);
+    
+    display();
+    
+    sx = 0; sy = fbHeight;
+    dx = sx; dy = sy;
+    float size1 = 20.0f * pxRatio;
+    float leftMargin = 10 * pxRatio;
+    dy = 0;
+ 
+    for (auto &text : texts)
+    {
+        //sprintf(txt,"%d. The quick brown fox jumper over the lazy dog. 1234567890",i);
+        const char *txt = text.c_str();
+        sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt, &dx, fbWidth,fbHeight);
+        dy += size1;
+    }
+#if 0
+        const char *txt3 = textOut2.str().c_str();
+        sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt3, &dx, fbWidth,fbHeight);
+        dy +=40 * pxRatio;
+        const char *txt4 = textOut3.str().c_str();
+        sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt4, &dx, fbWidth,fbHeight);
+        dy +=40 * pxRatio;
+        const char *txt2 = textFPS.str().c_str();
+        sth_draw_text(stash, droidRegular, size2, leftMargin, dy, txt2, &dx, fbWidth,fbHeight);
+        dy +=20 * pxRatio;
+    }
+#endif
+    
+    //sth_flush_draw(stash);
+    
+    sth_end_draw(stash);
+}
+
 int main(int argc, const char * argv[])
 {
-    GLint err;
-    GLFWwindow* window = initGraphics();
+    int width = 800, height = 600;
+    GLFWwindow* window = initGraphics(width, height);
     
     initFontStash();
     
-    OGL triangle;
-        err = glGetError();
-        assert(err==GL_NO_ERROR);
+    //camera
+    glm::mat4 view = glm::lookAt(
+                       glm::vec3(0.0f, 5.0f, 0.0f),
+                       glm::vec3(0.0f, 0.0f, 0.0f),
+                       glm::vec3(0.0f, 0.0f, 1.0f)
+    );
+    glm::mat4 proj = glm::perspective(45.0f, (float)width / (float)height, 0.10f, 20.0f);
+    OGL triangle(view, proj);
+    
     
     // performance measurement
     glfwSetTime(0);
@@ -357,106 +411,75 @@ int main(int argc, const char * argv[])
     auto size = 10;
     RingBuffer<float> fps(size), renderTimes(size);
     
-	float sx,sy,dx,dy;
+    //static float x=0, y=0;
     int winWidth, winHeight;
     int fbWidth, fbHeight;
     /* Loop until the user closes the window */
-        err = glGetError();
-        assert(err==GL_NO_ERROR);
     while (!glfwWindowShouldClose(window))
     {
-        err = glGetError();
-        assert(err==GL_NO_ERROR);
         auto t = glfwGetTime();
         auto dt = t - prevt;
         prevt = t;
         fps.push(1.0f/dt);
         renderTimes.push(renderTime*1000.0f);
-        
+    
         //get window size
    		glfwGetWindowSize(window, &winWidth, &winHeight);
 		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 		glViewport(0, 0, fbWidth, fbHeight);
 
-		// Calculate pixel ratio for hi-dpi devices.
-		auto pxRatio = (float)fbWidth / (float)winWidth;
-
-        /* Render here */
-		glClearColor(0.5,0.5,0.5,1);
-		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        err = glGetError();
-        assert(err==GL_NO_ERROR);
+        /* Set up a blank screen */
+        glClearColor(0.5,0.5,0.5,1);
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        check_gl_error();
         
         //render text
-        stringstream textOut, textOut2, textOut3;
+        auto pushClear = [](vector<string> &vec, stringstream & ss)
+        {
+            vec.push_back(ss.str());
+            ss.str(string());
+            ss.clear();
+        };
+        vector<string> textOuts;
+        stringstream textOut;
         textOut << "font frame time: " << std::setprecision(4) << dt*1000 << "ms";
-        textOut2  << "FPS: " << std::setprecision(4) << fps.average() << "";
-        textOut3 << "render time: " << std::setprecision(4) <<
-            renderTimes.average() << "ms";
-            //renderTime*1000 << "ms";
-        stringstream textFPS;
-        textFPS << "window size " << fbWidth << " x " << fbHeight;
-        
-		sth_begin_draw(stash);
-		
-		display();
-        
-		sx = 0; sy = fbHeight;
-		dx = sx; dy = sy;
-        float size1 = 30.0f * pxRatio;
-        float size2 = 25.0f * pxRatio;
-        float leftMargin = 10 * pxRatio;
-        dy = 0;
-		if (1)
-//        for (int i=20;i<=60;i+=2)
-		{
-			//sprintf(txt,"%d. The quick brown fox jumper over the lazy dog. 1234567890",i);
-            const char *txt = textOut.str().c_str();
-            sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt, &dx, fbWidth,fbHeight);
-            dy +=40 * pxRatio;
-            const char *txt3 = textOut2.str().c_str();
-            sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt3, &dx, fbWidth,fbHeight);
-            dy +=40 * pxRatio;
-            const char *txt4 = textOut3.str().c_str();
-            sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt4, &dx, fbWidth,fbHeight);
-            dy +=40 * pxRatio;
-            const char *txt2 = textFPS.str().c_str();
-            sth_draw_text(stash, droidRegular, size2, leftMargin, dy, txt2, &dx, fbWidth,fbHeight);
-            dy +=20 * pxRatio;
-		}
-        
-        //sth_flush_draw(stash);
-        
-        dx = 0;
-        sth_draw_text(stash, droidRegular,16.f, dx, sy-80, "How does this OpenGL True Type font look? ", &dx,fbWidth,fbHeight);
-        
-		sth_end_draw(stash);
+        pushClear(textOuts, textOut);
+        textOut << "FPS: " << std::setprecision(4) << fps.average() << "";
+        pushClear(textOuts, textOut);
+        textOut << "render time: " << std::setprecision(4)
+                << renderTimes.average() << "ms";
+        pushClear(textOuts, textOut);
+        textOut << "x: " << triangle.x << " y: " << triangle.y << " window size " << fbWidth << " x " << fbHeight;
+        pushClear(textOuts, textOut);
+
+        // Calculate pixel ratio for hi-dpi devices.
+        auto pxRatio = (float)fbWidth / (float)winWidth;
+        printText(textOuts, pxRatio, fbWidth, fbHeight);
 		
 		glEnable(GL_DEPTH_TEST);
-        err = glGetError();
-        assert(err==GL_NO_ERROR);
+        check_gl_error();
 
         //render triangle
+        double mx, my;
+        static double prevMX = 0, prevMY = 0;
+    glfwGetCursorPos(window, &mx, &my);
+        double _x = mx - prevMX;
+        double _y = my - prevMY;
+        prevMX = mx;
+        prevMY = my;
+        
+        double mouseScale = .8;
+        
         glUseProgram(triangle.shaderProgram);
-#if TRANSFORM
-        //transform triangle
-        //set uniform
-        triangle.transform = glm::rotate(triangle.transform, 1.0f, glm::vec3(0.0, 0.0, 1.0f));
-        err = glGetError();
-        assert(err==GL_NO_ERROR);
-        GLint uTransform = glGetUniformLocation(triangle.shaderProgram, "transform");
-        err = glGetError();
-        assert(err==GL_NO_ERROR);
-        glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(triangle.transform));
-        err = glGetError();
-        assert(err==GL_NO_ERROR);
-#endif
-        glBindVertexArray(triangle.vao);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-        err = glGetError();
-        assert(err==GL_NO_ERROR);
+        if (rmbPressed) {
+            triangle.update(_x * mouseScale, _y * mouseScale);
+        }
+        glm::mat4 camera = proj * view;
+        triangle.draw(camera);
+       
+        check_gl_error();
         
         renderTime = glfwGetTime() - t;
         /* Swap front and back buffers */

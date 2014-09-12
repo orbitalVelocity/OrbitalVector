@@ -20,7 +20,7 @@ void orbitDelta(GLfloat &delta,
 {
     
     float absTol = 0;
-    float relTol = 1e-10;
+    float relTol = 1e-12;
     int nBodies = (int)sys.size();
     for (int i = 0; i < nBodies; i++)
         sys[i].si = sys[i].sn;

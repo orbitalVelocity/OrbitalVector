@@ -34,6 +34,8 @@ public:
     void scale(glm::vec3 move);
     void loadIco();
     void loadPath();
+    void loadGrid();
+    void update();
     void draw(glm::mat4 &camera, glm::vec3 color);
 public:
     GLuint fragmentShader, shaderProgram, vertexShader;

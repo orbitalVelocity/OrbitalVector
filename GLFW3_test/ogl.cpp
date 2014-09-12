@@ -45,8 +45,10 @@ void OGL::init()
 #if 1
     if (drawType == GL_TRIANGLES)
         loadIco();
-    else
+    else if (drawType == GL_LINES)
         loadPath();
+    else
+        loadGrid();
 #else
     // Create Vertex Array Object
     glGenVertexArrays(1, &vao);
@@ -234,6 +236,49 @@ void printsys(vector<body> &sys)
         cout << "p: " << printVec3(body.sn.pos) << " v: " << printVec3(body.sn.vel) << "\n";
     }
 }
+#define MAPBUFFER 1
+#if MAPBUFFER
+void calcTrajectory(float *path, int pathSteps)
+{
+    //FIXME for some reason sending copies of ks/sys to orbitDelta
+    //does not work
+    //must copy original and move it back after for now
+    auto &ks2 = ks;
+    auto &sys2 = sys;
+    auto ks3 = ks;
+    auto sys3 = sys;
+   
+    const int vecSize = 6;
+    float dt = 1;
+    int j = 1; //for testing
+    path[0] = sys2[j].sn.pos.x;
+    path[1] = sys2[j].sn.pos.y;
+    path[2] = sys2[j].sn.pos.z;
+    for(int i=0; i<pathSteps/vecSize; i++)
+    {
+        orbitDelta(dt, ks2, sys2, true);
+        
+        //for (int j=0; j < sys2.size(); j++)
+        {
+            //                int bodyIndex = j*pathSteps*vecSize;
+            int pathIndex = i*vecSize + 3;
+            path[pathIndex+0] = sys2[j].sn.pos.x;
+            path[pathIndex+1] = sys2[j].sn.pos.y;
+            path[pathIndex+2] = sys2[j].sn.pos.z;
+            if (pathSteps <= pathIndex+3)
+                break;
+            path[pathIndex+3] = sys2[j].sn.pos.x;
+            path[pathIndex+4] = sys2[j].sn.pos.y;
+            path[pathIndex+5] = sys2[j].sn.pos.z;
+            //printks(ks2);
+            //printsys(sys2);
+        }
+    }
+    sys = std::move(sys3);
+    ks = std::move(ks3);
+
+}
+#else
 void calcTrajectory(vector<float> &path)
 {
     //FIXME for some reason sending copies of ks/sys to orbitDelta
@@ -244,30 +289,42 @@ void calcTrajectory(vector<float> &path)
     auto ks3 = ks;
     auto sys3 = sys;
     
-    const int vecSize = 3;
-    for(int i=0; i<path.size()/3; i++)
+    const int vecSize = 6;
+    float dt = 1;
+    int j = 1; //for testing
+    path.at(0) = sys2[j].sn.pos.x;
+    path.at(1) = sys2[j].sn.pos.y;
+    path.at(2) = sys2[j].sn.pos.z;
+    for(int i=0; i<path.size()/vecSize; i++)
     {
-        float dt = 1;
-        orbitDelta(dt, ks2, sys2, false);
+        orbitDelta(dt, ks2, sys2, true);
         
         //for (int j=0; j < sys2.size(); j++)
         {
-            int j = 1; //for testing
             //                int bodyIndex = j*pathSteps*vecSize;
-            int pathIndex = i*vecSize;
+            int pathIndex = i*vecSize + 3;
             path.at(pathIndex+0) = sys2[j].sn.pos.x;
             path.at(pathIndex+1) = sys2[j].sn.pos.y;
             path.at(pathIndex+2) = sys2[j].sn.pos.z;
+            if (path.size() <= pathIndex+3)
+                break;
+            path.at(pathIndex+3) = sys2[j].sn.pos.x;
+            path.at(pathIndex+4) = sys2[j].sn.pos.y;
+            path.at(pathIndex+5) = sys2[j].sn.pos.z;
             //printks(ks2);
             //printsys(sys2);
         }
+    }
+    for (int i=0; i<3; i++) {
+        path.pop_back();
     }
     sys = std::move(sys3);
     ks = std::move(ks3);
 
 }
+#endif
 
-void OGL::loadPath()
+void OGL::loadGrid()
 {
     //load shaders
     string vertFilename = "planetvs.txt";
@@ -277,12 +334,28 @@ void OGL::loadPath()
     shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
     newProgram(shaders);
     
-    int vecSize = 3;
-    int pathSteps = 360;
     std::vector<float> path;
-    path.resize(pathSteps);
-    calcTrajectory(path);
-   
+    int vecSize = 3;
+    
+    float gridSize = 1024;
+    for (int i=0; i < gridSize; i+=16) {
+        path.push_back(i-gridSize/2);
+        path.push_back(gridSize/2);
+        path.push_back(0.0);
+        path.push_back(i-gridSize/2);
+        path.push_back(-gridSize/2);
+        path.push_back(0.0);
+    }
+    for (int i=0; i < gridSize; i+=16) {
+        path.push_back(gridSize/2);
+        path.push_back(i-gridSize/2);
+        path.push_back(0.0);
+        path.push_back(-gridSize/2);
+        path.push_back(i-gridSize/2);
+        path.push_back(0.0);
+    }
+    
+    drawType = GL_LINES;
     drawCount = (int)(path.size()/vecSize);
     
     glGenBuffers(1, &vbo);
@@ -304,6 +377,67 @@ void OGL::loadPath()
     
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+    
+}
+void OGL::loadPath()
+{
+    //load shaders
+    string vertFilename = "planetvs.txt";
+    string fragFilename = "planetfs.txt";
+    map<GLuint, string> shaders;
+    shaders.insert({GL_VERTEX_SHADER, vertexSource});
+    shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
+    newProgram(shaders);
+  
+    glGenBuffers(1, &vbo);
+    glGenVertexArrays(1, &vao);
+
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        check_gl_error();
+    
+    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+        check_gl_error();
+    glEnableVertexAttribArray(posAttrib);
+        check_gl_error();
+    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), NULL);
+        check_gl_error();
+    update();
+    
+}
+void OGL::update()
+{
+    int vecSize = 3;
+    int pathSteps = 360;
+#if MAPBUFFER
+    float *path;
+    drawCount = pathSteps/vecSize;
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        check_gl_error();
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pathSteps, nullptr, GL_STREAM_DRAW);
+        check_gl_error();
+    path = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+        check_gl_error();
+    calcTrajectory(path, pathSteps);
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+        check_gl_error();
+ 
+#else
+    std::vector<float> path;
+    path.resize(pathSteps);
+    
+    calcTrajectory(path);
+   
+    drawCount = (int)(path.size()/vecSize);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        check_gl_error();
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*path.size(), nullptr, GL_DYNAMIC_DRAW);
+        check_gl_error();
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*path.size(), path.data(), GL_DYNAMIC_DRAW);
+        check_gl_error();
+#endif
+    
 }
 
 void OGL::scale(const glm::vec3 s)

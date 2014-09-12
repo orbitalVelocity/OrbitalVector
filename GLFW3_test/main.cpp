@@ -252,15 +252,20 @@ void initFontStash()
 
 }
 
+bool updateOrbit = false;
 static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (key == GLFW_KEY_F && action == GLFW_PRESS)
+		sys[1].incPrograde(.1);
+	if (key == GLFW_KEY_G && action == GLFW_PRESS)
+		sys[1].incPrograde(-.1);
+    //update orbit
+    updateOrbit = true;
 #if 0
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 		blowup = !blowup;
-	if (key == GLFW_KEY_S && action == GLFW_PRESS)
-		screenshot = 1;
 	if (key == GLFW_KEY_P && action == GLFW_PRESS)
 		premult = !premult;
 #endif
@@ -288,7 +293,7 @@ static void scroll(GLFWwindow* window, double xoffset, double yoffset)
 {
     yScroll = yoffset;
     fov -= yScroll;
-    fov = (fov < 45 ) ? 45 : fov;
+    fov = (fov < 10 ) ? 10 : fov;
     fov = (fov > 120) ? 120 : fov;
     xScroll = xoffset;
 }
@@ -446,7 +451,7 @@ int main(int argc, const char * argv[])
     
     //camera
     glm::mat4 view = glm::lookAt(
-                       glm::vec3(0.0f, 1.0f, 0.0f),
+                       glm::vec3(0.0f, 10.0f, 0.0f),
                        glm::vec3(0.0f, 0.0f, 0.0f),
                        glm::vec3(0.0f, 0.0f, 1.0f)
     );
@@ -456,12 +461,14 @@ int main(int argc, const char * argv[])
         check_gl_error();
     OGL orbit(GL_LINES);
         check_gl_error();
+    OGL grid(GL_LINEAR_ATTENUATION);
+        check_gl_error();
     
     // performance measurement
     glfwSetTime(0);
     auto prevt = glfwGetTime();
     float renderTime = 0.0f;
-    auto size = 10;
+    auto size = 60;
     RingBuffer<float> fps(size), renderTimes(size);
     
     static float x=0, y=0;
@@ -476,6 +483,10 @@ int main(int argc, const char * argv[])
         prevt = t;
         fps.push(1.0f/dt);
         renderTimes.push(renderTime*1000.0f);
+        if (updateOrbit) {
+            updateOrbit = false;
+        }
+        orbit.update(); //FIXME major memory leak!
     
         //get window size
    		glfwGetWindowSize(window, &winWidth, &winHeight);
@@ -502,8 +513,6 @@ int main(int argc, const char * argv[])
         };
         vector<string> textOuts;
         stringstream textOut;
-        textOut << "font frame time: " << std::setprecision(4) << dt*1000 << "ms";
-        pushClear(textOuts, textOut);
         textOut << "FPS: " << std::setprecision(4) << fps.average() << "";
         pushClear(textOuts, textOut);
         textOut << "render time: " << std::setprecision(4)
@@ -560,6 +569,7 @@ int main(int argc, const char * argv[])
         glm::vec3 planetColor   (0.6, 0.0, 0.0);
         glm::vec3 shipColor     (0.0, 0.7, 0.0);
         glm::vec3 shipOrbitColor(0.4, 0.8, 0.0);
+        glm::vec3 gridColor     (0.5, 0.6, 0.6);
         
         globe.move(sys[0].sn.pos);
         globe.scale(glm::vec3(10));
@@ -570,6 +580,7 @@ int main(int argc, const char * argv[])
        
         glUseProgram(orbit.shaderProgram);
         orbit.draw(camera, shipOrbitColor);
+        grid.draw(camera, gridColor);
         
         check_gl_error();
         

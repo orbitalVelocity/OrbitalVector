@@ -7,6 +7,7 @@
 //
 
 #include "ogl.h"
+#include "rk547m.h"
 
 using namespace std;
 
@@ -14,42 +15,38 @@ using namespace std;
 const GLchar* vertexSource =
 "#version 150 core\n"
 "in vec3 position;"
-"out vec3 fragColor;"
+//"out vec3 fragColor;"
 "uniform mat4 transform;"
-#if TRANSFORM
-"uniform mat4 view;"
-"uniform mat4 proj;"
-"void main() {"
-"   gl_Position = proj * view transform * vec4(position, 0.0, 1.0);"
-#else
 "void main() {"
 /*
 "   vec3 surfacePos = vec3(transform * vec4(position, 1.0));"
 "    vec3 surfaceToLight = normalize(vec3(0.0, -10,10) - surfacePos);"
 "    vec3 normal = normalize(transpose(inverse(mat3(transform))) * position);"
 "    float diffuseCoefficient = max(0.0, dot(normal, -surfaceToLight));"
- */
-"   fragColor = position;"//diffuseCoefficient * vec3(1.0,1.0,1.0);"
+//*/
+//"   fragColor = position;"//diffuseCoefficient * vec3(1.0,1.0,1.0);"
 "   gl_Position = transform * vec4(position, 1.0);"
-#endif
 "}";
 const GLchar* fragmentSource =
 "#version 150 core\n"
-"in vec3 fragColor;"
+//"in vec3 fragColor;"
 "out vec4 outColor;"
-//"uniform mat4 transform;"
+"uniform vec3 color;"
 "void main() {"
-"   outColor = vec4(fragColor, 1.0);"
+"   outColor = vec4(color, 1.0);"
 "}";
 
-OGL::OGL(glm::mat4 v, glm::mat4 p) : x(0), y(90) {
+OGL::OGL(GLenum _drawType) : drawType(_drawType), x(0), y(90) {
     init();
 }
 
 void OGL::init()
 {
 #if 1
-    loadIco();
+    if (drawType == GL_TRIANGLES)
+        loadIco();
+    else
+        loadPath();
 #else
     // Create Vertex Array Object
     glGenVertexArrays(1, &vao);
@@ -182,7 +179,7 @@ void OGL::loadIco() {
         {7,10,3}, {7,6,10}, {7,11,6}, {11,0,6}, {0,1,6},
         {6,1,10}, {9,0,11}, {9,11,2}, {9,2,5}, {7,2,11} };
 
-    int depth = 0;
+    int depth = 1;
     for(auto i=0; i<20; ++i)    //each face
     {
         //call tesselate with 3 vertices
@@ -214,7 +211,109 @@ void OGL::loadIco() {
     glBindVertexArray(0);
     
 }
+string printVec3(glm::vec3 v)
+    {
+        stringstream out;
+        out << v.x << ", " << v.y << ", " << v.z;
+        return out.str();
+    }
+void printks(vector<vector<state>> &ks)
+{
+    
+    for (auto &k : ks)
+        for (auto &s : k)
+        {
+            cout << printVec3(s.pos) << " v: " << printVec3(s.vel) << "\n";
+        }
+}
 
+void printsys(vector<body> &sys)
+{
+    for (auto &body : sys)
+    {
+        cout << "p: " << printVec3(body.sn.pos) << " v: " << printVec3(body.sn.vel) << "\n";
+    }
+}
+void calcTrajectory(vector<float> &path)
+{
+    //FIXME for some reason sending copies of ks/sys to orbitDelta
+    //does not work
+    //must copy original and move it back after for now
+    auto &ks2 = ks;
+    auto &sys2 = sys;
+    auto ks3 = ks;
+    auto sys3 = sys;
+    
+    const int vecSize = 3;
+    for(int i=0; i<path.size()/3; i++)
+    {
+        float dt = 1;
+        orbitDelta(dt, ks2, sys2, false);
+        
+        //for (int j=0; j < sys2.size(); j++)
+        {
+            int j = 1; //for testing
+            //                int bodyIndex = j*pathSteps*vecSize;
+            int pathIndex = i*vecSize;
+            path.at(pathIndex+0) = sys2[j].sn.pos.x;
+            path.at(pathIndex+1) = sys2[j].sn.pos.y;
+            path.at(pathIndex+2) = sys2[j].sn.pos.z;
+            //printks(ks2);
+            //printsys(sys2);
+        }
+    }
+    sys = std::move(sys3);
+    ks = std::move(ks3);
+
+}
+
+void OGL::loadPath()
+{
+    //load shaders
+    string vertFilename = "planetvs.txt";
+    string fragFilename = "planetfs.txt";
+    map<GLuint, string> shaders;
+    shaders.insert({GL_VERTEX_SHADER, vertexSource});
+    shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
+    newProgram(shaders);
+    
+    int vecSize = 3;
+    int pathSteps = 360;
+    std::vector<float> path;
+    path.resize(pathSteps);
+    calcTrajectory(path);
+   
+    drawCount = (int)(path.size()/vecSize);
+    
+    glGenBuffers(1, &vbo);
+    glGenVertexArrays(1, &vao);
+    
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        check_gl_error();
+    
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*path.size(), path.data(), GL_DYNAMIC_DRAW);
+        check_gl_error();
+    
+    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+        check_gl_error();
+    glEnableVertexAttribArray(posAttrib);
+        check_gl_error();
+    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), NULL);
+        check_gl_error();
+    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+}
+
+void OGL::scale(const glm::vec3 s)
+{
+    size = glm::scale(glm::mat4(), s);
+}
+void OGL::move(glm::vec3 m)
+{
+    position = glm::translate(glm::mat4(), m);
+}
 void OGL::update(float dx, float dy)
 {
     y += dy;
@@ -233,12 +332,15 @@ void OGL::update(float dx, float dy)
     orientation = glm::rotate(glm::mat4(), -y, glm::vec3(1.0f, 0.0f, 0.0f));
     orientation = glm::rotate(orientation, -x, glm::vec3(0.0f, 1.0f, 0.0f));
 }
-void OGL::draw(glm::mat4 &camera)
+
+void OGL::draw(glm::mat4 &camera, glm::vec3 color)
 {
+    GLint uColor = glGetUniformLocation(shaderProgram, "color");
+    glUniform3fv(uColor, 1, glm::value_ptr(color));
     GLint uTransform = glGetUniformLocation(shaderProgram, "transform");
-    glm::mat4 mvp = camera * position * orientation;
+    glm::mat4 mvp = camera * position * size * orientation;
     glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(mvp));
     glBindVertexArray(vao);
-    glDrawArrays(GL_TRIANGLES, 0, drawCount);
+    glDrawArrays(drawType, 0, drawCount);
  
 }

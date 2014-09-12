@@ -11,6 +11,7 @@
 #define GLFW_INCLUDE_GLCOREARB
 //#include <OpenGL/glu.h>
 #include "includes.h" 
+#include "rk547m.h"
 #include "ogl.h"
 #include <GLFW/glfw3.h>
 
@@ -281,6 +282,17 @@ static void mb(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
+float yScroll, xScroll;
+float fov = 45;
+static void scroll(GLFWwindow* window, double xoffset, double yoffset)
+{
+    yScroll = yoffset;
+    fov -= yScroll;
+    fov = (fov < 45 ) ? 45 : fov;
+    fov = (fov > 120) ? 120 : fov;
+    xScroll = xoffset;
+}
+
 GLFWwindow* initGraphics(int width, int height)
 {
     GLFWwindow* window;
@@ -306,6 +318,7 @@ GLFWwindow* initGraphics(int width, int height)
    	
 	glfwSetKeyCallback(window, key);
     glfwSetMouseButtonCallback(window, mb);
+    glfwSetScrollCallback(window, scroll);
     
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
@@ -387,6 +400,43 @@ void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight)
     sth_end_draw(stash);
 }
 
+void initPhysics()
+{
+    //hardcoded, need to go into object creation code
+    double m = 7e12;
+    double G = 6.673e-11;
+    double gm = m * G;
+    sys.push_back(body(state(glm::vec3(), glm::vec3(0, 0, 0)),
+                       gm,
+                       100,
+                       nullptr,
+                       objType::PLANET
+                       )
+                  );
+    glm::vec3 rad(110, 0, 0);
+    glm::vec3 vel(0, 1.3, 0);
+    m = 1e-10;
+    gm = m * G;
+    sys.push_back(body(state(rad, vel),
+                       gm,
+                       1,
+                       nullptr,
+                       objType::SHIP
+                       )
+                  );
+
+    const int numTerms = 8;
+    ks.resize(numTerms);
+    for (auto &k : ks)
+        k.resize(sys.size());
+}
+
+string vec3String(glm::vec3 v)
+{
+    stringstream printMe;
+    printMe << to_string(v.x) << "," << to_string(v.y) << "," << to_string(v.z);
+    return printMe.str();
+}
 int main(int argc, const char * argv[])
 {
     int width = 800, height = 600;
@@ -396,13 +446,16 @@ int main(int argc, const char * argv[])
     
     //camera
     glm::mat4 view = glm::lookAt(
-                       glm::vec3(0.0f, 5.0f, 0.0f),
+                       glm::vec3(0.0f, 1.0f, 0.0f),
                        glm::vec3(0.0f, 0.0f, 0.0f),
                        glm::vec3(0.0f, 0.0f, 1.0f)
     );
-    glm::mat4 proj = glm::perspective(45.0f, (float)width / (float)height, 0.10f, 20.0f);
-    OGL triangle(view, proj);
-    
+    glm::mat4 proj = glm::perspective(45.0f, (float)width / (float)height, 0.01f, 2000.0f);
+    initPhysics();
+    OGL globe(GL_TRIANGLES);
+        check_gl_error();
+    OGL orbit(GL_LINES);
+        check_gl_error();
     
     // performance measurement
     glfwSetTime(0);
@@ -411,14 +464,15 @@ int main(int argc, const char * argv[])
     auto size = 10;
     RingBuffer<float> fps(size), renderTimes(size);
     
-    //static float x=0, y=0;
+    static float x=0, y=0;
     int winWidth, winHeight;
     int fbWidth, fbHeight;
     /* Loop until the user closes the window */
+    glm::mat4 orientation2;
     while (!glfwWindowShouldClose(window))
     {
         auto t = glfwGetTime();
-        auto dt = t - prevt;
+        float dt = t - prevt;
         prevt = t;
         fps.push(1.0f/dt);
         renderTimes.push(renderTime*1000.0f);
@@ -428,6 +482,10 @@ int main(int argc, const char * argv[])
 		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 		glViewport(0, 0, fbWidth, fbHeight);
 
+        
+        //physics
+        orbitDelta(dt, ks, sys, false);
+        
         /* Set up a blank screen */
         glClearColor(0.5,0.5,0.5,1);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -451,7 +509,11 @@ int main(int argc, const char * argv[])
         textOut << "render time: " << std::setprecision(4)
                 << renderTimes.average() << "ms";
         pushClear(textOuts, textOut);
-        textOut << "x: " << triangle.x << " y: " << triangle.y << " window size " << fbWidth << " x " << fbHeight;
+        textOut << "mouse x: " << x << " y: " << y << " window size " << fbWidth << " x " << fbHeight;
+        pushClear(textOuts, textOut);
+        textOut << "ship (" << vec3String(sys[1].sn.pos) << ")";
+        pushClear(textOuts, textOut);
+        textOut << "scroll: " << yScroll << ", " << xScroll;
         pushClear(textOuts, textOut);
 
         // Calculate pixel ratio for hi-dpi devices.
@@ -461,24 +523,54 @@ int main(int argc, const char * argv[])
 		glEnable(GL_DEPTH_TEST);
         check_gl_error();
 
-        //render triangle
+        //render meshes
         double mx, my;
         static double prevMX = 0, prevMY = 0;
-    glfwGetCursorPos(window, &mx, &my);
+        glfwGetCursorPos(window, &mx, &my);
         double _x = mx - prevMX;
         double _y = my - prevMY;
         prevMX = mx;
         prevMY = my;
+        static float z = 0;
+        double mouseScale = .1;
         
-        double mouseScale = .8;
-        
-        glUseProgram(triangle.shaderProgram);
+        glUseProgram(globe.shaderProgram);
+        static glm::mat4 roll;
         if (rmbPressed) {
-            triangle.update(_x * mouseScale, _y * mouseScale);
+            glm::mat4 orientation = glm::mat4();
+            //globe.update(_x * mouseScale, _y * mouseScale);
+            y += _y * mouseScale;
+            x += _x * mouseScale;
+            x = (x > 360) ? x - 360 : x;
+            y = (y > 90) ? 90 : y;
+            y = (y < -90) ? -90 : y;
+            orientation = glm::rotate(orientation, -y, glm::vec3(1,0,0));
+            orientation2 = glm::rotate(orientation, x, glm::vec3(0,0,1));
+        } else if (lmbPressed) {
+            z += _x * mouseScale;
+            roll = glm::rotate(glm::mat4(), z, glm::vec3(0,1,0)); //very off, don't know how to fix it though
+            
         }
-        glm::mat4 camera = proj * view;
-        triangle.draw(camera);
+        //scroll behavior
+        proj = glm::perspective(fov, (float)width / (float)height, 0.01f, 2000.0f);
+        //putting it all together
+        glm::mat4 orientation3 = glm::translate(orientation2*roll, -sys[1].sn.pos);
+        camera = proj * view * orientation3;
+        
+        glm::vec3 planetColor   (0.6, 0.0, 0.0);
+        glm::vec3 shipColor     (0.0, 0.7, 0.0);
+        glm::vec3 shipOrbitColor(0.4, 0.8, 0.0);
+        
+        globe.move(sys[0].sn.pos);
+        globe.scale(glm::vec3(10));
+        globe.draw(camera, planetColor);
+        globe.move(sys[1].sn.pos);
+        globe.scale(glm::vec3(.1,.1,.1));
+        globe.draw(camera, shipColor);
        
+        glUseProgram(orbit.shaderProgram);
+        orbit.draw(camera, shipOrbitColor);
+        
         check_gl_error();
         
         renderTime = glfwGetTime() - t;

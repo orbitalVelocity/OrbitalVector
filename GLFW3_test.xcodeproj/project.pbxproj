@@ -19,6 +19,7 @@
 		F1B3C68118D9397B00971791 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68018D9397B00971791 /* Cocoa.framework */; };
 		F1B3C68318D9398100971791 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68218D9398100971791 /* OpenGL.framework */; };
 		F1B3C68518D93A5C00971791 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68418D93A5C00971791 /* QuartzCore.framework */; };
+		F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BB301019C1DB9200E349FE /* rk547m.cpp */; };
 		F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */; };
 /* End PBXBuildFile section */
 
@@ -59,6 +60,8 @@
 		F1B3C68018D9397B00971791 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		F1B3C68218D9398100971791 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		F1B3C68418D93A5C00971791 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		F1BB301019C1DB9200E349FE /* rk547m.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rk547m.cpp; sourceTree = "<group>"; };
+		F1BB301119C1DB9200E349FE /* rk547m.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rk547m.h; sourceTree = "<group>"; };
 		F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLError.cpp; sourceTree = "<group>"; };
 		F1FDDCF919BE68D4009CFEB0 /* GLError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLError.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -131,6 +134,8 @@
 		F1B3C67218D935EC00971791 /* GLFW3_test */ = {
 			isa = PBXGroup;
 			children = (
+				F1BB301019C1DB9200E349FE /* rk547m.cpp */,
+				F1BB301119C1DB9200E349FE /* rk547m.h */,
 				F1B3C67318D935EC00971791 /* main.cpp */,
 				F15E8E9A19BD406B003E566C /* ogl.cpp */,
 				F15E8E9B19BD406B003E566C /* ogl.h */,
@@ -198,6 +203,7 @@
 				F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */,
 				F1B3C67418D935EC00971791 /* main.cpp in Sources */,
 				F15E8EA619BD4696003E566C /* LoadShader.cpp in Sources */,
+				F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */,
 				F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */,
 				F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */,
 			);

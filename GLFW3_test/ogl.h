@@ -16,7 +16,7 @@ using namespace std;
 class OGL
 {
 public:
-    OGL(glm::mat4 v, glm::mat4 p);
+    OGL(GLenum _drawType);
     ~OGL()
     {
         glDeleteProgram(shaderProgram);
@@ -30,11 +30,15 @@ public:
     void init();
     void newProgram(map<GLuint, string> &shaders);
     void update(float, float);
+    void move(glm::vec3 move);
+    void scale(glm::vec3 move);
     void loadIco();
-    void draw(glm::mat4 &camera);
+    void loadPath();
+    void draw(glm::mat4 &camera, glm::vec3 color);
 public:
     GLuint fragmentShader, shaderProgram, vertexShader;
     GLuint vbo, vao;
+    GLenum drawType;
     
     GLuint textProgram;
     GLint uniform_tex;
@@ -42,6 +46,7 @@ public:
     GLint attribute_coord;
     
     glm::mat4 position;
+    glm::mat4 size;
     glm::mat4 orientation;
     float x,y;
     int drawCount;

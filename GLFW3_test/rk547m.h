@@ -69,6 +69,9 @@ public:
     void setParent(body* p) {
         parent = p;
     }
+    void incCustom(GLfloat dv, glm::vec3 v) {
+        sn.vel += glm::normalize(v) * dv;
+    }
     void incPrograde(GLfloat dv) {
         GLfloat h = glm::length(sn.vel);// .mag();
         sn.vel += sn.vel * dv/h;

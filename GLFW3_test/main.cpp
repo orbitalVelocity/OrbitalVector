@@ -253,12 +253,13 @@ void initFontStash()
 }
 
 bool updateOrbit = false;
+glm::vec3 cameraVector;
 static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	if (key == GLFW_KEY_F && action == GLFW_PRESS)
-		sys[1].incPrograde(.1);
+		sys[1].incCustom(.1, cameraVector);
 	if (key == GLFW_KEY_G && action == GLFW_PRESS)
 		sys[1].incPrograde(-.1);
     //update orbit
@@ -371,7 +372,6 @@ void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight)
 	float sx,sy,dx,dy;
    
     sth_begin_draw(stash);
-    
     display();
     
     sx = 0; sy = fbHeight;
@@ -382,26 +382,12 @@ void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight)
  
     for (auto &text : texts)
     {
-        //sprintf(txt,"%d. The quick brown fox jumper over the lazy dog. 1234567890",i);
         const char *txt = text.c_str();
         sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt, &dx, fbWidth,fbHeight);
         dy += size1;
     }
-#if 0
-        const char *txt3 = textOut2.str().c_str();
-        sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt3, &dx, fbWidth,fbHeight);
-        dy +=40 * pxRatio;
-        const char *txt4 = textOut3.str().c_str();
-        sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt4, &dx, fbWidth,fbHeight);
-        dy +=40 * pxRatio;
-        const char *txt2 = textFPS.str().c_str();
-        sth_draw_text(stash, droidRegular, size2, leftMargin, dy, txt2, &dx, fbWidth,fbHeight);
-        dy +=20 * pxRatio;
-    }
-#endif
     
     //sth_flush_draw(stash);
-    
     sth_end_draw(stash);
 }
 
@@ -450,18 +436,24 @@ int main(int argc, const char * argv[])
     initFontStash();
     
     //camera
-    glm::mat4 view = glm::lookAt(
-                       glm::vec3(0.0f, 10.0f, 0.0f),
-                       glm::vec3(0.0f, 0.0f, 0.0f),
+    auto lookAt = [](float back, float offset)
+    {
+        return glm::lookAt(
+                       glm::vec3(0.0f, back, 0.0f),
+                       glm::vec3(0.0f, 0.0f, offset),
                        glm::vec3(0.0f, 0.0f, 1.0f)
-    );
+                    );
+    };
+    float back = 10.0f/45.0f/45.0f;
+    float offset = 3.0f/45.0f/45.0f;
+    glm::mat4 view = lookAt(back*fov*fov, offset*fov*fov);
     glm::mat4 proj = glm::perspective(45.0f, (float)width / (float)height, 0.01f, 2000.0f);
     initPhysics();
     OGL globe(GL_TRIANGLES);
         check_gl_error();
     OGL orbit(GL_LINES);
         check_gl_error();
-    OGL grid(GL_LINEAR_ATTENUATION);
+    OGL grid(GL_LINEAR_ATTENUATION); //just something that's not triangles and lines
         check_gl_error();
     
     // performance measurement
@@ -476,6 +468,7 @@ int main(int argc, const char * argv[])
     int fbWidth, fbHeight;
     /* Loop until the user closes the window */
     glm::mat4 orientation2;
+    glm::vec3 cameraGrade;
     while (!glfwWindowShouldClose(window))
     {
         auto t = glfwGetTime();
@@ -522,7 +515,9 @@ int main(int argc, const char * argv[])
         pushClear(textOuts, textOut);
         textOut << "ship (" << vec3String(sys[1].sn.pos) << ")";
         pushClear(textOuts, textOut);
-        textOut << "scroll: " << yScroll << ", " << xScroll;
+        textOut << "fov: " << fov << ", " << offset*fov*fov;
+        pushClear(textOuts, textOut);
+        textOut << "cameraGrade: " << vec3String(cameraGrade);
         pushClear(textOuts, textOut);
 
         // Calculate pixel ratio for hi-dpi devices.
@@ -546,7 +541,7 @@ int main(int argc, const char * argv[])
         glUseProgram(globe.shaderProgram);
         static glm::mat4 roll;
         if (rmbPressed) {
-            glm::mat4 orientation = glm::mat4();
+            auto orientation = glm::mat4();
             //globe.update(_x * mouseScale, _y * mouseScale);
             y += _y * mouseScale;
             x += _x * mouseScale;
@@ -562,8 +557,9 @@ int main(int argc, const char * argv[])
         }
         //scroll behavior
         proj = glm::perspective(fov, (float)width / (float)height, 0.01f, 2000.0f);
+        view = lookAt(10.0f, offset*fov*fov);
         //putting it all together
-        glm::mat4 orientation3 = glm::translate(orientation2*roll, -sys[1].sn.pos);
+        auto orientation3 = glm::translate(orientation2*roll, -sys[1].sn.pos);
         camera = proj * view * orientation3;
         
         glm::vec3 planetColor   (0.6, 0.0, 0.0);
@@ -571,13 +567,44 @@ int main(int argc, const char * argv[])
         glm::vec3 shipOrbitColor(0.4, 0.8, 0.0);
         glm::vec3 gridColor     (0.5, 0.6, 0.6);
         
+        //central planet
         globe.move(sys[0].sn.pos);
         globe.scale(glm::vec3(10));
         globe.draw(camera, planetColor);
+        
+        //ship
         globe.move(sys[1].sn.pos);
         globe.scale(glm::vec3(.1,.1,.1));
-        globe.draw(camera, shipColor);
+        //same orientation as camera
+        auto camera2 = proj * view * glm::translate(glm::mat4(), -sys[1].sn.pos);
+        globe.draw(camera2, shipColor);
        
+        //UI
+        //prograde
+        auto progradeOffset = glm::normalize(sys[1].sn.vel);
+        globe.move(sys[1].sn.pos+progradeOffset);
+        globe.scale(glm::vec3(.05));
+        globe.draw(camera, planetColor);
+        
+        //retrograde
+        globe.move(sys[1].sn.pos-progradeOffset);
+        globe.scale(glm::vec3(.05));
+        globe.draw(camera, planetColor);
+        
+        //camera grade
+        //vec4 = mat4 * vec4
+        //auto posOffset = glm::normalize()
+        auto cameraFocus = glm::vec3(0,0,offset*fov*fov);
+        auto cameraPos = glm::vec3(0,10,0);
+        cameraVector = cameraFocus - cameraPos;
+        cameraVector = glm::normalize(cameraVector);
+        cameraVector = glm::rotateX(cameraVector, y);
+        cameraVector = glm::rotateZ(cameraVector, -x);
+        cameraGrade = glm::vec3(cameraVector);
+        globe.move(sys[1].sn.pos+cameraGrade);
+        globe.scale(glm::vec3(.05));
+        globe.draw(camera, planetColor);
+        
         glUseProgram(orbit.shaderProgram);
         orbit.draw(camera, shipOrbitColor);
         grid.draw(camera, gridColor);

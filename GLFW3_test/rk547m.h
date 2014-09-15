@@ -125,7 +125,7 @@ void RK45Int(float &dt, float absTol, float relTol,
              vector<vector<state> > &ks, vector<body> &sys,
              bool varialbeDT);
 
-
+extern glm::mat4 world;
 extern vector<vector<state> > ks;           //state of system
 extern vector<body> sys;                    //sys[planetID].sn is pos
 extern vector<float> orbits;   //orbits[planetID] is path

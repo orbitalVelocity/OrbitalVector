@@ -19,6 +19,7 @@
 #include "../fontstash/opengl_fontstashcallbacks.h"
 #include "../rendertest/LoadShader.h"
 #include "../rendertest/GLPrimInternalData.h"
+#include "camera.h"
 
 #define CUSTOM_VSYNC 2
 #define VSYNC 1
@@ -252,7 +253,6 @@ void initFontStash()
 
 }
 
-bool updateOrbit = false;
 glm::vec3 cameraVector;
 static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -262,8 +262,6 @@ static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 		sys[1].incCustom(.1, cameraVector);
 	if (key == GLFW_KEY_G && action == GLFW_PRESS)
 		sys[1].incPrograde(-.1);
-    //update orbit
-    updateOrbit = true;
 #if 0
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 		blowup = !blowup;
@@ -405,7 +403,7 @@ void initPhysics()
                        )
                   );
     glm::vec3 rad(110, 0, 0);
-    glm::vec3 vel(0, 1.3, 0);
+    glm::vec3 vel(0, 0, 1.3);
     m = 1e-10;
     gm = m * G;
     sys.push_back(body(state(rad, vel),
@@ -428,6 +426,15 @@ string vec3String(glm::vec3 v)
     printMe << to_string(v.x) << "," << to_string(v.y) << "," << to_string(v.z);
     return printMe.str();
 }
+
+void initCamera(Camera & camera, int width, int height) {
+    camera.setPosition(glm::vec3(0, 0, 10.0f));
+    camera.setFocus(glm::vec3(0,3.0f,0));
+    camera.setClip(0.01f, 2000.0f);
+    camera.setFOV(45.0f);
+    camera.setAspectRatio((float)width/(float)height);
+}
+
 int main(int argc, const char * argv[])
 {
     int width = 800, height = 600;
@@ -435,20 +442,11 @@ int main(int argc, const char * argv[])
     
     initFontStash();
     
-    //camera
-    auto lookAt = [](float back, float offset)
-    {
-        return glm::lookAt(
-                       glm::vec3(0.0f, back, 0.0f),
-                       glm::vec3(0.0f, 0.0f, offset),
-                       glm::vec3(0.0f, 0.0f, 1.0f)
-                    );
-    };
-    float back = 10.0f/45.0f/45.0f;
-    float offset = 3.0f/45.0f/45.0f;
-    glm::mat4 view = lookAt(back*fov*fov, offset*fov*fov);
-    glm::mat4 proj = glm::perspective(45.0f, (float)width / (float)height, 0.01f, 2000.0f);
+    Camera camera;
+    initCamera(camera, width, height);
+    
     initPhysics();
+    
     OGL globe(GL_TRIANGLES);
         check_gl_error();
     OGL orbit(GL_LINES);
@@ -476,16 +474,12 @@ int main(int argc, const char * argv[])
         prevt = t;
         fps.push(1.0f/dt);
         renderTimes.push(renderTime*1000.0f);
-        if (updateOrbit) {
-            updateOrbit = false;
-        }
         orbit.update(); //FIXME major memory leak!
     
         //get window size
    		glfwGetWindowSize(window, &winWidth, &winHeight);
 		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
 		glViewport(0, 0, fbWidth, fbHeight);
-
         
         //physics
         orbitDelta(dt, ks, sys, false);
@@ -515,15 +509,16 @@ int main(int argc, const char * argv[])
         pushClear(textOuts, textOut);
         textOut << "ship (" << vec3String(sys[1].sn.pos) << ")";
         pushClear(textOuts, textOut);
-        textOut << "fov: " << fov << ", " << offset*fov*fov;
-        pushClear(textOuts, textOut);
         textOut << "cameraGrade: " << vec3String(cameraGrade);
+        pushClear(textOuts, textOut);
+        textOut << "camera pos: " << vec3String(camera.getPosition());
         pushClear(textOuts, textOut);
 
         // Calculate pixel ratio for hi-dpi devices.
         auto pxRatio = (float)fbWidth / (float)winWidth;
         printText(textOuts, pxRatio, fbWidth, fbHeight);
 		
+        //render everything else
 		glEnable(GL_DEPTH_TEST);
         check_gl_error();
 
@@ -541,26 +536,16 @@ int main(int argc, const char * argv[])
         glUseProgram(globe.shaderProgram);
         static glm::mat4 roll;
         if (rmbPressed) {
-            auto orientation = glm::mat4();
-            //globe.update(_x * mouseScale, _y * mouseScale);
-            y += _y * mouseScale;
-            x += _x * mouseScale;
-            x = (x > 360) ? x - 360 : x;
-            y = (y > 90) ? 90 : y;
-            y = (y < -90) ? -90 : y;
-            orientation = glm::rotate(orientation, -y, glm::vec3(1,0,0));
-            orientation2 = glm::rotate(orientation, x, glm::vec3(0,0,1));
+            camera.rotate(_y*mouseScale, _x*mouseScale);
         } else if (lmbPressed) {
             z += _x * mouseScale;
             roll = glm::rotate(glm::mat4(), z, glm::vec3(0,1,0)); //very off, don't know how to fix it though
-            
         }
         //scroll behavior
-        proj = glm::perspective(fov, (float)width / (float)height, 0.01f, 2000.0f);
-        view = lookAt(10.0f, offset*fov*fov);
-        //putting it all together
-        auto orientation3 = glm::translate(orientation2*roll, -sys[1].sn.pos);
-        camera = proj * view * orientation3;
+        camera.setFOV(fov);
+        
+        auto _camera = camera.matrix();
+        world = glm::translate(glm::mat4(), -sys[1].sn.pos);
         
         glm::vec3 planetColor   (0.6, 0.0, 0.0);
         glm::vec3 shipColor     (0.0, 0.7, 0.0);
@@ -570,44 +555,40 @@ int main(int argc, const char * argv[])
         //central planet
         globe.move(sys[0].sn.pos);
         globe.scale(glm::vec3(10));
-        globe.draw(camera, planetColor);
+        globe.draw(_camera, planetColor);
         
         //ship
         globe.move(sys[1].sn.pos);
         globe.scale(glm::vec3(.1,.1,.1));
         //same orientation as camera
-        auto camera2 = proj * view * glm::translate(glm::mat4(), -sys[1].sn.pos);
-        globe.draw(camera2, shipColor);
+//        auto camera2 = proj * view * glm::translate(glm::mat4(), -sys[1].sn.pos);
+        globe.draw(_camera, shipColor);
        
         //UI
         //prograde
         auto progradeOffset = glm::normalize(sys[1].sn.vel);
         globe.move(sys[1].sn.pos+progradeOffset);
         globe.scale(glm::vec3(.05));
-        globe.draw(camera, planetColor);
+        globe.draw(_camera, planetColor);
         
         //retrograde
         globe.move(sys[1].sn.pos-progradeOffset);
         globe.scale(glm::vec3(.05));
-        globe.draw(camera, planetColor);
+        globe.draw(_camera, planetColor);
         
         //camera grade
-        //vec4 = mat4 * vec4
-        //auto posOffset = glm::normalize()
-        auto cameraFocus = glm::vec3(0,0,offset*fov*fov);
-        auto cameraPos = glm::vec3(0,10,0);
-        cameraVector = cameraFocus - cameraPos;
+        cameraVector = camera.forward();
         cameraVector = glm::normalize(cameraVector);
         cameraVector = glm::rotateX(cameraVector, y);
         cameraVector = glm::rotateZ(cameraVector, -x);
         cameraGrade = glm::vec3(cameraVector);
         globe.move(sys[1].sn.pos+cameraGrade);
         globe.scale(glm::vec3(.05));
-        globe.draw(camera, planetColor);
+        globe.draw(_camera, planetColor);
         
         glUseProgram(orbit.shaderProgram);
-        orbit.draw(camera, shipOrbitColor);
-        grid.draw(camera, gridColor);
+        orbit.draw(_camera, shipOrbitColor);
+        grid.draw(_camera, gridColor);
         
         check_gl_error();
         

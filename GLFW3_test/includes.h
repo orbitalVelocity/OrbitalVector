@@ -17,6 +17,7 @@
 #include <chrono>
 #include <cassert>
 #include <iomanip>
+#include <fstream>
 #include <map>
 
 #include <GL/glew.h>

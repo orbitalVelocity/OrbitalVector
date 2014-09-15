@@ -10,6 +10,7 @@
 #define __GLFW3_test__ogl__
 
 #include "includes.h"
+#include "rk547m.h"
 #include <iostream>
 using namespace std;
 

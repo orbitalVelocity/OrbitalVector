@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F1011C6419C5F45A00602446 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1011C6219C5F45A00602446 /* camera.cpp */; };
+		F1011C6719C68C6700602446 /* scene.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1011C6519C68C6700602446 /* scene.cpp */; };
+		F1011C6F19C6954100602446 /* lineFragment.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1011C6B19C6953900602446 /* lineFragment.glsl */; };
+		F1011C7019C6954100602446 /* lineVertex.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1011C6C19C6953900602446 /* lineVertex.glsl */; };
+		F1011C7119C6954100602446 /* planetFragment.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1011C6D19C6953900602446 /* planetFragment.glsl */; };
+		F1011C7219C6954100602446 /* planetVertex.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1011C6E19C6953900602446 /* planetVertex.glsl */; };
 		F159FF4D18DA86650003FF56 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67C18D9396300971791 /* libglfw3.a */; };
 		F15E8E9C19BD406B003E566C /* ogl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8E9A19BD406B003E566C /* ogl.cpp */; };
 		F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EA019BD4696003E566C /* GLPrimitiveRenderer.cpp */; };
@@ -26,17 +32,29 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		F1B3C66E18D935EC00971791 /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = /usr/share/man/man1/;
-			dstSubfolderSpec = 0;
+			buildActionMask = 12;
+			dstPath = "";
+			dstSubfolderSpec = 16;
 			files = (
+				F1011C6F19C6954100602446 /* lineFragment.glsl in CopyFiles */,
+				F1011C7019C6954100602446 /* lineVertex.glsl in CopyFiles */,
+				F1011C7119C6954100602446 /* planetFragment.glsl in CopyFiles */,
+				F1011C7219C6954100602446 /* planetVertex.glsl in CopyFiles */,
 				F1B3C67618D935EC00971791 /* GLFW3_test.1 in CopyFiles */,
 			);
-			runOnlyForDeploymentPostprocessing = 1;
+			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F1011C6219C5F45A00602446 /* camera.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
+		F1011C6319C5F45A00602446 /* camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
+		F1011C6519C68C6700602446 /* scene.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = scene.cpp; sourceTree = "<group>"; };
+		F1011C6619C68C6700602446 /* scene.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scene.h; sourceTree = "<group>"; };
+		F1011C6B19C6953900602446 /* lineFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = lineFragment.glsl; path = glsl/lineFragment.glsl; sourceTree = "<group>"; };
+		F1011C6C19C6953900602446 /* lineVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = lineVertex.glsl; path = glsl/lineVertex.glsl; sourceTree = "<group>"; };
+		F1011C6D19C6953900602446 /* planetFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = planetFragment.glsl; path = glsl/planetFragment.glsl; sourceTree = "<group>"; };
+		F1011C6E19C6953900602446 /* planetVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = planetVertex.glsl; path = glsl/planetVertex.glsl; sourceTree = "<group>"; };
 		F15E8E9A19BD406B003E566C /* ogl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ogl.cpp; sourceTree = "<group>"; };
 		F15E8E9B19BD406B003E566C /* ogl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ogl.h; sourceTree = "<group>"; };
 		F15E8E9D19BD40C2003E566C /* includes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = includes.h; sourceTree = "<group>"; };
@@ -82,6 +100,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F1011C6919C6933D00602446 /* glsl */ = {
+			isa = PBXGroup;
+			children = (
+				F1011C6B19C6953900602446 /* lineFragment.glsl */,
+				F1011C6C19C6953900602446 /* lineVertex.glsl */,
+				F1011C6D19C6953900602446 /* planetFragment.glsl */,
+				F1011C6E19C6953900602446 /* planetVertex.glsl */,
+			);
+			name = glsl;
+			sourceTree = "<group>";
+		};
 		F15E8E9E19BD4696003E566C /* rendertest */ = {
 			isa = PBXGroup;
 			children = (
@@ -117,6 +146,7 @@
 				F1B3C67E18D9397400971791 /* IOKit.framework */,
 				F1B3C67C18D9396300971791 /* libglfw3.a */,
 				F1B3C67218D935EC00971791 /* GLFW3_test */,
+				F1011C6919C6933D00602446 /* glsl */,
 				F15E8E9E19BD4696003E566C /* rendertest */,
 				F15E8EB219BD47C9003E566C /* fontstash */,
 				F1B3C67118D935EC00971791 /* Products */,
@@ -134,9 +164,13 @@
 		F1B3C67218D935EC00971791 /* GLFW3_test */ = {
 			isa = PBXGroup;
 			children = (
+				F1B3C67318D935EC00971791 /* main.cpp */,
 				F1BB301019C1DB9200E349FE /* rk547m.cpp */,
 				F1BB301119C1DB9200E349FE /* rk547m.h */,
-				F1B3C67318D935EC00971791 /* main.cpp */,
+				F1011C6219C5F45A00602446 /* camera.cpp */,
+				F1011C6519C68C6700602446 /* scene.cpp */,
+				F1011C6619C68C6700602446 /* scene.h */,
+				F1011C6319C5F45A00602446 /* camera.h */,
 				F15E8E9A19BD406B003E566C /* ogl.cpp */,
 				F15E8E9B19BD406B003E566C /* ogl.h */,
 				F15E8E9D19BD40C2003E566C /* includes.h */,
@@ -198,10 +232,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1011C6719C68C6700602446 /* scene.cpp in Sources */,
 				F15E8E9C19BD406B003E566C /* ogl.cpp in Sources */,
 				F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */,
 				F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */,
 				F1B3C67418D935EC00971791 /* main.cpp in Sources */,
+				F1011C6419C5F45A00602446 /* camera.cpp in Sources */,
 				F15E8EA619BD4696003E566C /* LoadShader.cpp in Sources */,
 				F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */,
 				F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */,

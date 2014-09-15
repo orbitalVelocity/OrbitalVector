@@ -13,6 +13,7 @@ using namespace std;
 vector<vector<state> > ks;
 vector<body> sys;
 vector<float> orbits;
+glm::mat4 world;
 
 void orbitDelta(GLfloat &delta,
                 vector<vector<state> > &ks, vector<body> &sys,

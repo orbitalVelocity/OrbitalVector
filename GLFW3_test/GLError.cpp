@@ -7,7 +7,7 @@
 //
 
 #include "GLError.h"
-
+#include <cassert>
 
 #ifdef WIN32
 #  include <GL/glew.h>
@@ -23,6 +23,7 @@ using namespace std;
 void _check_gl_error(const char *file, int line) {
     GLenum err (glGetError());
     
+    bool errFlag = false;
     while(err!=GL_NO_ERROR) {
         string error;
         
@@ -36,5 +37,9 @@ void _check_gl_error(const char *file, int line) {
         
         cerr << "GL_" << error.c_str() <<" - "<<file<<":"<<line<<endl;
         err=glGetError();
+        errFlag = true;
+    }
+    if (errFlag) {
+        assert(false);
     }
 }

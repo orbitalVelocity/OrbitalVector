@@ -10,55 +10,23 @@
 #include "rk547m.h"
 
 using namespace std;
-// Shader sources
-const GLchar* vertexSourceR =
-"#version 150 core\n"
-"in vec3 position;"
-"out vec3 fragColor;"
-"uniform mat4 transform;"
-"void main() {"
-/*
-"   vec3 surfacePos = vec3(transform * vec4(position, 1.0));"
-"    vec3 surfaceToLight = normalize(vec3(0.0, -10,10) - surfacePos);"
-"    vec3 normal = normalize(transpose(inverse(mat3(transform))) * position);"
-"    float diffuseCoefficient = max(0.0, dot(normal, -surfaceToLight));"
-//*/
-"   fragColor = position;"//diffuseCoefficient * vec3(1.0,1.0,1.0);"
-"   gl_Position = transform * vec4(position, 1.0);"
-"}";
-const GLchar* fragmentSourceR =
-"#version 150 core\n"
-"in vec3 fragColor;"
-"out vec4 outColor;"
-"void main() {"
-"   outColor = vec4(fragColor, 1.0);"
-"}";
 
 
-// Shader sources
-const GLchar* vertexSource =
-"#version 150 core\n"
-"in vec3 position;"
-//"out vec3 fragColor;"
-"uniform mat4 transform;"
-"void main() {"
-/*
-"   vec3 surfacePos = vec3(transform * vec4(position, 1.0));"
-"    vec3 surfaceToLight = normalize(vec3(0.0, -10,10) - surfacePos);"
-"    vec3 normal = normalize(transpose(inverse(mat3(transform))) * position);"
-"    float diffuseCoefficient = max(0.0, dot(normal, -surfaceToLight));"
-//*/
-//"   fragColor = position;"//diffuseCoefficient * vec3(1.0,1.0,1.0);"
-"   gl_Position = transform * vec4(position, 1.0);"
-"}";
-const GLchar* fragmentSource =
-"#version 150 core\n"
-//"in vec3 fragColor;"
-"out vec4 outColor;"
-"uniform vec3 color;"
-"void main() {"
-"   outColor = vec4(color, 1.0);"
-"}";
+std::string get_file_contents(string filename)
+{
+    std::ifstream in(filename, std::ios::in | std::ios::binary);
+    if (in)
+    {
+        std::string contents;
+        in.seekg(0, std::ios::end);
+        contents.resize(in.tellg());
+        in.seekg(0, std::ios::beg);
+        in.read(&contents[0], contents.size());
+        in.close();
+        return(contents);
+    }
+    throw(errno);
+}
 
 OGL::OGL(GLenum _drawType) : drawType(_drawType), x(0), y(90) {
     init();
@@ -176,11 +144,14 @@ void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, vector<G
 
 void OGL::loadIco() {
     //load shaders
-    string vertFilename = "planetvs.txt";
-    string fragFilename = "planetfs.txt";
+    string vertFilename = "planetVertex.glsl";
+    string fragFilename = "planetFragment.glsl";
     map<GLuint, string> shaders;
-    shaders.insert({GL_VERTEX_SHADER, vertexSourceR});
-    shaders.insert({GL_FRAGMENT_SHADER, fragmentSourceR});
+    
+    auto vShader = get_file_contents(vertFilename);
+    auto fragmentSource = get_file_contents(fragFilename);
+    shaders.insert({GL_VERTEX_SHADER, vShader});
+    shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
     newProgram(shaders);
     
     glGenBuffers(1, &vbo);
@@ -351,9 +322,12 @@ void calcTrajectory(vector<float> &path)
 void OGL::loadGrid()
 {
     //load shaders
-    string vertFilename = "planetvs.txt";
-    string fragFilename = "planetfs.txt";
+    string vertFilename = "lineVertex.glsl";
+    string fragFilename = "lineFragment.glsl";
     map<GLuint, string> shaders;
+
+    auto vertexSource = get_file_contents(vertFilename);
+    auto fragmentSource = get_file_contents(fragFilename);
     shaders.insert({GL_VERTEX_SHADER, vertexSource});
     shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
     newProgram(shaders);
@@ -364,19 +338,19 @@ void OGL::loadGrid()
     float gridSize = 1024;
     for (int i=0; i < gridSize; i+=16) {
         path.push_back(i-gridSize/2);
+        path.push_back(0.0);
         path.push_back(gridSize/2);
-        path.push_back(0.0);
         path.push_back(i-gridSize/2);
-        path.push_back(-gridSize/2);
         path.push_back(0.0);
+        path.push_back(-gridSize/2);
     }
     for (int i=0; i < gridSize; i+=16) {
         path.push_back(gridSize/2);
-        path.push_back(i-gridSize/2);
         path.push_back(0.0);
+        path.push_back(i-gridSize/2);
         path.push_back(-gridSize/2);
-        path.push_back(i-gridSize/2);
         path.push_back(0.0);
+        path.push_back(i-gridSize/2);
     }
     
     drawType = GL_LINES;
@@ -406,9 +380,12 @@ void OGL::loadGrid()
 void OGL::loadPath()
 {
     //load shaders
-    string vertFilename = "planetvs.txt";
-    string fragFilename = "planetfs.txt";
+    string vertFilename = "lineVertex.glsl";
+    string fragFilename = "lineFragment.glsl";
     map<GLuint, string> shaders;
+    
+    auto vertexSource = get_file_contents(vertFilename);
+    auto fragmentSource = get_file_contents(fragFilename);
     shaders.insert({GL_VERTEX_SHADER, vertexSource});
     shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
     newProgram(shaders);
@@ -433,7 +410,7 @@ void OGL::update()
 {
     int vecSize = 3;
     int pathSteps = 360;
-#if MAPBUFFER
+
     float *path;
     drawCount = pathSteps/vecSize;
 
@@ -446,21 +423,7 @@ void OGL::update()
     calcTrajectory(path, pathSteps);
     glUnmapBuffer(GL_ARRAY_BUFFER);
         check_gl_error();
- 
-#else
-    std::vector<float> path;
-    path.resize(pathSteps);
-    
-    calcTrajectory(path);
-   
-    drawCount = (int)(path.size()/vecSize);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        check_gl_error();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*path.size(), nullptr, GL_DYNAMIC_DRAW);
-        check_gl_error();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*path.size(), path.data(), GL_DYNAMIC_DRAW);
-        check_gl_error();
-#endif
+
     
 }
 
@@ -479,14 +442,7 @@ void OGL::update(float dx, float dy)
     x = (x > 360) ? x - 360 : x;
     y = (y > 180) ? 180 : y;
     y = (y < 0) ? 0 : y;
-#if TRANSFORM
-        //transform triangle
-        //set uniform
-        GLint uView = glGetUniformLocation(shaderProgram, "view");
-        glUniformMatrix4fv(uView, 1, GL_FALSE, glm::value_ptr(view));
-        GLint uProj = glGetUniformLocation(shaderProgram, "proj");
-        glUniformMatrix4fv(uProj, 1, GL_FALSE, glm::value_ptr(proj));
-#endif
+
     orientation = glm::rotate(glm::mat4(), -y, glm::vec3(1.0f, 0.0f, 0.0f));
     orientation = glm::rotate(orientation, -x, glm::vec3(0.0f, 1.0f, 0.0f));
 }
@@ -496,7 +452,7 @@ void OGL::draw(glm::mat4 &camera, glm::vec3 color)
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
     glUniform3fv(uColor, 1, glm::value_ptr(color));
     GLint uTransform = glGetUniformLocation(shaderProgram, "transform");
-    glm::mat4 mvp = camera * position * size * orientation;
+    glm::mat4 mvp = camera * world * position * size * orientation;
     glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(mvp));
     glBindVertexArray(vao);
     glDrawArrays(drawType, 0, drawCount);

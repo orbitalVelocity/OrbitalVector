@@ -27,7 +27,20 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "GLError.h"
 
+#include "rk547m.h"
 #define TRANSFORM 0
+using namespace std;
 
+string get_file_contents(string filename);
+string printVec3(glm::vec3 v);
 
+class Obj {
+public:
+    Obj(){}
+public:
+    vector<glm::vec3> triangles, vertices, normals;
+    vector<unsigned> normCount, normIndex;
+};
+
+void readObj(char *filename, Obj &obj);
 #endif

@@ -116,6 +116,8 @@ public:
     objType type;
 };
 
+void printsys(vector<body> &sys);
+void printks(vector<vector<state>> &ks);
 void orbitDelta(GLfloat &delta,
                 vector<vector<state> > &ks, vector<body> &sys,
                 bool variableDT);

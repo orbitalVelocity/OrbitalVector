@@ -12,57 +12,15 @@
 using namespace std;
 
 
-std::string get_file_contents(string filename)
-{
-    std::ifstream in(filename, std::ios::in | std::ios::binary);
-    if (in)
-    {
-        std::string contents;
-        in.seekg(0, std::ios::end);
-        contents.resize(in.tellg());
-        in.seekg(0, std::ios::beg);
-        in.read(&contents[0], contents.size());
-        in.close();
-        return(contents);
-    }
-    throw(errno);
-}
-
 OGL::OGL(GLenum _drawType) : drawType(_drawType), x(0), y(90) {
-    init();
 }
 
 void OGL::init()
 {
-#if 1
     if (drawType == GL_TRIANGLES)
         loadIco();
-    else if (drawType == GL_LINES)
-        loadPath();
     else
         loadGrid();
-#else
-    // Create Vertex Array Object
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    
-    // Create a Vertex Buffer Object and copy the vertex data to it
-    GLfloat vertices[] = {
-        0.0f, 0.5f,
-        0.5f, -0.5f,
-        -0.5f, -0.5f
-    };
-    
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-    check_gl_error();
-    
-    map<GLuint, string> shaders;
-    shaders.insert({GL_VERTEX_SHADER, vertexSource});
-    shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
-    newProgram(shaders);
-#endif
 }
 
 void OGL::newProgram(map<GLuint, string> &shaders)
@@ -190,134 +148,18 @@ void OGL::loadIco() {
     glBufferData(GL_ARRAY_BUFFER, vertexData.size()*sizeof(float), vertexData.data(), GL_STATIC_DRAW);
     
     drawCount = (int)(vertexData.size()/3);
-#if 0
-    
-    // Specify the layout of the vertex data
-    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
-    glEnableVertexAttribArray(posAttrib);
-    check_gl_error();
-    glVertexAttribPointer(posAttrib, 2, GL_FLOAT, GL_FALSE, 0, 0);
-    check_gl_error();
-#endif
+
     GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
     glEnableVertexAttribArray(posAttrib);
     check_gl_error();
     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), NULL);
     check_gl_error();
     
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     
 }
-string printVec3(glm::vec3 v)
-    {
-        stringstream out;
-        out << v.x << ", " << v.y << ", " << v.z;
-        return out.str();
-    }
-void printks(vector<vector<state>> &ks)
-{
-    
-    for (auto &k : ks)
-        for (auto &s : k)
-        {
-            cout << printVec3(s.pos) << " v: " << printVec3(s.vel) << "\n";
-        }
-}
 
-void printsys(vector<body> &sys)
-{
-    for (auto &body : sys)
-    {
-        cout << "p: " << printVec3(body.sn.pos) << " v: " << printVec3(body.sn.vel) << "\n";
-    }
-}
-#define MAPBUFFER 1
-#if MAPBUFFER
-void calcTrajectory(float *path, int pathSteps)
-{
-    //FIXME for some reason sending copies of ks/sys to orbitDelta
-    //does not work
-    //must copy original and move it back after for now
-    auto &ks2 = ks;
-    auto &sys2 = sys;
-    auto ks3 = ks;
-    auto sys3 = sys;
-   
-    const int vecSize = 6;
-    float dt = 1;
-    int j = 1; //for testing
-    path[0] = sys2[j].sn.pos.x;
-    path[1] = sys2[j].sn.pos.y;
-    path[2] = sys2[j].sn.pos.z;
-    for(int i=0; i<pathSteps/vecSize; i++)
-    {
-        orbitDelta(dt, ks2, sys2, true);
-        
-        //for (int j=0; j < sys2.size(); j++)
-        {
-            //                int bodyIndex = j*pathSteps*vecSize;
-            int pathIndex = i*vecSize + 3;
-            path[pathIndex+0] = sys2[j].sn.pos.x;
-            path[pathIndex+1] = sys2[j].sn.pos.y;
-            path[pathIndex+2] = sys2[j].sn.pos.z;
-            if (pathSteps <= pathIndex+3)
-                break;
-            path[pathIndex+3] = sys2[j].sn.pos.x;
-            path[pathIndex+4] = sys2[j].sn.pos.y;
-            path[pathIndex+5] = sys2[j].sn.pos.z;
-            //printks(ks2);
-            //printsys(sys2);
-        }
-    }
-    sys = std::move(sys3);
-    ks = std::move(ks3);
-
-}
-#else
-void calcTrajectory(vector<float> &path)
-{
-    //FIXME for some reason sending copies of ks/sys to orbitDelta
-    //does not work
-    //must copy original and move it back after for now
-    auto &ks2 = ks;
-    auto &sys2 = sys;
-    auto ks3 = ks;
-    auto sys3 = sys;
-    
-    const int vecSize = 6;
-    float dt = 1;
-    int j = 1; //for testing
-    path.at(0) = sys2[j].sn.pos.x;
-    path.at(1) = sys2[j].sn.pos.y;
-    path.at(2) = sys2[j].sn.pos.z;
-    for(int i=0; i<path.size()/vecSize; i++)
-    {
-        orbitDelta(dt, ks2, sys2, true);
-        
-        //for (int j=0; j < sys2.size(); j++)
-        {
-            //                int bodyIndex = j*pathSteps*vecSize;
-            int pathIndex = i*vecSize + 3;
-            path.at(pathIndex+0) = sys2[j].sn.pos.x;
-            path.at(pathIndex+1) = sys2[j].sn.pos.y;
-            path.at(pathIndex+2) = sys2[j].sn.pos.z;
-            if (path.size() <= pathIndex+3)
-                break;
-            path.at(pathIndex+3) = sys2[j].sn.pos.x;
-            path.at(pathIndex+4) = sys2[j].sn.pos.y;
-            path.at(pathIndex+5) = sys2[j].sn.pos.z;
-            //printks(ks2);
-            //printsys(sys2);
-        }
-    }
-    for (int i=0; i<3; i++) {
-        path.pop_back();
-    }
-    sys = std::move(sys3);
-    ks = std::move(ks3);
-
-}
-#endif
 
 void OGL::loadGrid()
 {
@@ -373,58 +215,15 @@ void OGL::loadGrid()
     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), NULL);
         check_gl_error();
     
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     
 }
-void OGL::loadPath()
-{
-    //load shaders
-    string vertFilename = "lineVertex.glsl";
-    string fragFilename = "lineFragment.glsl";
-    map<GLuint, string> shaders;
-    
-    auto vertexSource = get_file_contents(vertFilename);
-    auto fragmentSource = get_file_contents(fragFilename);
-    shaders.insert({GL_VERTEX_SHADER, vertexSource});
-    shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
-    newProgram(shaders);
-  
-    glGenBuffers(1, &vbo);
-    glGenVertexArrays(1, &vao);
 
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        check_gl_error();
-    
-    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
-        check_gl_error();
-    glEnableVertexAttribArray(posAttrib);
-        check_gl_error();
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), NULL);
-        check_gl_error();
-    update();
-    
-}
+
 void OGL::update()
 {
-    int vecSize = 3;
-    int pathSteps = 360;
-
-    float *path;
-    drawCount = pathSteps/vecSize;
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        check_gl_error();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pathSteps, nullptr, GL_STREAM_DRAW);
-        check_gl_error();
-    path = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-        check_gl_error();
-    calcTrajectory(path, pathSteps);
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-        check_gl_error();
-
-    
+//call back function?
 }
 
 void OGL::scale(const glm::vec3 s)
@@ -451,10 +250,14 @@ void OGL::draw(glm::mat4 &camera, glm::vec3 color)
 {
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
     glUniform3fv(uColor, 1, glm::value_ptr(color));
+        check_gl_error();
     GLint uTransform = glGetUniformLocation(shaderProgram, "transform");
     glm::mat4 mvp = camera * world * position * size * orientation;
     glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(mvp));
+        check_gl_error();
     glBindVertexArray(vao);
+        check_gl_error();
     glDrawArrays(drawType, 0, drawCount);
+        check_gl_error();
  
 }

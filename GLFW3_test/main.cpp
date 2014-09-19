@@ -20,6 +20,8 @@
 #include "../rendertest/LoadShader.h"
 #include "../rendertest/GLPrimInternalData.h"
 #include "camera.h"
+#include "scene.h"
+#include "orbit.h"
 
 #define CUSTOM_VSYNC 2
 #define VSYNC 1
@@ -446,13 +448,27 @@ int main(int argc, const char * argv[])
     initCamera(camera, width, height);
     
     initPhysics();
+    Scene scene;
     
-    OGL globe(GL_TRIANGLES);
+    OGL _globe(GL_TRIANGLES);
+    _globe.init();
         check_gl_error();
-    OGL orbit(GL_LINES);
+    Orbit _orbit(GL_LINES);
+    _orbit.init();
         check_gl_error();
     OGL grid(GL_LINEAR_ATTENUATION); //just something that's not triangles and lines
+    grid.init();
         check_gl_error();
+ 
+//    scene.renderables.push_back(std::move(_globe));
+        check_gl_error();
+//    scene.renderables.push_back(std::move(_orbit));
+        check_gl_error();
+//    scene.renderables.push_back(std::move(grid));
+//        check_gl_error();
+    
+    auto &globe = _globe;//scene.renderables[0];
+    auto &orbit = _orbit;//scene.renderables[1];
     
     // performance measurement
     glfwSetTime(0);
@@ -474,7 +490,8 @@ int main(int argc, const char * argv[])
         prevt = t;
         fps.push(1.0f/dt);
         renderTimes.push(renderTime*1000.0f);
-        orbit.update(); //FIXME major memory leak!
+        orbit.update();
+//        scene.renderables[1].update();
     
         //get window size
    		glfwGetWindowSize(window, &winWidth, &winHeight);
@@ -555,7 +572,9 @@ int main(int argc, const char * argv[])
         //central planet
         globe.move(sys[0].sn.pos);
         globe.scale(glm::vec3(10));
+        check_gl_error();
         globe.draw(_camera, planetColor);
+        check_gl_error();
         
         //ship
         globe.move(sys[1].sn.pos);
@@ -563,6 +582,7 @@ int main(int argc, const char * argv[])
         //same orientation as camera
 //        auto camera2 = proj * view * glm::translate(glm::mat4(), -sys[1].sn.pos);
         globe.draw(_camera, shipColor);
+        check_gl_error();
        
         //UI
         //prograde
@@ -570,11 +590,13 @@ int main(int argc, const char * argv[])
         globe.move(sys[1].sn.pos+progradeOffset);
         globe.scale(glm::vec3(.05));
         globe.draw(_camera, planetColor);
+        check_gl_error();
         
         //retrograde
         globe.move(sys[1].sn.pos-progradeOffset);
         globe.scale(glm::vec3(.05));
         globe.draw(_camera, planetColor);
+        check_gl_error();
         
         //camera grade
         cameraVector = camera.forward();
@@ -585,11 +607,12 @@ int main(int argc, const char * argv[])
         globe.move(sys[1].sn.pos+cameraGrade);
         globe.scale(glm::vec3(.05));
         globe.draw(_camera, planetColor);
+        check_gl_error();
         
         glUseProgram(orbit.shaderProgram);
         orbit.draw(_camera, shipOrbitColor);
+        check_gl_error();
         grid.draw(_camera, gridColor);
-        
         check_gl_error();
         
         renderTime = glfwGetTime() - t;

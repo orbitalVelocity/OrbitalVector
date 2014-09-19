@@ -15,6 +15,23 @@ vector<body> sys;
 vector<float> orbits;
 glm::mat4 world;
 
+void printks(vector<vector<state>> &ks)
+{
+    
+    for (auto &k : ks)
+        for (auto &s : k)
+        {
+            cout << printVec3(s.pos) << " v: " << printVec3(s.vel) << "\n";
+        }
+}
+
+void printsys(vector<body> &sys)
+{
+    for (auto &body : sys)
+    {
+        cout << "p: " << printVec3(body.sn.pos) << " v: " << printVec3(body.sn.vel) << "\n";
+    }
+}
 void orbitDelta(GLfloat &delta,
                 vector<vector<state> > &ks, vector<body> &sys,
                 bool changeDT)

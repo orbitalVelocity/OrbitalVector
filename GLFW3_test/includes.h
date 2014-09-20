@@ -34,13 +34,29 @@ using namespace std;
 string get_file_contents(string filename);
 string printVec3(glm::vec3 v);
 
+
+vector<unsigned> normCount, normIndex;
+#if 0
+class triangle {
+  public:
+    triangle(unsigned a, unsigned b, unsigned c): idx{a, b, c} {}
+    glm::vec3 &get(unsigned i) const { return glm::vec3[idx[i]]; }
+    unsigned getIdx(unsigned i) const { return idx[i]; }
+
+    GLuint *ptr() { return idx; }
+  private:
+    GLuint idx[3];
+};
+
 class Obj {
 public:
     Obj(){}
 public:
-    vector<glm::vec3> triangles, vertices, normals;
+    vector<GLuint> triangles;
+    vector<glm::vec3> vertices, normals;
     vector<unsigned> normCount, normIndex;
 };
 
-void readObj(char *filename, Obj &obj);
+void readObj(string filename, Obj &obj);
+#endif
 #endif

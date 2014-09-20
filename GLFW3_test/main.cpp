@@ -459,6 +459,34 @@ int main(int argc, const char * argv[])
     OGL grid(GL_LINEAR_ATTENUATION); //just something that's not triangles and lines
     grid.init();
         check_gl_error();
+    
+    OGL ship(GL_TRIANGLES);
+    ship.loadShaders("shipVertex.glsl", "shipFragment.glsl");
+    Obj shipMesh;
+    readObj("jet.obj", shipMesh);
+    vector<GLuint> shipTriangles(shipMesh.triangles.size());
+    auto &triangles = shipMesh.triangles;
+    for (int i=0; i < triangles.size(); i++) {
+        shipTriangles.at(i) = triangles[i];
+    }
+    vector<float> shipVertices(shipMesh.vertices.size()*3);
+    auto &vertices = shipMesh.vertices;
+    for (int i=0; i < vertices.size(); i++) {
+        shipVertices.at(i+0) = vertices[i].x;
+        shipVertices.at(i+1) = vertices[i].y;
+        shipVertices.at(i+2) = vertices[i].z;
+    }
+    vector<float> shipNormals(shipMesh.normals.size()*3);
+    auto &normals = shipMesh.normals;
+    for (int i=0; i < normals.size(); i++) {
+        shipNormals.at(i+0) = normals[i].x;
+        shipNormals.at(i+1) = normals[i].y;
+        shipNormals.at(i+2) = normals[i].z;
+    }
+//    ship.loadAttrib("position", shipTriangles, GL_STATIC_DRAW);
+    ship.loadAttrib("position", shipVertices, GL_STATIC_DRAW);
+    ship.loadAttrib("normal", shipNormals, GL_STATIC_DRAW);
+    
  
 //    scene.renderables.push_back(std::move(_globe));
         check_gl_error();
@@ -581,7 +609,7 @@ int main(int argc, const char * argv[])
         globe.scale(glm::vec3(.1,.1,.1));
         //same orientation as camera
 //        auto camera2 = proj * view * glm::translate(glm::mat4(), -sys[1].sn.pos);
-        globe.draw(_camera, shipColor);
+        //globe.draw(_camera, shipColor);
         check_gl_error();
        
         //UI
@@ -607,6 +635,11 @@ int main(int argc, const char * argv[])
         globe.move(sys[1].sn.pos+cameraGrade);
         globe.scale(glm::vec3(.05));
         globe.draw(_camera, planetColor);
+        check_gl_error();
+        
+        ship.move(sys[1].sn.pos);
+        ship.scale(glm::vec3(.1));
+        ship.drawIndexed(_camera, planetColor, shipTriangles.data());
         check_gl_error();
         
         glUseProgram(orbit.shaderProgram);

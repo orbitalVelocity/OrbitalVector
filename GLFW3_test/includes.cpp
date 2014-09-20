@@ -32,12 +32,10 @@ string printVec3(glm::vec3 v)
     out << v.x << ", " << v.y << ", " << v.z;
     return out.str();
 }
-
-
-
+/*
 void computeNormals(vector<glm::vec3> &normals,
                     vector<unsigned> &normCount,
-                    const vector<glm::vec3> &triangles,
+                    const vector<GLuint> &triangles,
                     const vector<glm::vec3> &vertices) {
     normals = vector<glm::vec3>(vertices.size(), glm::vec3(0));
     normCount = vector<unsigned>(vertices.size(), 0);
@@ -82,19 +80,19 @@ void permuteNormals(vector<glm::vec3> &normals, vector<glm::vec3> &triangles,
     triangles = newTriangles;
 }
 
-void readObj(char *filename, Obj &obj) {
-    ifstream in(filename);
+void readObj(string filename, Obj &obj) {
+    ifstream in(filename.c_str());
     if (!in) {
         cerr << "Invalid input file." << endl;
         exit(1);
     };
     
-    unsigned maxVertex(0), curMat(0), matStartTri(0);
+    unsigned maxVertex(0);
     vector<glm::vec3> &vertices = obj.vertices;
     vector<glm::vec3> &normals = obj.normals;
     vector<unsigned> &normCount = obj.normCount;
     vector<unsigned> &normIndex = obj.normIndex;
-    vector<glm::vec3> &triangles = obj.triangles;
+    vector<GLuint> &triangles = obj.triangles;
     
     
     while (!!in) {
@@ -127,16 +125,19 @@ void readObj(char *filename, Obj &obj) {
                     normIndex.push_back(a);
                 }
             }
-            triangles.push_back(glm::vec3(x[0], x[1], x[2]));
+            for (int i=0; i<3; i++) {
+                triangles.push_back(x[i]);
+            }
             
             // Support quadrilaterals.
             while (in.peek() == ' ') in.get(c);
             if (isdigit(in.peek())) {
                 unsigned x;
                 in >> x; --x;
-                triangles.push_back(glm::vec3(triangles[triangles.size()-1].x,
-                                             triangles[triangles.size()-1].y,
-                                             x));
+                triangles.push_back(triangles[triangles.size()-1]*3+0);
+                triangles.push_back(triangles[triangles.size()-1]*3+1);
+                triangles.push_back(x);
+                
                 if (x > maxVertex) maxVertex = x;
             }
         } else {
@@ -175,8 +176,11 @@ void readObj(char *filename, Obj &obj) {
     }
     
     if (normals.size() == 0) computeNormals(normals, normCount, triangles, vertices);
-    else permuteNormals(normals, triangles, vertices, normIndex);
+    else {
+        cout << "permuting normals...\n";
+        permuteNormals(normals, triangles, vertices, normIndex);
+    }
 //    centerVertices(vertices);
 //    drawDist = computeDrawDist(vertices);
 }
-
+*/

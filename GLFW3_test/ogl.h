@@ -29,13 +29,16 @@ public:
         glDeleteVertexArrays(1, &vao);
     }
     void init();
+    void loadShaders(string vs, string fs);
     void newProgram(map<GLuint, string> &shaders);
     void update(float, float);
     void move(glm::vec3 move);
     void scale(glm::vec3 move);
     void loadIco();
     void loadGrid();
+    void loadAttrib(string name, vector<float> input, GLuint hint);
     void update();
+    void drawIndexed(glm::mat4 &camera, glm::vec3 color, GLuint* indices);
     void draw(glm::mat4 &camera, glm::vec3 color);
 public:
     GLuint fragmentShader, shaderProgram, vertexShader;

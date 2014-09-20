@@ -173,6 +173,7 @@ void Orbit::update(float dx, float dy)
 void Orbit::draw(glm::mat4 &camera, glm::vec3 color)
 {
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
+    check_gl_error();
     glUniform3fv(uColor, 1, glm::value_ptr(color));
     check_gl_error();
     GLint uTransform = glGetUniformLocation(shaderProgram, "transform");

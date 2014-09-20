@@ -55,9 +55,6 @@ void OGL::newProgram(map<GLuint, string> &shaders)
     check_gl_error();
     glUseProgram(shaderProgram);
     check_gl_error();
-
-
-
 }
 
 void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, vector<GLfloat> &buffer)
@@ -100,23 +97,21 @@ void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, vector<G
     }
 }
 
+void OGL::loadShaders(string vs, string fs)
+{
+    map<GLuint, string> shaders;
+    auto vShader = get_file_contents(vs);
+    auto fragmentSource = get_file_contents(fs);
+    shaders.insert({GL_VERTEX_SHADER, vShader});
+    shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
+    newProgram(shaders);
+}
+
 void OGL::loadIco() {
     //load shaders
     string vertFilename = "planetVertex.glsl";
     string fragFilename = "planetFragment.glsl";
-    map<GLuint, string> shaders;
-    
-    auto vShader = get_file_contents(vertFilename);
-    auto fragmentSource = get_file_contents(fragFilename);
-    shaders.insert({GL_VERTEX_SHADER, vShader});
-    shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
-    newProgram(shaders);
-    
-    glGenBuffers(1, &vbo);
-    glGenVertexArrays(1, &vao);
-    
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    loadShaders(vertFilename, fragFilename);
     
     // Make a sphere
     vector<GLfloat> vertexData;
@@ -134,7 +129,7 @@ void OGL::loadIco() {
         {7,10,3}, {7,6,10}, {7,11,6}, {11,0,6}, {0,1,6},
         {6,1,10}, {9,0,11}, {9,11,2}, {9,2,5}, {7,2,11} };
 
-    int depth = 1;
+    int depth = 2;
     for(auto i=0; i<20; ++i)    //each face
     {
         //call tesselate with 3 vertices
@@ -145,19 +140,11 @@ void OGL::loadIco() {
                    vertexData
                    );
     }
-    glBufferData(GL_ARRAY_BUFFER, vertexData.size()*sizeof(float), vertexData.data(), GL_STATIC_DRAW);
     
+    //setup GL states
     drawCount = (int)(vertexData.size()/3);
-
-    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
-    glEnableVertexAttribArray(posAttrib);
-    check_gl_error();
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), NULL);
-    check_gl_error();
-    
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    
+    drawType = GL_TRIANGLES;
+    loadAttrib("position", vertexData, GL_STATIC_DRAW);
 }
 
 
@@ -166,14 +153,10 @@ void OGL::loadGrid()
     //load shaders
     string vertFilename = "lineVertex.glsl";
     string fragFilename = "lineFragment.glsl";
-    map<GLuint, string> shaders;
-
-    auto vertexSource = get_file_contents(vertFilename);
-    auto fragmentSource = get_file_contents(fragFilename);
-    shaders.insert({GL_VERTEX_SHADER, vertexSource});
-    shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
-    newProgram(shaders);
+    loadShaders(vertFilename, fragFilename);
+ 
     
+    //generate positions
     std::vector<float> path;
     int vecSize = 3;
     
@@ -197,7 +180,13 @@ void OGL::loadGrid()
     
     drawType = GL_LINES;
     drawCount = (int)(path.size()/vecSize);
-    
+    loadAttrib("position", path, GL_DYNAMIC_DRAW);
+}
+
+//single data type per attrib
+void OGL::loadAttrib(string attribName, vector<float> path, GLuint drawHint)
+{
+    //transfer position data
     glGenBuffers(1, &vbo);
     glGenVertexArrays(1, &vao);
     
@@ -205,10 +194,11 @@ void OGL::loadGrid()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
         check_gl_error();
     
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*path.size(), path.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*path.size(), path.data(), drawHint);
         check_gl_error();
     
-    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
+    //set position attribute
+    GLint posAttrib = glGetAttribLocation(shaderProgram, attribName.c_str());
         check_gl_error();
     glEnableVertexAttribArray(posAttrib);
         check_gl_error();
@@ -246,9 +236,27 @@ void OGL::update(float dx, float dy)
     orientation = glm::rotate(orientation, -x, glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
+void OGL::drawIndexed(glm::mat4 &camera, glm::vec3 color, GLuint *indices)
+{
+    GLint uColor = glGetUniformLocation(shaderProgram, "color");
+    check_gl_error();
+    glUniform3fv(uColor, 1, glm::value_ptr(color));
+    check_gl_error();
+    GLint uTransform = glGetUniformLocation(shaderProgram, "transform");
+    glm::mat4 mvp = camera * world * position * size * orientation;
+    glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(mvp));
+    check_gl_error();
+    glBindVertexArray(vao);
+    check_gl_error();
+    glDrawElements(drawType, drawCount, GL_UNSIGNED_INT, indices);
+    check_gl_error();
+    
+}
+
 void OGL::draw(glm::mat4 &camera, glm::vec3 color)
 {
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
+        check_gl_error();
     glUniform3fv(uColor, 1, glm::value_ptr(color));
         check_gl_error();
     GLint uTransform = glGetUniformLocation(shaderProgram, "transform");

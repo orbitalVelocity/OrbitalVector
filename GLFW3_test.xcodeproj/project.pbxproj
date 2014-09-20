@@ -28,6 +28,9 @@
 		F1B3C68318D9398100971791 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68218D9398100971791 /* OpenGL.framework */; };
 		F1B3C68518D93A5C00971791 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68418D93A5C00971791 /* QuartzCore.framework */; };
 		F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BB301019C1DB9200E349FE /* rk547m.cpp */; };
+		F1C8EFBB19CD2CA3008CCC90 /* shipVertex.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */; };
+		F1C8EFBC19CD2CA3008CCC90 /* shipFragment.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */; };
+		F1C8EFBD19CD2CAA008CCC90 /* jet.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFBA19CD2C86008CCC90 /* jet.obj */; };
 		F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */; };
 /* End PBXBuildFile section */
 
@@ -38,6 +41,9 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				F1C8EFBD19CD2CAA008CCC90 /* jet.obj in CopyFiles */,
+				F1C8EFBB19CD2CA3008CCC90 /* shipVertex.glsl in CopyFiles */,
+				F1C8EFBC19CD2CA3008CCC90 /* shipFragment.glsl in CopyFiles */,
 				F1011C6F19C6954100602446 /* lineFragment.glsl in CopyFiles */,
 				F1011C7019C6954100602446 /* lineVertex.glsl in CopyFiles */,
 				F1011C7119C6954100602446 /* planetFragment.glsl in CopyFiles */,
@@ -85,6 +91,9 @@
 		F1B3C68418D93A5C00971791 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		F1BB301019C1DB9200E349FE /* rk547m.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rk547m.cpp; sourceTree = "<group>"; };
 		F1BB301119C1DB9200E349FE /* rk547m.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rk547m.h; sourceTree = "<group>"; };
+		F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = shipVertex.glsl; path = glsl/shipVertex.glsl; sourceTree = "<group>"; };
+		F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = shipFragment.glsl; path = glsl/shipFragment.glsl; sourceTree = "<group>"; };
+		F1C8EFBA19CD2C86008CCC90 /* jet.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jet.obj; sourceTree = "<group>"; };
 		F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLError.cpp; sourceTree = "<group>"; };
 		F1FDDCF919BE68D4009CFEB0 /* GLError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLError.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -110,6 +119,8 @@
 			children = (
 				F1011C6B19C6953900602446 /* lineFragment.glsl */,
 				F1011C6C19C6953900602446 /* lineVertex.glsl */,
+				F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */,
+				F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */,
 				F1011C6D19C6953900602446 /* planetFragment.glsl */,
 				F1011C6E19C6953900602446 /* planetVertex.glsl */,
 			);
@@ -155,6 +166,7 @@
 				F15E8E9E19BD4696003E566C /* rendertest */,
 				F15E8EB219BD47C9003E566C /* fontstash */,
 				F1B3C67118D935EC00971791 /* Products */,
+				F1C8EFB919CD2C86008CCC90 /* assets */,
 			);
 			sourceTree = "<group>";
 		};
@@ -187,6 +199,14 @@
 				F1FDDCF919BE68D4009CFEB0 /* GLError.h */,
 			);
 			path = GLFW3_test;
+			sourceTree = "<group>";
+		};
+		F1C8EFB919CD2C86008CCC90 /* assets */ = {
+			isa = PBXGroup;
+			children = (
+				F1C8EFBA19CD2C86008CCC90 /* jet.obj */,
+			);
+			path = assets;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

@@ -12,7 +12,8 @@
 using namespace std;
 
 
-OGL::OGL(GLenum _drawType) : drawType(_drawType), x(0), y(90) {
+OGL::OGL(GLenum _drawType) : drawType(_drawType), vboIdx(0) {
+    glGenVertexArrays(1, &vao);
 }
 
 void OGL::init()
@@ -184,17 +185,17 @@ void OGL::loadGrid()
 }
 
 //single data type per attrib
-void OGL::loadAttrib(string attribName, vector<float> path, GLuint drawHint)
+void OGL::loadAttrib(string attribName, vector<float> &path, GLuint drawHint, GLuint bufferType)
 {
     //transfer position data
-    glGenBuffers(1, &vbo);
-    glGenVertexArrays(1, &vao);
+    vbo.resize(vboIdx+1);
+    glGenBuffers(1, &vbo[vboIdx]);
     
     glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(bufferType, vbo[vboIdx]);
         check_gl_error();
     
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*path.size(), path.data(), drawHint);
+    glBufferData(bufferType, sizeof(float)*path.size(), path.data(), drawHint);
         check_gl_error();
     
     //set position attribute
@@ -205,9 +206,9 @@ void OGL::loadAttrib(string attribName, vector<float> path, GLuint drawHint)
     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), NULL);
         check_gl_error();
     
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//    glBindBuffer(bufferType, 0);
     glBindVertexArray(0);
-    
+    vboIdx++;
 }
 
 
@@ -216,51 +217,39 @@ void OGL::update()
 //call back function?
 }
 
-void OGL::scale(const glm::vec3 s)
-{
-    size = glm::scale(glm::mat4(), s);
-}
-void OGL::move(glm::vec3 m)
-{
-    position = glm::translate(glm::mat4(), m);
-}
-void OGL::update(float dx, float dy)
-{
-    y += dy;
-    x += dx;
-    x = (x > 360) ? x - 360 : x;
-    y = (y > 180) ? 180 : y;
-    y = (y < 0) ? 0 : y;
 
-    orientation = glm::rotate(glm::mat4(), -y, glm::vec3(1.0f, 0.0f, 0.0f));
-    orientation = glm::rotate(orientation, -x, glm::vec3(0.0f, 1.0f, 0.0f));
-}
 
-void OGL::drawIndexed(glm::mat4 &camera, glm::vec3 color, GLuint *indices)
+void OGL::drawIndexed(Camera &_camera, glm::mat4 &mvp,
+                      glm::vec3 color, GLuint *indices)
 {
+    glm::mat4 camera = _camera.matrix();
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
     check_gl_error();
     glUniform3fv(uColor, 1, glm::value_ptr(color));
     check_gl_error();
+    GLint uCamera = glGetUniformLocation(shaderProgram, "cameraPos");
+    check_gl_error();
+    glUniform3fv(uCamera, 1, glm::value_ptr(_camera.position));
+    check_gl_error();
     GLint uTransform = glGetUniformLocation(shaderProgram, "transform");
-    glm::mat4 mvp = camera * world * position * size * orientation;
+//    glm::mat4 mvp = camera * world * position * size * orientation;
     glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(mvp));
     check_gl_error();
     glBindVertexArray(vao);
     check_gl_error();
-    glDrawElements(drawType, drawCount, GL_UNSIGNED_INT, indices);
+    glDrawElements(drawType, drawCount, GL_UNSIGNED_INT, (void*)0);
     check_gl_error();
     
 }
 
-void OGL::draw(glm::mat4 &camera, glm::vec3 color)
+void OGL::draw(glm::mat4 &mvp, glm::vec3 color)
 {
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
         check_gl_error();
     glUniform3fv(uColor, 1, glm::value_ptr(color));
         check_gl_error();
     GLint uTransform = glGetUniformLocation(shaderProgram, "transform");
-    glm::mat4 mvp = camera * world * position * size * orientation;
+//    glm::mat4 mvp = camera * world * position * size * orientation;
     glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(mvp));
         check_gl_error();
     glBindVertexArray(vao);

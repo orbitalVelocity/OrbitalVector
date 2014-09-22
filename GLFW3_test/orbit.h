@@ -30,9 +30,6 @@ public:
     }
     void init();
     void newProgram(map<GLuint, string> &shaders);
-    void update(float, float);
-    void move(glm::vec3 move);
-    void scale(glm::vec3 move);
     void loadPath();
     void update();
     void draw(glm::mat4 &camera, glm::vec3 color);
@@ -46,9 +43,7 @@ public:
     GLint uniform_color;
     GLint attribute_coord;
     
-    glm::mat4 position;
-    glm::mat4 size;
-    glm::mat4 orientation;
+    
     float x,y;
     int drawCount;
 };

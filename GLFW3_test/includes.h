@@ -35,8 +35,8 @@ string get_file_contents(string filename);
 string printVec3(glm::vec3 v);
 
 
-vector<unsigned> normCount, normIndex;
 #if 0
+vector<unsigned> normCount, normIndex;
 class triangle {
   public:
     triangle(unsigned a, unsigned b, unsigned c): idx{a, b, c} {}

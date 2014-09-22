@@ -1,10 +1,8 @@
 #version 150 core
 in vec3 position;
 in vec3 normal;
-//in vec3 vertices;
 out vec3 fragNormal;
-//out vec3 fragVertices;
-//out vec3 fragColor;
+out vec3 fragVertex;
 uniform mat4 transform;
 void main() {
     /*
@@ -15,5 +13,6 @@ void main() {
      //*/
     //   fragColor = position;//diffuseCoefficient * vec3(1.0,1.0,1.0);
     fragNormal = normal;
+    fragVertex = position;
     gl_Position = transform * vec4(position, 1.0);
 }

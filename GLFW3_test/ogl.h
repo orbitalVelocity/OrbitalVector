@@ -11,6 +11,7 @@
 
 #include "includes.h"
 #include "rk547m.h"
+#include "camera.h"
 #include <iostream>
 using namespace std;
 
@@ -24,37 +25,36 @@ public:
         glDeleteShader(fragmentShader);
         glDeleteShader(vertexShader);
         
-        glDeleteBuffers(1, &vbo);
+        for (auto &v : vbo)
+            glDeleteBuffers(1, &v);
+        glDeleteBuffers(1, &elementBuffer);
         
         glDeleteVertexArrays(1, &vao);
     }
     void init();
     void loadShaders(string vs, string fs);
     void newProgram(map<GLuint, string> &shaders);
-    void update(float, float);
-    void move(glm::vec3 move);
-    void scale(glm::vec3 move);
     void loadIco();
     void loadGrid();
-    void loadAttrib(string name, vector<float> input, GLuint hint);
+    void loadAttrib(string name, vector<float> &input,
+                    GLuint hint, GLuint type=GL_ARRAY_BUFFER);
     void update();
-    void drawIndexed(glm::mat4 &camera, glm::vec3 color, GLuint* indices);
+    void drawIndexed(Camera &camera, glm::mat4 &mvp,
+                     glm::vec3 color, GLuint* indices);
     void draw(glm::mat4 &camera, glm::vec3 color);
 public:
     GLuint fragmentShader, shaderProgram, vertexShader;
-    GLuint vbo, vao;
+    GLuint vao, elementBuffer;
+    vector<GLuint> vbo;
+    int vboIdx;
     GLenum drawType;
+    int drawCount;
     
     GLuint textProgram;
     GLint uniform_tex;
     GLint uniform_color;
     GLint attribute_coord;
-    
-    glm::mat4 position;
-    glm::mat4 size;
-    glm::mat4 orientation;
-    float x,y;
-    int drawCount;
+
 #if TRANSFORM
 #endif
 };

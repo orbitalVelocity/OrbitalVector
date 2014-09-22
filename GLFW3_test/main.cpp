@@ -22,6 +22,8 @@
 #include "camera.h"
 #include "scene.h"
 #include "orbit.h"
+#include "tiny_obj_loader.h"
+#include "spatial.h"
 
 #define CUSTOM_VSYNC 2
 #define VSYNC 1
@@ -437,8 +439,94 @@ void initCamera(Camera & camera, int width, int height) {
     camera.setAspectRatio((float)width/(float)height);
 }
 
+static void PrintInfo(const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials)
+{
+  std::cout << "# of shapes    : " << shapes.size() << std::endl;
+  std::cout << "# of materials : " << materials.size() << std::endl;
+
+  for (size_t i = 0; i < shapes.size(); i++) {
+    printf("shape[%ld].name = %s\n", i, shapes[i].name.c_str());
+    printf("Size of shape[%ld].indices: %ld\n", i, shapes[i].mesh.indices.size());
+    printf("Size of shape[%ld].material_ids: %ld\n", i, shapes[i].mesh.material_ids.size());
+    assert((shapes[i].mesh.indices.size() % 3) == 0);
+    for (size_t f = 0; f < shapes[i].mesh.indices.size() / 3; f++) {
+      printf("  idx[%ld] = %d, %d, %d. mat_id = %d\n", f,
+             shapes[i].mesh.indices[3*f+0],
+             shapes[i].mesh.indices[3*f+1],
+             shapes[i].mesh.indices[3*f+2],
+             shapes[i].mesh.material_ids[f]);
+    }
+
+    printf("shape[%ld].vertices: %ld\n", i, shapes[i].mesh.positions.size());
+    assert((shapes[i].mesh.positions.size() % 3) == 0);
+    for (size_t v = 0; v < shapes[i].mesh.positions.size() / 3; v++) {
+      printf("  v[%ld] = (%f, %f, %f)\n", v,
+        shapes[i].mesh.positions[3*v+0],
+        shapes[i].mesh.positions[3*v+1],
+        shapes[i].mesh.positions[3*v+2]);
+    }
+    printf("shape[%ld].normals: %ld\n", i, shapes[i].mesh.normals.size());
+    for (size_t v = 0; v < shapes[i].mesh.normals.size() / 3; v++) {
+      printf("  n[%ld] = (%f, %f, %f)\n", v,
+        shapes[i].mesh.normals[3*v+0],
+        shapes[i].mesh.normals[3*v+1],
+        shapes[i].mesh.normals[3*v+2]);
+    }
+  }
+
+//  for (size_t i = 0; i < materials.size(); i++) {
+//    printf("material[%ld].name = %s\n", i, materials[i].name.c_str());
+//    printf("  material.Ka = (%f, %f ,%f)\n", materials[i].ambient[0], materials[i].ambient[1], materials[i].ambient[2]);
+//    printf("  material.Kd = (%f, %f ,%f)\n", materials[i].diffuse[0], materials[i].diffuse[1], materials[i].diffuse[2]);
+//    printf("  material.Ks = (%f, %f ,%f)\n", materials[i].specular[0], materials[i].specular[1], materials[i].specular[2]);
+//    printf("  material.Tr = (%f, %f ,%f)\n", materials[i].transmittance[0], materials[i].transmittance[1], materials[i].transmittance[2]);
+//    printf("  material.Ke = (%f, %f ,%f)\n", materials[i].emission[0], materials[i].emission[1], materials[i].emission[2]);
+//    printf("  material.Ns = %f\n", materials[i].shininess);
+//    printf("  material.Ni = %f\n", materials[i].ior);
+//    printf("  material.dissolve = %f\n", materials[i].dissolve);
+//    printf("  material.illum = %d\n", materials[i].illum);
+//    printf("  material.map_Ka = %s\n", materials[i].ambient_texname.c_str());
+//    printf("  material.map_Kd = %s\n", materials[i].diffuse_texname.c_str());
+//    printf("  material.map_Ks = %s\n", materials[i].specular_texname.c_str());
+//    printf("  material.map_Ns = %s\n", materials[i].normal_texname.c_str());
+//    std::map<std::string, std::string>::const_iterator it(materials[i].unknown_parameter.begin());
+//    std::map<std::string, std::string>::const_iterator itEnd(materials[i].unknown_parameter.end());
+//    for (; it != itEnd; it++) {
+//      printf("  material.%s = %s\n", it->first.c_str(), it->second.c_str());
+//    }
+//    printf("\n");
+//  }
+}
+
+std::vector<tinyobj::shape_t> shapes;
+std::vector<tinyobj::material_t> materials;
+
+static bool
+TestLoadObj(
+            const char* filename,
+            const char* basepath = NULL)
+{
+    std::cout << "Loading " << filename << std::endl;
+    
+    std::string err = tinyobj::LoadObj(shapes, materials, filename, basepath);
+    
+    if (!err.empty()) {
+        std::cerr << err << std::endl;
+        return false;
+    }
+    
+    PrintInfo(shapes, materials);
+    
+    return true;
+}
 int main(int argc, const char * argv[])
 {
+//    assert(true == TestLoadObj("cornell_box.obj"));
+//    assert(true == TestLoadObj("jet.obj"));
+//    assert(true == TestLoadObj("cube.obj"));
+//    assert(true == TestLoadObj("marker.obj"));
+//    return 1;
+    
     int width = 800, height = 600;
     GLFWwindow* window = initGraphics(width, height);
     
@@ -449,6 +537,9 @@ int main(int argc, const char * argv[])
     
     initPhysics();
     Scene scene;
+    
+    //create Spatial objects for each thing FIXME not done yet
+    Spatial sGlobe, sOrbit, sShip;
     
     OGL _globe(GL_TRIANGLES);
     _globe.init();
@@ -462,30 +553,27 @@ int main(int argc, const char * argv[])
     
     OGL ship(GL_TRIANGLES);
     ship.loadShaders("shipVertex.glsl", "shipFragment.glsl");
-    Obj shipMesh;
-    readObj("jet.obj", shipMesh);
-    vector<GLuint> shipTriangles(shipMesh.triangles.size());
-    auto &triangles = shipMesh.triangles;
-    for (int i=0; i < triangles.size(); i++) {
-        shipTriangles.at(i) = triangles[i];
-    }
-    vector<float> shipVertices(shipMesh.vertices.size()*3);
-    auto &vertices = shipMesh.vertices;
-    for (int i=0; i < vertices.size(); i++) {
-        shipVertices.at(i+0) = vertices[i].x;
-        shipVertices.at(i+1) = vertices[i].y;
-        shipVertices.at(i+2) = vertices[i].z;
-    }
-    vector<float> shipNormals(shipMesh.normals.size()*3);
-    auto &normals = shipMesh.normals;
-    for (int i=0; i < normals.size(); i++) {
-        shipNormals.at(i+0) = normals[i].x;
-        shipNormals.at(i+1) = normals[i].y;
-        shipNormals.at(i+2) = normals[i].z;
-    }
-//    ship.loadAttrib("position", shipTriangles, GL_STATIC_DRAW);
-    ship.loadAttrib("position", shipVertices, GL_STATIC_DRAW);
-    ship.loadAttrib("normal", shipNormals, GL_STATIC_DRAW);
+//    assert(true == TestLoadObj("cornell_box.obj"));
+//    assert(true == TestLoadObj("suzanne.obj"));
+    assert(true == TestLoadObj("terran_corvette.obj"));
+//    assert(true == TestLoadObj("marker.obj"));
+        check_gl_error();
+
+    auto shipIdx = 0;
+    ship.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
+        check_gl_error();
+    ship.loadAttrib("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
+    glBindVertexArray(ship.vao);
+        check_gl_error();
+    glGenBuffers(1, &ship.elementBuffer);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship.elementBuffer);
+        check_gl_error();
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                 shapes[shipIdx].mesh.indices.size() * sizeof(GLuint),
+                 shapes[shipIdx].mesh.indices.data(),
+                 GL_STATIC_DRAW
+                 );
+    ship.drawCount = (int)shapes[shipIdx].mesh.indices.size();
     
  
 //    scene.renderables.push_back(std::move(_globe));
@@ -511,6 +599,7 @@ int main(int argc, const char * argv[])
     /* Loop until the user closes the window */
     glm::mat4 orientation2;
     glm::vec3 cameraGrade;
+    glm::mat4 mvp;
     while (!glfwWindowShouldClose(window))
     {
         auto t = glfwGetTime();
@@ -598,32 +687,27 @@ int main(int argc, const char * argv[])
         glm::vec3 gridColor     (0.5, 0.6, 0.6);
         
         //central planet
-        globe.move(sys[0].sn.pos);
-        globe.scale(glm::vec3(10));
+        sGlobe.move(sys[0].sn.pos);
+        sGlobe.scale(glm::vec3(10));
         check_gl_error();
-        globe.draw(_camera, planetColor);
-        check_gl_error();
-        
-        //ship
-        globe.move(sys[1].sn.pos);
-        globe.scale(glm::vec3(.1,.1,.1));
-        //same orientation as camera
-//        auto camera2 = proj * view * glm::translate(glm::mat4(), -sys[1].sn.pos);
-        //globe.draw(_camera, shipColor);
+        mvp = _camera * world * sGlobe.transform();
+        globe.draw(mvp, planetColor);
         check_gl_error();
        
         //UI
         //prograde
         auto progradeOffset = glm::normalize(sys[1].sn.vel);
-        globe.move(sys[1].sn.pos+progradeOffset);
-        globe.scale(glm::vec3(.05));
-        globe.draw(_camera, planetColor);
+        sGlobe.move(sys[1].sn.pos+progradeOffset);
+        sGlobe.scale(glm::vec3(.05));
+        mvp = _camera * world * sGlobe.transform();
+        globe.draw(mvp, planetColor);
         check_gl_error();
         
         //retrograde
-        globe.move(sys[1].sn.pos-progradeOffset);
-        globe.scale(glm::vec3(.05));
-        globe.draw(_camera, planetColor);
+        sGlobe.move(sys[1].sn.pos-progradeOffset);
+        sGlobe.scale(glm::vec3(.05));
+        mvp = _camera * world * sGlobe.transform();
+        globe.draw(mvp, planetColor);
         check_gl_error();
         
         //camera grade
@@ -632,20 +716,28 @@ int main(int argc, const char * argv[])
         cameraVector = glm::rotateX(cameraVector, y);
         cameraVector = glm::rotateZ(cameraVector, -x);
         cameraGrade = glm::vec3(cameraVector);
-        globe.move(sys[1].sn.pos+cameraGrade);
-        globe.scale(glm::vec3(.05));
-        globe.draw(_camera, planetColor);
+        sGlobe.move(sys[1].sn.pos+cameraGrade);
+        sGlobe.scale(glm::vec3(.05));
+        
+        mvp = _camera * world * sGlobe.transform();
+        globe.draw(mvp, planetColor);
         check_gl_error();
         
-        ship.move(sys[1].sn.pos);
-        ship.scale(glm::vec3(.1));
-        ship.drawIndexed(_camera, planetColor, shipTriangles.data());
+        //ship
+        glUseProgram(ship.shaderProgram);
+        sShip.move(sys[1].sn.pos);
+        sShip.scale(glm::vec3(.001));
+        auto orientation = glm::orientation(sys[1].sn.vel, glm::vec3(0,1,0));
+        sShip.rotate(orientation);
+        mvp = camera.matrix() * world * sShip.transform();
+        ship.drawIndexed(camera, mvp, planetColor, shapes[shipIdx].mesh.indices.data());
         check_gl_error();
         
         glUseProgram(orbit.shaderProgram);
-        orbit.draw(_camera, shipOrbitColor);
+        mvp = _camera * world;
+        orbit.draw(mvp, shipOrbitColor);
         check_gl_error();
-        grid.draw(_camera, gridColor);
+        grid.draw(mvp, gridColor);
         check_gl_error();
         
         renderTime = glfwGetTime() - t;

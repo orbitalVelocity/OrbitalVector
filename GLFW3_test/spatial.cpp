@@ -20,12 +20,16 @@ void Spatial::rotate(float dx, float dy)
 {
     y += dy;
     x += dx;
-    x = (x > 360) ? x - 360 : x;
-    y = (y > 180) ? 180 : y;
-    y = (y < 0) ? 0 : y;
+//    x = (x > 360) ? x - 360 : x;
+//    y = (y > 180) ? 180 : y;
+//    y = (y < 0) ? 0 : y;
     
-    orientation = glm::rotate(glm::mat4(), -y, glm::vec3(1.0f, 0.0f, 0.0f));
-    orientation = glm::rotate(orientation, -x, glm::vec3(0.0f, 1.0f, 0.0f));
+    auto rotateYAxis = glm::rotate(glm::mat4(), -dx, xAxis);
+    yAxis = glm::vec3(rotateYAxis * glm::vec4(yAxis, 1.0f));
+    auto rotateXAxis = glm::rotate(glm::mat4(), -dy, yAxis);
+    xAxis = glm::vec3(rotateXAxis * glm::vec4(xAxis, 1.0f));
+    orientation = glm::rotate(glm::mat4(), -x, xAxis);
+    orientation = glm::rotate(orientation, -y, yAxis);
 }
 
 void Spatial::rotate(glm::mat4 &m)

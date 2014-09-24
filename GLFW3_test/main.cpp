@@ -31,7 +31,7 @@
 using namespace std;
 
 static PrimInternalData sData;
-glm::mat4 camera;
+Camera camera;
 
 void errorcb(int error, const char* desc)
 {
@@ -257,6 +257,8 @@ void initFontStash()
 
 }
 
+void addSatellite(body &);
+
 glm::vec3 cameraVector;
 static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -266,6 +268,17 @@ static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 		sys[1].incCustom(.1, cameraVector);
 	if (key == GLFW_KEY_G && action == GLFW_PRESS)
 		sys[1].incPrograde(-.1);
+    
+	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
+    {
+        double m = 1e-2;
+        double G = 6.673e-11;
+        double gm = m * G;
+        auto pos = sys[1].sn.pos + glm::normalize(sys[1].sn.vel);
+        auto vel = sys[1].sn.vel + glm::normalize(camera.forward()) * 100.0f;
+        body bullet(state(pos, vel), 10, gm, nullptr, objType::SHIP);
+        addSatellite(bullet);
+    }
 #if 0
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
 		blowup = !blowup;
@@ -408,7 +421,7 @@ void initPhysics()
                   );
     glm::vec3 rad(110, 0, 0);
     glm::vec3 vel(0, 0, 1.3);
-    m = 1e-10;
+    m = 1e5;
     gm = m * G;
     sys.push_back(body(state(rad, vel),
                        gm,
@@ -422,6 +435,16 @@ void initPhysics()
     ks.resize(numTerms);
     for (auto &k : ks)
         k.resize(sys.size());
+}
+
+void addSatellite(body &b)
+{
+    sys.push_back(b);
+    for (auto &k : ks)
+    {
+        k.clear();
+        k.resize(sys.size());
+    }
 }
 
 string vec3String(glm::vec3 v)
@@ -514,8 +537,23 @@ TestLoadObj(
         std::cerr << err << std::endl;
         return false;
     }
-    
-    PrintInfo(shapes, materials);
+    glm::vec3 com;
+    auto &pos = shapes[0].mesh.positions;
+    for (int i=0; i< pos.size(); i+=3)
+    {
+        com += glm::vec3(pos[i+0],
+                         pos[i+1],
+                         pos[i+2]);
+    }
+    com /= pos.size();
+    for (int i=0; i< pos.size(); i+=3)
+    {
+        pos[i+0] -= com.x;
+        pos[i+1] -= 3*com.y;
+        pos[i+2] -= com.z;
+    }
+    cout << "center of mass in local coord is " << vec3String(com);
+    //PrintInfo(shapes, materials);
     
     return true;
 }
@@ -532,20 +570,26 @@ int main(int argc, const char * argv[])
     
     initFontStash();
     
-    Camera camera;
     initCamera(camera, width, height);
     
     initPhysics();
     Scene scene;
     
     //create Spatial objects for each thing FIXME not done yet
-    Spatial sGlobe, sOrbit, sShip;
+    vector<Spatial> sGlobe, sOrbit, sShip;
+    sGlobe.resize(3);
+    sGlobe[0].scale(glm::vec3(10));
+    sGlobe[1].scale(glm::vec3(.05));
+    sGlobe[2].scale(glm::vec3(.05));
+    sOrbit.push_back(Spatial());
+    sShip.push_back(Spatial());
+    sShip[0].scale(glm::vec3(.001));
     
-    OGL _globe(GL_TRIANGLES);
-    _globe.init();
+    OGL globe(GL_TRIANGLES);
+    globe.init();
         check_gl_error();
-    Orbit _orbit(GL_LINES);
-    _orbit.init();
+    Orbit orbit(GL_LINES);
+    orbit.init();
         check_gl_error();
     OGL grid(GL_LINEAR_ATTENUATION); //just something that's not triangles and lines
     grid.init();
@@ -576,16 +620,6 @@ int main(int argc, const char * argv[])
     ship.drawCount = (int)shapes[shipIdx].mesh.indices.size();
     
  
-//    scene.renderables.push_back(std::move(_globe));
-        check_gl_error();
-//    scene.renderables.push_back(std::move(_orbit));
-        check_gl_error();
-//    scene.renderables.push_back(std::move(grid));
-//        check_gl_error();
-    
-    auto &globe = _globe;//scene.renderables[0];
-    auto &orbit = _orbit;//scene.renderables[1];
-    
     // performance measurement
     glfwSetTime(0);
     auto prevt = glfwGetTime();
@@ -600,39 +634,15 @@ int main(int argc, const char * argv[])
     glm::mat4 orientation2;
     glm::vec3 cameraGrade;
     glm::mat4 mvp;
-    while (!glfwWindowShouldClose(window))
-    {
-        auto t = glfwGetTime();
-        float dt = t - prevt;
-        prevt = t;
-        fps.push(1.0f/dt);
-        renderTimes.push(renderTime*1000.0f);
-        orbit.update();
-//        scene.renderables[1].update();
     
-        //get window size
-   		glfwGetWindowSize(window, &winWidth, &winHeight);
-		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-		glViewport(0, 0, fbWidth, fbHeight);
-        
-        //physics
-        orbitDelta(dt, ks, sys, false);
-        
-        /* Set up a blank screen */
-        glClearColor(0.5,0.5,0.5,1);
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        check_gl_error();
-        
-        //render text
-        auto pushClear = [](vector<string> &vec, stringstream & ss)
-        {
-            vec.push_back(ss.str());
-            ss.str(string());
-            ss.clear();
-        };
-        vector<string> textOuts;
+    auto pushClear = [](vector<string> &vec, stringstream & ss)
+    {
+        vec.push_back(ss.str());
+        ss.str(string());
+        ss.clear();
+    };
+    auto getText = [&](vector<string> & textOuts)
+    {
         stringstream textOut;
         textOut << "FPS: " << std::setprecision(4) << fps.average() << "";
         pushClear(textOuts, textOut);
@@ -647,16 +657,60 @@ int main(int argc, const char * argv[])
         pushClear(textOuts, textOut);
         textOut << "camera pos: " << vec3String(camera.getPosition());
         pushClear(textOuts, textOut);
+        textOut << "ship xAxis: " << vec3String(sShip[0].xAxis);
+        pushClear(textOuts, textOut);
+        textOut << "ship yAxis: " << vec3String(sShip[0].yAxis);
+        pushClear(textOuts, textOut);
+        textOut << "projectiles: " << sys.size() - 2;
+            pushClear(textOuts, textOut);
+//        auto count = 0;
+//        for (auto & object : sys) {
+//            textOut << count++ << " " << vec3String(object.sn.pos);
+//            pushClear(textOuts, textOut);
+//        }
 
+
+    };
+    
+    
+    while (!glfwWindowShouldClose(window))
+    {
+        /* performance measurement setup */
+        auto t = glfwGetTime();
+        float dt = t - prevt;
+        prevt = t;
+        fps.push(1.0f/dt);
+        renderTimes.push(renderTime*1000.0f);
+    
+        /* get window size */
+   		glfwGetWindowSize(window, &winWidth, &winHeight);
+		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+		glViewport(0, 0, fbWidth, fbHeight);
+        
         // Calculate pixel ratio for hi-dpi devices.
         auto pxRatio = (float)fbWidth / (float)winWidth;
-        printText(textOuts, pxRatio, fbWidth, fbHeight);
 		
-        //render everything else
+        /* Set up a blank screen */
+        glClearColor(0.5,0.5,0.5,1);
+        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        check_gl_error();
+        
+        /* physics */
+        orbitDelta(dt, ks, sys, false);
+        orbit.update();
+        
+        /* render text  */
+        vector<string> textOuts;
+        getText(textOuts);
+        printText(textOuts, pxRatio, fbWidth, fbHeight);
+ 
+        /* render everything else */
 		glEnable(GL_DEPTH_TEST);
         check_gl_error();
 
-        //render meshes
+        /* render meshes */
         double mx, my;
         static double prevMX = 0, prevMY = 0;
         glfwGetCursorPos(window, &mx, &my);
@@ -664,19 +718,20 @@ int main(int argc, const char * argv[])
         double _y = my - prevMY;
         prevMX = mx;
         prevMY = my;
-        static float z = 0;
         double mouseScale = .1;
         
-        glUseProgram(globe.shaderProgram);
         static glm::mat4 roll;
         if (rmbPressed) {
             camera.rotate(_y*mouseScale, _x*mouseScale);
         } else if (lmbPressed) {
-            z += _x * mouseScale;
-            roll = glm::rotate(glm::mat4(), z, glm::vec3(0,1,0)); //very off, don't know how to fix it though
+            sShip[0].rotate(_y*mouseScale, _x*mouseScale);
+//            z += _x * mouseScale;
+//            roll = glm::rotate(glm::mat4(), z, glm::vec3(0,1,0)); //very off, don't know how to fix it though
         }
         //scroll behavior
-        camera.setFOV(fov);
+        //camera.setFOV(fov);
+        camera.offsetPos(glm::vec3(0,0,-yScroll));
+        yScroll = 0;
         
         auto _camera = camera.matrix();
         world = glm::translate(glm::mat4(), -sys[1].sn.pos);
@@ -687,51 +742,60 @@ int main(int argc, const char * argv[])
         glm::vec3 gridColor     (0.5, 0.6, 0.6);
         
         //central planet
-        sGlobe.move(sys[0].sn.pos);
-        sGlobe.scale(glm::vec3(10));
-        check_gl_error();
-        mvp = _camera * world * sGlobe.transform();
-        globe.draw(mvp, planetColor);
-        check_gl_error();
-       
+        sGlobe[0].move(sys[0].sn.pos);
         //UI
         //prograde
         auto progradeOffset = glm::normalize(sys[1].sn.vel);
-        sGlobe.move(sys[1].sn.pos+progradeOffset);
-        sGlobe.scale(glm::vec3(.05));
-        mvp = _camera * world * sGlobe.transform();
-        globe.draw(mvp, planetColor);
-        check_gl_error();
-        
+        sGlobe[1].move(sys[1].sn.pos+progradeOffset);
         //retrograde
-        sGlobe.move(sys[1].sn.pos-progradeOffset);
-        sGlobe.scale(glm::vec3(.05));
-        mvp = _camera * world * sGlobe.transform();
-        globe.draw(mvp, planetColor);
-        check_gl_error();
+        sGlobe[2].move(sys[1].sn.pos-progradeOffset);
+
+        glUseProgram(globe.shaderProgram);
+        for (auto &s : sGlobe) {
+            mvp = _camera * world * s.transform();
+            globe.draw(mvp, planetColor);
+            check_gl_error();
+        }
+        auto projectileOffset = 2;
+        for (int i=projectileOffset; i < sys.size(); i++)
+        {
+            mvp = _camera
+                  * world
+                  * glm::translate(glm::mat4(), sys[i].sn.pos)
+                  * glm::scale(glm::mat4(), glm::vec3(1.0f));
+            globe.draw(mvp, planetColor);
+            check_gl_error();
+        }
         
-        //camera grade
+//        //camera grade
         cameraVector = camera.forward();
         cameraVector = glm::normalize(cameraVector);
         cameraVector = glm::rotateX(cameraVector, y);
         cameraVector = glm::rotateZ(cameraVector, -x);
-        cameraGrade = glm::vec3(cameraVector);
-        sGlobe.move(sys[1].sn.pos+cameraGrade);
-        sGlobe.scale(glm::vec3(.05));
-        
-        mvp = _camera * world * sGlobe.transform();
-        globe.draw(mvp, planetColor);
-        check_gl_error();
+//        cameraGrade = glm::vec3(cameraVector);
+//        sGlobe.move(sys[1].sn.pos+cameraGrade);
+//        sGlobe.scale(glm::vec3(.05));
         
         //ship
         glUseProgram(ship.shaderProgram);
-        sShip.move(sys[1].sn.pos);
-        sShip.scale(glm::vec3(.001));
-        auto orientation = glm::orientation(sys[1].sn.vel, glm::vec3(0,1,0));
-        sShip.rotate(orientation);
-        mvp = camera.matrix() * world * sShip.transform();
-        ship.drawIndexed(camera, mvp, planetColor, shapes[shipIdx].mesh.indices.data());
-        check_gl_error();
+        //ship
+        int shipOffset = 1;
+        for (int i=0; i < sShip.size(); i++) {
+            sShip[i].move(sys[i+shipOffset].sn.pos);
+//            auto orientation = glm::orientation(sys[1].sn.vel, glm::vec3(0,1,0));
+//            sShip[i].rotate(orientation);
+            
+//            mvp = camera.matrix() * world * sShip[i].transform();
+            mvp = camera.matrix()
+                  * world
+                  * sShip[i].position
+                  * sShip[i].size
+                  * glm::rotate(glm::inverse(camera.orientation()),
+                                180.0f,
+                                glm::vec3(0,1,0));
+            ship.drawIndexed(camera, mvp, planetColor, shapes[shipIdx].mesh.indices.data());
+            check_gl_error();
+        }
         
         glUseProgram(orbit.shaderProgram);
         mvp = _camera * world;

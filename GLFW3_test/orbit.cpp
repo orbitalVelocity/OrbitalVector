@@ -64,11 +64,12 @@ void calcTrajectory(float *path, int pathSteps)
     //FIXME for some reason sending copies of ks/sys to orbitDelta
     //does not work
     //must copy original and move it back after for now
-    auto &ks2 = ks;
+    auto ks2 = ks;
     auto &sys2 = sys;
     auto ks3 = ks;
     auto sys3 = sys;
     
+
     const int vecSize = 6;
     float dt = 1;
     int j = 1; //for testing

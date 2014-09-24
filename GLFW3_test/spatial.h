@@ -14,7 +14,10 @@
 class Spatial
 {
 public:
-    Spatial() : x(0), y(90) {}
+    Spatial() : x(0), y(90) {
+        yAxis = glm::vec3(1.0f, 0, 0);
+        xAxis = glm::vec3(0, 1.0f, 0);
+    }
     void move(glm::vec3 move);
     void scale(glm::vec3 move);
     void rotate(glm::mat4 &m);
@@ -26,5 +29,6 @@ public:
     glm::mat4 orientation;
     
     float x, y;
+    glm::vec3 xAxis, yAxis;
 };
 #endif /* defined(__GLFW3_test__spatial__) */

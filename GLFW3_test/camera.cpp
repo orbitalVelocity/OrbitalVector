@@ -38,7 +38,10 @@ void Camera::setFocus(const glm::vec3 f)
 
 void Camera::offsetPos(const glm::vec3 offset)
 {
-    position += offset;
+    if (offset.z + position.z > 1.0f)
+        position += offset;
+    else
+        position = glm::vec3(0, 0, 1.0f);
 }
 
 float Camera::getFOV() const

@@ -18,6 +18,7 @@ Orbit::Orbit(GLenum _drawType) : drawType(_drawType), x(0), y(90) {
 
 void Orbit::init()
 {
+    path.reserve(360);
         loadPath();
 }
 
@@ -59,17 +60,16 @@ void Orbit::newProgram(map<GLuint, string> &shaders)
 }
 
 
-void calcTrajectory(float *path, int pathSteps)
+void Orbit::calcTrajectory(int pathSteps)
 {
     //FIXME for some reason sending copies of ks/sys to orbitDelta
     //does not work
     //must copy original and move it back after for now
     auto ks2 = ks;
     auto &sys2 = sys;
-    auto ks3 = ks;
+    
     auto sys3 = sys;
     
-
     const int vecSize = 6;
     float dt = 1;
     int j = 1; //for testing
@@ -97,7 +97,6 @@ void calcTrajectory(float *path, int pathSteps)
         }
     }
     sys = std::move(sys3);
-    ks = std::move(ks3);
     
 }
 
@@ -134,21 +133,30 @@ void Orbit::loadPath()
 
 void Orbit::update()
 {
+    static int count = 0;
     int vecSize = 3;
     int pathSteps = 360;
+
     
-    float *path;
+    float  *pathGL;
     drawCount = pathSteps/vecSize;
-    
+    calcTrajectory(pathSteps);
+    int pathSize = sizeof(float) * pathSteps;
+
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     check_gl_error();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float)*pathSteps, nullptr, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, pathSize, nullptr, GL_STREAM_DRAW);
     check_gl_error();
-    path = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    pathGL = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+#if 0
+    calcTrajectory(pathGL, pathSteps);
+#else
+    memcpy(pathGL, path.data(), pathSize);
+#endif
     check_gl_error();
-    calcTrajectory(path, pathSteps);
     glUnmapBuffer(GL_ARRAY_BUFFER);
     check_gl_error();
+    count++;
 }
 
 

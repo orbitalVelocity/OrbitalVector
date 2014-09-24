@@ -32,6 +32,7 @@ public:
     void newProgram(map<GLuint, string> &shaders);
     void loadPath();
     void update();
+    void calcTrajectory(int pathSteps);
     void draw(glm::mat4 &camera, glm::vec3 color);
 public:
     GLuint fragmentShader, shaderProgram, vertexShader;
@@ -43,7 +44,7 @@ public:
     GLint uniform_color;
     GLint attribute_coord;
     
-    
+    vector<float> path;
     float x,y;
     int drawCount;
 };

@@ -377,7 +377,7 @@
 					/usr/local/lib/,
 					/usr/local/Cellar/glew/1.10.0/lib,
 				);
-				OTHER_CFLAGS = "-O3";
+				OTHER_CFLAGS = "-O0";
 				OTHER_LDFLAGS = "-lGLEW";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -400,7 +400,7 @@
 					/usr/local/lib/,
 					/usr/local/Cellar/glew/1.10.0/lib,
 				);
-				OTHER_CFLAGS = "-O3";
+				OTHER_CFLAGS = "-O0";
 				OTHER_LDFLAGS = "-lGLEW";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

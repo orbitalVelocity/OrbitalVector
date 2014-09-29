@@ -9,7 +9,7 @@
 #include "camera.h"
 
 Camera::Camera() :
-    position(0, 0, 1),
+    position(0, 0.5, 1),
     hAngle(0),
     vAngle(0),
     nearPlane(10e-3f),
@@ -38,10 +38,10 @@ void Camera::setFocus(const glm::vec3 f)
 
 void Camera::offsetPos(const glm::vec3 offset)
 {
-    if (offset.z + position.z > 1.0f)
+    if (offset.z + position.z > 2.0f)
         position += offset;
     else
-        position = glm::vec3(0, 0, 1.0f);
+        position = glm::vec3(0, 0.5, 2.0f);
 }
 
 float Camera::getFOV() const

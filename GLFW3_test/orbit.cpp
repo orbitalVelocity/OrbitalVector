@@ -18,7 +18,8 @@ Orbit::Orbit(GLenum _drawType) : drawType(_drawType), x(0), y(90) {
 
 void Orbit::init()
 {
-    path.reserve(360);
+    paths.resize(1);
+    paths[0].reserve(360);
         loadPath();
 }
 
@@ -60,7 +61,7 @@ void Orbit::newProgram(map<GLuint, string> &shaders)
 }
 
 
-void Orbit::calcTrajectory(int pathSteps)
+void Orbit::calcTrajectory(int &pathSteps)
 {
     //FIXME for some reason sending copies of ks/sys to orbitDelta
     //does not work
@@ -70,34 +71,83 @@ void Orbit::calcTrajectory(int pathSteps)
     
     auto sys3 = sys;
     
-    const int vecSize = 6;
+    
     float dt = 1;
     int j = 1; //for testing
-    path[0] = sys2[j].sn.pos.x;
-    path[1] = sys2[j].sn.pos.y;
-    path[2] = sys2[j].sn.pos.z;
-    for(int i=0; i<pathSteps/vecSize; i++)
+    for (auto &p : paths)
+        p.clear();
+    paths.clear();
+    paths.resize(sys.size()-1);//# of grav wells, maybe not even that!
+    paths[0].reserve(pathSteps);
+    int count = 0;
+    for (auto &path : paths)
+    {
+        path.resize(3);
+        path[0] = sys2[j+count].sn.pos.x;
+        path[1] = sys2[j+count].sn.pos.y;
+        path[2] = sys2[j+count].sn.pos.z;
+        count++;
+    }
+    
+    auto origin = sys2[j].sn.pos;
+    bool apoFound = false;
+    bool periFound = false;
+    float lastDistance = 0;
+    float last2Distance = 0;
+    float distance = 100;
+
+    auto loopCond = [&]() {
+        return (!apoFound or !periFound) and paths[0].size() < 1000;
+    };
+    
+    while (loopCond())
     {
         orbitDelta(dt, ks2, sys2, true);
-        
-        //for (int j=0; j < sys2.size(); j++)
+        //check dist to parent
+        distance = glm::length(sys2[j].sn.pos - sys2[0].sn.pos);
+        if (last2Distance > lastDistance && lastDistance < distance)
         {
-            //                int bodyIndex = j*pathSteps*vecSize;
-            int pathIndex = i*vecSize + 3;
-            path[pathIndex+0] = sys2[j].sn.pos.x;
-            path[pathIndex+1] = sys2[j].sn.pos.y;
-            path[pathIndex+2] = sys2[j].sn.pos.z;
-            if (pathSteps <= pathIndex+3)
-                break;
-            path[pathIndex+3] = sys2[j].sn.pos.x;
-            path[pathIndex+4] = sys2[j].sn.pos.y;
-            path[pathIndex+5] = sys2[j].sn.pos.z;
-            //printks(ks2);
-            //printsys(sys2);
+            periFound = true;
+            peri      = distance;
+            periPos   = sys2[j].sn.pos;
+            
+//            cout << " periapsis found! ";
+        }
+        if (last2Distance < lastDistance && lastDistance > distance
+            && last2Distance != 0 && lastDistance != 0)
+        {
+            apoFound = true;
+            apo      = distance;
+            apoPos   = sys2[j].sn.pos;
+//            cout << " apoapsis found! "
+//                 << last2Distance
+//                 << ", " << lastDistance;
+        }
+//        cout << "\tdistance: " << distance << "\n";
+        
+        if ((last2Distance == lastDistance || lastDistance == distance)
+            && last2Distance != 0.0f && lastDistance != 0.0f)
+        {
+            cout << "same radius across 2 time points! gotta solve this\n";
+        }
+   
+        last2Distance = lastDistance;
+        lastDistance = distance;
+        int offset = 1; //grav wells
+        for (int k=0; k < sys2.size()-offset; k++) {
+            paths[k].push_back(sys2[k+offset].sn.pos.x);
+            paths[k].push_back(sys2[k+offset].sn.pos.y);
+            paths[k].push_back(sys2[k+offset].sn.pos.z);
+            if (!loopCond())
+                continue;
+            paths[k].push_back(sys2[k+offset].sn.pos.x);
+            paths[k].push_back(sys2[k+offset].sn.pos.y);
+            paths[k].push_back(sys2[k+offset].sn.pos.z);
         }
     }
     sys = std::move(sys3);
-    
+ 
+    pathSteps = paths[0].size();
 }
 
 void Orbit::loadPath()
@@ -135,30 +185,51 @@ void Orbit::update()
 {
     static int count = 0;
     int vecSize = 3;
-    int pathSteps = 360;
+    int pathSteps = 980;
 
-    
     float  *pathGL;
     drawCount = pathSteps/vecSize;
     calcTrajectory(pathSteps);
     int pathSize = sizeof(float) * pathSteps;
+    int totalPathSize = (int)(paths.size()*paths[0].size() * sizeof(float));
 
+//    return; //FIXME so nextMesh is called from draw
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     check_gl_error();
-    glBufferData(GL_ARRAY_BUFFER, pathSize, nullptr, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, totalPathSize, nullptr, GL_STREAM_DRAW);
     check_gl_error();
     pathGL = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-#if 0
-    calcTrajectory(pathGL, pathSteps);
-#else
-    memcpy(pathGL, path.data(), pathSize);
-#endif
+    int pathOffset = 0;
+    for (auto &path : paths)
+    {
+        memcpy(&pathGL[pathOffset], path.data(), pathSize);
+        pathOffset += path.size();
+    }
+    drawCount = (int)(paths.size() * paths[0].size());
+//    memcpy(pathGL, paths[0].data(), totalPathSize);)
     check_gl_error();
     glUnmapBuffer(GL_ARRAY_BUFFER);
     check_gl_error();
     count++;
 }
 
+bool Orbit::nextMesh()
+{
+    static int count = 0;
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    check_gl_error();
+    auto pathSize = paths[count].size();
+    glBufferData(GL_ARRAY_BUFFER, pathSize, nullptr, GL_STREAM_DRAW);
+    check_gl_error();
+    float *pathGL = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    memcpy(pathGL, paths[count].data(), pathSize);
+    check_gl_error();
+    glUnmapBuffer(GL_ARRAY_BUFFER);
+    check_gl_error();
+    count = (count + 1) % paths.size() - 1; //gravwell offset
+    
+    return count != 0;
+}
 
 
 void Orbit::draw(glm::mat4 &mvp, glm::vec3 color)
@@ -174,6 +245,9 @@ void Orbit::draw(glm::mat4 &mvp, glm::vec3 color)
     glBindVertexArray(vao);
     check_gl_error();
     glDrawArrays(drawType, 0, drawCount);
+//    while (nextMesh()) {
+//        glDrawArrays(drawType, 0, drawCount);
+//    }
     check_gl_error();
     
 }

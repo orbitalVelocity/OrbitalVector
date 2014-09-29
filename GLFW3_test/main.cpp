@@ -24,6 +24,7 @@
 #include "orbit.h"
 #include "tiny_obj_loader.h"
 #include "spatial.h"
+#include "text.h"
 
 #define CUSTOM_VSYNC 2
 #define VSYNC 1
@@ -258,7 +259,7 @@ void initFontStash()
 }
 
 void addSatellite(body &);
-
+float timeWarp;
 glm::vec3 cameraVector;
 static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -268,14 +269,19 @@ static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 		sys[1].incCustom(.1, cameraVector);
 	if (key == GLFW_KEY_G && action == GLFW_PRESS)
 		sys[1].incPrograde(-.1);
+	if (key == GLFW_KEY_COMMA && action == GLFW_PRESS)
+        timeWarp /= 2;
+	if (key == GLFW_KEY_PERIOD && action == GLFW_PRESS)
+        timeWarp *= 2;
+    
     
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
     {
-        double m = 1e-2;
+        double m = 1e-42;
         double G = 6.673e-11;
         double gm = m * G;
-        auto pos = sys[1].sn.pos + glm::normalize(sys[1].sn.vel);
-        auto vel = sys[1].sn.vel + glm::normalize(camera.forward()) * 100.0f;
+        auto pos = sys[1].sn.pos + glm::normalize(camera.forward()) * 10.0f;
+        auto vel = sys[1].sn.vel + glm::normalize(camera.forward()) * 3.0f;
         body bullet(state(pos, vel), 10, gm, nullptr, objType::SHIP);
         addSatellite(bullet);
     }
@@ -382,6 +388,8 @@ public:
     vector<T> data;
 };
 
+vector<Text> guiText;
+
 void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight)
 {
 	float sx,sy,dx,dy;
@@ -402,6 +410,13 @@ void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight)
         dy += size1;
     }
     
+    for (auto &t : guiText)
+    {
+        dx = t.pos.x * fbWidth;
+        dy = t.pos.y * fbHeight;
+        size1 = t.fontSize * pxRatio;
+        sth_draw_text(stash, droidRegular, size1, dx, dy, t.text.c_str(), &dx, fbWidth, fbHeight);
+    }
     //sth_flush_draw(stash);
     sth_end_draw(stash);
 }
@@ -557,6 +572,7 @@ TestLoadObj(
     
     return true;
 }
+
 int main(int argc, const char * argv[])
 {
 //    assert(true == TestLoadObj("cornell_box.obj"));
@@ -630,11 +646,12 @@ int main(int argc, const char * argv[])
     static float x=0, y=0;
     int winWidth, winHeight;
     int fbWidth, fbHeight;
-    /* Loop until the user closes the window */
+    
     glm::mat4 orientation2;
     glm::vec3 cameraGrade;
     glm::mat4 mvp;
     
+    // text rendering
     auto pushClear = [](vector<string> &vec, stringstream & ss)
     {
         vec.push_back(ss.str());
@@ -653,26 +670,30 @@ int main(int argc, const char * argv[])
         pushClear(textOuts, textOut);
         textOut << "ship (" << vec3String(sys[1].sn.pos) << ")";
         pushClear(textOuts, textOut);
-        textOut << "cameraGrade: " << vec3String(cameraGrade);
+        textOut << "ship dist: " << glm::length(sys[1].sn.pos);
         pushClear(textOuts, textOut);
-        textOut << "camera pos: " << vec3String(camera.getPosition());
+        textOut << "ship vel: " << glm::length(sys[1].sn.vel);
         pushClear(textOuts, textOut);
-        textOut << "ship xAxis: " << vec3String(sShip[0].xAxis);
-        pushClear(textOuts, textOut);
-        textOut << "ship yAxis: " << vec3String(sShip[0].yAxis);
-        pushClear(textOuts, textOut);
+//        textOut << "ship xAxis: " << vec3String(sShip[0].xAxis);
+//        pushClear(textOuts, textOut);
+//        textOut << "ship yAxis: " << vec3String(sShip[0].yAxis);
+//        pushClear(textOuts, textOut);
         textOut << "projectiles: " << sys.size() - 2;
             pushClear(textOuts, textOut);
-//        auto count = 0;
-//        for (auto & object : sys) {
-//            textOut << count++ << " " << vec3String(object.sn.pos);
+        textOut << "path size: " << orbit.drawCount;
+            pushClear(textOuts, textOut);
+//        textOut << "apoapsis:  " << apo;
 //            pushClear(textOuts, textOut);
-//        }
-
-
+//        textOut << "periapsis: " << peri;
+//            pushClear(textOuts, textOut);
     };
     
     
+    guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
+    guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(orbit.apo)));
+    guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(orbit.peri)));
+    
+    timeWarp = 1.0f;
     while (!glfwWindowShouldClose(window))
     {
         /* performance measurement setup */
@@ -698,12 +719,40 @@ int main(int argc, const char * argv[])
         check_gl_error();
         
         /* physics */
-        orbitDelta(dt, ks, sys, false);
-        orbit.update();
+        auto tmp = dt * timeWarp;
+        orbitDelta(tmp, ks, sys, false);
+        static int orbitCount = 0;
+        if (orbitCount++ % 16 == 0) {
+            orbit.update();
+        }
         
         /* render text  */
         vector<string> textOuts;
         getText(textOuts);
+        
+#if 1
+        auto get2d = [&](glm::vec3 _pos)
+        {
+            glm::vec4 pos = camera.matrix() * world * glm::vec4(_pos, 1.0f);
+            pos.x /= pos.z;
+            pos.y /= pos.z;
+            pos.x = ( pos.x+1.0f) / 2;
+            pos.y = (-pos.y+1.0f) / 2; //fixme why y has to be negative?
+            stringstream textOut;
+//            textOut << "x " << pos.x;
+//            pushClear(textOuts, textOut);
+//            textOut << "y " << pos.y;
+//            pushClear(textOuts, textOut);
+            return glm::vec2(pos.x, pos.y);
+        };
+        guiText[0].pos = get2d(sys[0].sn.pos);
+        guiText[1].pos = get2d(orbit.apoPos);
+        guiText[2].pos = get2d(orbit.periPos);
+        
+        guiText[1].text = to_string(orbit.apo);
+        guiText[2].text = to_string(orbit.peri);
+#endif
+        
         printText(textOuts, pxRatio, fbWidth, fbHeight);
  
         /* render everything else */

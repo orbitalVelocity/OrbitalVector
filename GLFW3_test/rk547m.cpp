@@ -10,6 +10,8 @@
 #include <vector>
 using namespace std;
 
+#define MIN_DT .1
+
 vector<vector<state> > ks;
 vector<body> sys;
 vector<float> orbits;
@@ -38,7 +40,7 @@ void orbitDelta(GLfloat &delta,
 {
     
     float absTol = 0;
-    float relTol = 1e-16;
+    float relTol = 1e-6;
     int nBodies = (int)sys.size();
     for (int i = 0; i < nBodies; i++)
         sys[i].si = sys[i].sn;
@@ -57,7 +59,7 @@ void orbitDelta(GLfloat &delta,
 }
 
 //with RK5(4)7M code adapted from Matthew Roesle
-void calcRHS(float t) {
+void calcRHS(float t, vector<body> &sys) {
     float r, tmp;
     int i, j;
     int nBodies = (int)sys.size();
@@ -130,7 +132,7 @@ void RK45Int(float &dt, float absTol, float relTol,
     for (i = 0; i < nBodies; i++)
         sys[i].stmp = sys[i].si;
     
-    calcRHS(t);
+    calcRHS(t, sys);
     
     t1 = A21*dt;
     for (i = 0; i < nBodies; i++) {
@@ -139,7 +141,7 @@ void RK45Int(float &dt, float absTol, float relTol,
 //        printVec3(sys[i].stmp.pos); cout << " = "; printVec3(sys[i].si.pos);
     }
     
-    calcRHS(t + C2*dt);
+    calcRHS(t + C2*dt, sys);
     
     t1 = A31*dt;
     t2 = A32*dt;
@@ -148,7 +150,7 @@ void RK45Int(float &dt, float absTol, float relTol,
         sys[i].stmp = sys[i].si + k1[i]*t1 + k2[i]*t2;
     }
     
-    calcRHS(t + C3*dt);
+    calcRHS(t + C3*dt, sys);
     
     t1 = A41*dt;
     t2 = A42*dt;
@@ -158,7 +160,7 @@ void RK45Int(float &dt, float absTol, float relTol,
         sys[i].stmp = sys[i].si + k1[i]*t1 + k2[i]*t2 + k3[i]*t3;
     }
     
-    calcRHS(t + C4*dt);
+    calcRHS(t + C4*dt, sys);
     
     t1 = A51*dt;
     t2 = A52*dt;
@@ -169,7 +171,7 @@ void RK45Int(float &dt, float absTol, float relTol,
         sys[i].stmp = sys[i].si + k1[i]*t1 + k2[i]*t2 + k3[i]*t3 + k4[i]*t4;
     }
     
-    calcRHS(t + C5*dt);
+    calcRHS(t + C5*dt, sys);
     
     t1 = A61*dt;
     t2 = A62*dt;
@@ -181,7 +183,7 @@ void RK45Int(float &dt, float absTol, float relTol,
         sys[i].stmp = sys[i].si + k1[i]*t1 + k2[i]*t2 + k3[i]*t3 + k4[i]*t4 + k5[i]*t5;
     }
     
-    calcRHS(t + C6*dt);
+    calcRHS(t + C6*dt, sys);
     
     t1 = B11*dt;
     t3 = B13*dt;
@@ -194,7 +196,7 @@ void RK45Int(float &dt, float absTol, float relTol,
         sys[i].stmp = sn5[i];
     }
     
-    calcRHS(t + C7*dt);
+    calcRHS(t + C7*dt, sys);
     
     t1 = B21*dt;
     t3 = B23*dt;
@@ -218,8 +220,8 @@ void RK45Int(float &dt, float absTol, float relTol,
             dt = 0.9*dt*pow(maxerr, -0.20);
         else
             dt *= 2.0;
-        if (dt < 1.0)
-            dt = 1.0;
+        if (dt < MIN_DT)
+            dt = MIN_DT;
     }
     else {
         if (changeDT) {
@@ -227,15 +229,15 @@ void RK45Int(float &dt, float absTol, float relTol,
                 dt = 0.9*dt*pow(maxerr, -0.20);
             else
                 dt *= 0.5;
-            if (dt < 1.0)
-                dt = 1.0;
+            if (dt < MIN_DT)
+                dt = MIN_DT;
         }
         
         
         for (i = 0; i < nBodies; i++)
             sys[i].stmp = sys[i].si;
         
-        calcRHS(t);
+        calcRHS(t, sys);
         
         t1 = A21*dt;
         for (i = 0; i < nBodies; i++) {
@@ -243,7 +245,7 @@ void RK45Int(float &dt, float absTol, float relTol,
             sys[i].stmp = sys[i].si + k1[i]*t1;
         }
         
-        calcRHS(t + C2*dt);
+        calcRHS(t + C2*dt, sys);
         
         t1 = A31*dt;
         t2 = A32*dt;
@@ -252,7 +254,7 @@ void RK45Int(float &dt, float absTol, float relTol,
             sys[i].stmp = sys[i].si + k1[i]*t1 + k2[i]*t2;
         }
         
-        calcRHS(t + C3*dt);
+        calcRHS(t + C3*dt, sys);
         
         t1 = A41*dt;
         t2 = A42*dt;
@@ -262,7 +264,7 @@ void RK45Int(float &dt, float absTol, float relTol,
             sys[i].stmp = sys[i].si + k1[i]*t1 + k2[i]*t2 + k3[i]*t3;
         }
         
-        calcRHS(t + C4*dt);
+        calcRHS(t + C4*dt, sys);
         
         t1 = A51*dt;
         t2 = A52*dt;
@@ -273,7 +275,7 @@ void RK45Int(float &dt, float absTol, float relTol,
             sys[i].stmp = sys[i].si + k1[i]*t1 + k2[i]*t2 + k3[i]*t3 + k4[i]*t4;
         }
         
-        calcRHS(t + C5*dt);
+        calcRHS(t + C5*dt, sys);
         
         t1 = A61*dt;
         t2 = A62*dt;
@@ -285,7 +287,7 @@ void RK45Int(float &dt, float absTol, float relTol,
             sys[i].stmp = sys[i].si + k1[i]*t1 + k2[i]*t2 + k3[i]*t3 + k4[i]*t4 + k5[i]*t5;
         }
         
-        calcRHS(t + C6*dt);
+        calcRHS(t + C6*dt, sys);
         
         t1 = B11*dt;
         t3 = B13*dt;
@@ -298,7 +300,7 @@ void RK45Int(float &dt, float absTol, float relTol,
             sys[i].stmp = sn5[i];
         }
         
-        calcRHS(t + C7*dt);
+        calcRHS(t + C7*dt, sys);
         
         t1 = B21*dt;
         t3 = B23*dt;
@@ -322,8 +324,8 @@ void RK45Int(float &dt, float absTol, float relTol,
             dt = 0.9*dt*pow(maxerr, -0.20);
         else
             dt *= 2.0;
-        if (dt < 1.0)
-            dt = 1.0;
+        if (dt < MIN_DT)
+            dt = MIN_DT;
     }
     
     for (i = 0; i < nBodies; i++)

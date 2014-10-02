@@ -39,7 +39,7 @@ public:
     void loadAttrib(string name, vector<float> &input,
                     GLuint hint, GLuint type=GL_ARRAY_BUFFER);
     void update();
-    void drawIndexed(Camera &camera, glm::mat4 &mvp,
+    void drawIndexed(Camera &camera, glm::vec3 light, glm::mat4 &mvp,
                      glm::vec3 color, GLuint* indices);
     void draw(glm::mat4 &camera, glm::vec3 color);
 public:

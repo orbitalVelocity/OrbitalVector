@@ -219,7 +219,7 @@ void OGL::update()
 
 
 
-void OGL::drawIndexed(Camera &_camera, glm::mat4 &mvp,
+void OGL::drawIndexed(Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
                       glm::vec3 color, GLuint *indices)
 {
     glm::mat4 camera = _camera.matrix();
@@ -231,9 +231,15 @@ void OGL::drawIndexed(Camera &_camera, glm::mat4 &mvp,
     check_gl_error();
     glUniform3fv(uCamera, 1, glm::value_ptr(_camera.position));
     check_gl_error();
-    GLint uTransform = glGetUniformLocation(shaderProgram, "transform");
-//    glm::mat4 mvp = camera * world * position * size * orientation;
-    glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(mvp));
+    GLint uLight = glGetUniformLocation(shaderProgram, "lightPos");
+    check_gl_error();
+    glUniform3fv(uLight, 1, glm::value_ptr(lightPos));
+    check_gl_error();
+    uCamera = glGetUniformLocation(shaderProgram, "camera");
+    glUniformMatrix4fv(uCamera, 1, GL_FALSE, glm::value_ptr(camera));
+    check_gl_error();
+    GLint uModel = glGetUniformLocation(shaderProgram, "model");
+    glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(model));
     check_gl_error();
     glBindVertexArray(vao);
     check_gl_error();

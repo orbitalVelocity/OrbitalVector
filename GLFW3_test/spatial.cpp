@@ -16,20 +16,26 @@ void Spatial::move(glm::vec3 m)
 {
     position = glm::translate(glm::mat4(), m);
 }
-void Spatial::rotate(float dx, float dy)
+void Spatial::rotate(float dx, float dy, float dz)
 {
     y += dy;
     x += dx;
 //    x = (x > 360) ? x - 360 : x;
 //    y = (y > 180) ? 180 : y;
 //    y = (y < 0) ? 0 : y;
-    
+#if 0
     auto rotateYAxis = glm::rotate(glm::mat4(), -dx, xAxis);
     yAxis = glm::vec3(rotateYAxis * glm::vec4(yAxis, 1.0f));
     auto rotateXAxis = glm::rotate(glm::mat4(), -dy, yAxis);
     xAxis = glm::vec3(rotateXAxis * glm::vec4(xAxis, 1.0f));
     orientation = glm::rotate(glm::mat4(), -x, xAxis);
     orientation = glm::rotate(orientation, -y, yAxis);
+#else
+    auto orientation2 = glm::rotate(glm::mat4(), dx, xAxis);
+    orientation2 = glm::rotate(orientation2, -dy, yAxis);
+    orientation2 = glm::rotate(orientation2, dz, zAxis);
+    orientation = orientation * orientation2;
+#endif
 }
 
 void Spatial::rotate(glm::mat4 &m)

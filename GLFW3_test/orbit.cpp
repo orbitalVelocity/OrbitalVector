@@ -66,13 +66,13 @@ void Orbit::calcTrajectory(int &pathSteps)
     //FIXME for some reason sending copies of ks/sys to orbitDelta
     //does not work
     //must copy original and move it back after for now
-    auto ks2 = ks;
-    auto &sys2 = sys;
+    auto &ks2 = ks;
+    auto sys2 = sys;
     
-    auto sys3 = sys;
+//    auto sys3 = sys;
     
     
-    float dt = 1;
+    float dt = 2.0;
     int j = 1; //for testing
     for (auto &p : paths)
         p.clear();
@@ -100,6 +100,11 @@ void Orbit::calcTrajectory(int &pathSteps)
         return (!apoFound or !periFound) and paths[0].size() < 1000;
     };
     
+    int offset = 1; //grav wells
+    int numTrajectories = sys2.size() - offset;
+    vector<bool> objectCrashed;
+    objectCrashed.resize(numTrajectories, false);
+    
     while (loopCond())
     {
         orbitDelta(dt, ks2, sys2, true);
@@ -110,8 +115,6 @@ void Orbit::calcTrajectory(int &pathSteps)
             periFound = true;
             peri      = distance;
             periPos   = sys2[j].sn.pos;
-            
-//            cout << " periapsis found! ";
         }
         if (last2Distance < lastDistance && lastDistance > distance
             && last2Distance != 0 && lastDistance != 0)
@@ -119,11 +122,7 @@ void Orbit::calcTrajectory(int &pathSteps)
             apoFound = true;
             apo      = distance;
             apoPos   = sys2[j].sn.pos;
-//            cout << " apoapsis found! "
-//                 << last2Distance
-//                 << ", " << lastDistance;
         }
-//        cout << "\tdistance: " << distance << "\n";
         
         if ((last2Distance == lastDistance || lastDistance == distance)
             && last2Distance != 0.0f && lastDistance != 0.0f)
@@ -133,19 +132,34 @@ void Orbit::calcTrajectory(int &pathSteps)
    
         last2Distance = lastDistance;
         lastDistance = distance;
-        int offset = 1; //grav wells
-        for (int k=0; k < sys2.size()-offset; k++) {
-            paths[k].push_back(sys2[k+offset].sn.pos.x);
-            paths[k].push_back(sys2[k+offset].sn.pos.y);
-            paths[k].push_back(sys2[k+offset].sn.pos.z);
-            if (!loopCond())
-                continue;
-            paths[k].push_back(sys2[k+offset].sn.pos.x);
-            paths[k].push_back(sys2[k+offset].sn.pos.y);
-            paths[k].push_back(sys2[k+offset].sn.pos.z);
+        for (int k=0; k < numTrajectories; k++) {
+            //FIXME could be optimized
+            if (glm::length(sys2[k+offset].sn.pos) < 10.0f) {
+                objectCrashed[k] = true;
+            }
+            if (false){//objectCrashed[k]) {
+                paths[k].push_back(0.0f);
+                paths[k].push_back(0.0f);
+                paths[k].push_back(0.0f);
+                if (!loopCond()) {
+                    continue;
+                }
+                paths[k].push_back(0.0f);
+                paths[k].push_back(0.0f);
+                paths[k].push_back(0.0f);
+            } else {
+                paths[k].push_back(sys2[k+offset].sn.pos.x);
+                paths[k].push_back(sys2[k+offset].sn.pos.y);
+                paths[k].push_back(sys2[k+offset].sn.pos.z);
+                if (!loopCond())
+                    continue;
+                paths[k].push_back(sys2[k+offset].sn.pos.x);
+                paths[k].push_back(sys2[k+offset].sn.pos.y);
+                paths[k].push_back(sys2[k+offset].sn.pos.z);
+            }
         }
     }
-    sys = std::move(sys3);
+//    sys = std::move(sys3);
  
     pathSteps = paths[0].size();
 }

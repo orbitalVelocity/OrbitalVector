@@ -261,6 +261,7 @@ void initFontStash()
 void addSatellite(body &);
 float timeWarp;
 glm::vec3 cameraVector;
+vector<Spatial> sGlobe, sOrbit, sShip;
 static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -274,14 +275,34 @@ static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
 	if (key == GLFW_KEY_PERIOD && action == GLFW_PRESS)
         timeWarp *= 2;
     
+    float deltaMove = 2;
+	if (key == GLFW_KEY_A)// && action == GLFW_PRESS)
+        sShip[0].rotate(deltaMove, 0, 0);
+	if (key == GLFW_KEY_D)// && action == GLFW_PRESS)
+        sShip[0].rotate(-deltaMove, 0, 0);
+	if (key == GLFW_KEY_W)// && action == GLFW_PRESS)
+        sShip[0].rotate(0, -deltaMove, 0);
+	if (key == GLFW_KEY_S)// && action == GLFW_PRESS)
+        sShip[0].rotate(0, deltaMove, 0);
+	if (key == GLFW_KEY_Q)// && action == GLFW_PRESS)
+        sShip[0].rotate(0, 0, -deltaMove);
+	if (key == GLFW_KEY_E)// && action == GLFW_PRESS)
+        sShip[0].rotate(0, 0, deltaMove);
+    
     
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
     {
         double m = 1e-42;
         double G = 6.673e-11;
         double gm = m * G;
-        auto pos = sys[1].sn.pos + glm::normalize(camera.forward()) * 10.0f;
-        auto vel = sys[1].sn.vel + glm::normalize(camera.forward()) * 3.0f;
+        auto shipVector = glm::vec3(sShip[0].orientation * glm::vec4(0,0,1,1));
+        cout << "ship orientation: " << printVec3(shipVector) << "\n";
+        auto pos = sys[1].sn.pos
+                   + glm::normalize(shipVector)
+                   * 10.0f;
+        auto vel = sys[1].sn.vel
+                   + glm::normalize(shipVector)
+                   * 3.0f;
         body bullet(state(pos, vel), 10, gm, nullptr, objType::SHIP);
         addSatellite(bullet);
     }
@@ -462,12 +483,6 @@ void addSatellite(body &b)
     }
 }
 
-string vec3String(glm::vec3 v)
-{
-    stringstream printMe;
-    printMe << to_string(v.x) << "," << to_string(v.y) << "," << to_string(v.z);
-    return printMe.str();
-}
 
 void initCamera(Camera & camera, int width, int height) {
     camera.setPosition(glm::vec3(0, 0, 10.0f));
@@ -567,7 +582,7 @@ TestLoadObj(
         pos[i+1] -= 3*com.y;
         pos[i+2] -= com.z;
     }
-    cout << "center of mass in local coord is " << vec3String(com);
+    cout << "center of mass in local coord is " << printVec3(com);
     //PrintInfo(shapes, materials);
     
     return true;
@@ -575,13 +590,7 @@ TestLoadObj(
 
 int main(int argc, const char * argv[])
 {
-//    assert(true == TestLoadObj("cornell_box.obj"));
-//    assert(true == TestLoadObj("jet.obj"));
-//    assert(true == TestLoadObj("cube.obj"));
-//    assert(true == TestLoadObj("marker.obj"));
-//    return 1;
-    
-    int width = 800, height = 600;
+    int width = 1280, height = 720;
     GLFWwindow* window = initGraphics(width, height);
     
     initFontStash();
@@ -592,7 +601,6 @@ int main(int argc, const char * argv[])
     Scene scene;
     
     //create Spatial objects for each thing FIXME not done yet
-    vector<Spatial> sGlobe, sOrbit, sShip;
     sGlobe.resize(3);
     sGlobe[0].scale(glm::vec3(10));
     sGlobe[1].scale(glm::vec3(.05));
@@ -600,6 +608,8 @@ int main(int argc, const char * argv[])
     sOrbit.push_back(Spatial());
     sShip.push_back(Spatial());
     sShip[0].scale(glm::vec3(.001));
+ 
+    glm::vec3 lightPos(0, 0, -1000);
     
     OGL globe(GL_TRIANGLES);
     globe.init();
@@ -668,27 +678,19 @@ int main(int argc, const char * argv[])
         pushClear(textOuts, textOut);
         textOut << "mouse x: " << x << " y: " << y << " window size " << fbWidth << " x " << fbHeight;
         pushClear(textOuts, textOut);
-        textOut << "ship (" << vec3String(sys[1].sn.pos) << ")";
+        textOut << "ship (" << printVec3(sys[1].sn.pos) << ")";
         pushClear(textOuts, textOut);
         textOut << "ship dist: " << glm::length(sys[1].sn.pos);
         pushClear(textOuts, textOut);
         textOut << "ship vel: " << glm::length(sys[1].sn.vel);
         pushClear(textOuts, textOut);
-//        textOut << "ship xAxis: " << vec3String(sShip[0].xAxis);
-//        pushClear(textOuts, textOut);
-//        textOut << "ship yAxis: " << vec3String(sShip[0].yAxis);
-//        pushClear(textOuts, textOut);
         textOut << "projectiles: " << sys.size() - 2;
-            pushClear(textOuts, textOut);
+        pushClear(textOuts, textOut);
         textOut << "path size: " << orbit.drawCount;
-            pushClear(textOuts, textOut);
-//        textOut << "apoapsis:  " << apo;
-//            pushClear(textOuts, textOut);
-//        textOut << "periapsis: " << peri;
-//            pushClear(textOuts, textOut);
+        pushClear(textOuts, textOut);
     };
     
-    
+    //init GUI text
     guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
     guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(orbit.apo)));
     guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(orbit.peri)));
@@ -722,7 +724,7 @@ int main(int argc, const char * argv[])
         auto tmp = dt * timeWarp;
         orbitDelta(tmp, ks, sys, false);
         static int orbitCount = 0;
-        if (orbitCount++ % 16 == 0) {
+        if (orbitCount++ % 30 == 0) {
             orbit.update();
         }
         
@@ -769,16 +771,13 @@ int main(int argc, const char * argv[])
         prevMY = my;
         double mouseScale = .1;
         
-        static glm::mat4 roll;
         if (rmbPressed) {
             camera.rotate(_y*mouseScale, _x*mouseScale);
         } else if (lmbPressed) {
-            sShip[0].rotate(_y*mouseScale, _x*mouseScale);
-//            z += _x * mouseScale;
-//            roll = glm::rotate(glm::mat4(), z, glm::vec3(0,1,0)); //very off, don't know how to fix it though
+            sShip[0].rotate(_y*mouseScale, _x*mouseScale, 0.0f);
         }
+        
         //scroll behavior
-        //camera.setFOV(fov);
         camera.offsetPos(glm::vec3(0,0,-yScroll));
         yScroll = 0;
         
@@ -822,8 +821,6 @@ int main(int argc, const char * argv[])
         cameraVector = glm::rotateX(cameraVector, y);
         cameraVector = glm::rotateZ(cameraVector, -x);
 //        cameraGrade = glm::vec3(cameraVector);
-//        sGlobe.move(sys[1].sn.pos+cameraGrade);
-//        sGlobe.scale(glm::vec3(.05));
         
         //ship
         glUseProgram(ship.shaderProgram);
@@ -831,18 +828,12 @@ int main(int argc, const char * argv[])
         int shipOffset = 1;
         for (int i=0; i < sShip.size(); i++) {
             sShip[i].move(sys[i+shipOffset].sn.pos);
-//            auto orientation = glm::orientation(sys[1].sn.vel, glm::vec3(0,1,0));
-//            sShip[i].rotate(orientation);
-            
-//            mvp = camera.matrix() * world * sShip[i].transform();
-            mvp = camera.matrix()
-                  * world
-                  * sShip[i].position
-                  * sShip[i].size
-                  * glm::rotate(glm::inverse(camera.orientation()),
-                                180.0f,
-                                glm::vec3(0,1,0));
-            ship.drawIndexed(camera, mvp, planetColor, shapes[shipIdx].mesh.indices.data());
+            mvp = world
+            * sShip[i].transform();
+//                  * glm::rotate(glm::inverse(camera.orientation()),
+//                                180.0f,
+//                                glm::vec3(0,1,0));
+            ship.drawIndexed(camera, lightPos, mvp, planetColor, shapes[shipIdx].mesh.indices.data());
             check_gl_error();
         }
         

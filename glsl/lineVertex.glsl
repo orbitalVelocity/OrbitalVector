@@ -2,6 +2,7 @@
 in vec3 position;
 //out vec3 fragColor;
 uniform mat4 transform;
+out float depth;
 void main() {
 /*
     vec3 surfacePos = vec3(transform * vec4(position, 1.0));
@@ -11,4 +12,5 @@ void main() {
  //*/
 //   fragColor = position;//diffuseCoefficient * vec3(1.0,1.0,1.0);
    gl_Position = transform * vec4(position, 1.0);
+    depth = gl_Position.z;
 }

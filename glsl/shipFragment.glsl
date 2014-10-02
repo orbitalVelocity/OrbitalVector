@@ -1,7 +1,8 @@
 #version 150 core
 in vec3 fragNormal;
 in vec3 fragVertex;
-uniform mat4 transform;
+uniform vec3 lightPos;
+uniform mat4 model;
 uniform vec3 cameraPos;
 uniform vec3 color;
 out vec4 outColor;
@@ -13,8 +14,10 @@ void main() {
     vec3 specularColor = vec3(1, 1, 1);
     
     //specular lighting
-    vec3 vertex = vec3(transform * vec4(fragVertex, 1.0));
-    vec3 incidentVector = light1;
+    light2 = vec3(model * vec4(light2, 1.0));
+    vec3 vertex = vec3(model * vec4(fragVertex, 1.0));
+    vec3 _lightPos = vec3(model * vec4(lightPos, 1.0));
+    vec3 incidentVector = vertex - _lightPos;
     vec3 reflectionVector = reflect(incidentVector, fragNormal);
     vec3 surfToCamera = normalize(vertex - cameraPos);
     float cosAngle = max(0.0, dot(surfToCamera, reflectionVector));

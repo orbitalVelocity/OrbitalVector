@@ -16,6 +16,7 @@
 		F1011C7519C7F0C700602446 /* orbit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1011C7319C7F0C700602446 /* orbit.cpp */; };
 		F1011C7719C7F17200602446 /* includes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1011C7619C7F17200602446 /* includes.cpp */; };
 		F111F26B19D48F8C00DD4439 /* text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111F26919D48F8C00DD4439 /* text.cpp */; };
+		F111F26E19D9E94200DD4439 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111F26C19D9E94200DD4439 /* input.cpp */; };
 		F159FF4D18DA86650003FF56 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67C18D9396300971791 /* libglfw3.a */; };
 		F15D70DE19CFD303008F6573 /* spatial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15D70DC19CFD303008F6573 /* spatial.cpp */; };
 		F15E8E9C19BD406B003E566C /* ogl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8E9A19BD406B003E566C /* ogl.cpp */; };
@@ -71,6 +72,8 @@
 		F1011C7619C7F17200602446 /* includes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = includes.cpp; sourceTree = "<group>"; };
 		F111F26919D48F8C00DD4439 /* text.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = text.cpp; sourceTree = "<group>"; };
 		F111F26A19D48F8C00DD4439 /* text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = text.h; sourceTree = "<group>"; };
+		F111F26C19D9E94200DD4439 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
+		F111F26D19D9E94200DD4439 /* input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = input.h; sourceTree = "<group>"; };
 		F15D70DC19CFD303008F6573 /* spatial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = spatial.cpp; sourceTree = "<group>"; };
 		F15D70DD19CFD303008F6573 /* spatial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spatial.h; sourceTree = "<group>"; };
 		F15E8E9A19BD406B003E566C /* ogl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ogl.cpp; sourceTree = "<group>"; };
@@ -191,6 +194,8 @@
 			isa = PBXGroup;
 			children = (
 				F1B3C67318D935EC00971791 /* main.cpp */,
+				F111F26C19D9E94200DD4439 /* input.cpp */,
+				F111F26D19D9E94200DD4439 /* input.h */,
 				F111F26919D48F8C00DD4439 /* text.cpp */,
 				F111F26A19D48F8C00DD4439 /* text.h */,
 				F15D70DC19CFD303008F6573 /* spatial.cpp */,
@@ -285,6 +290,7 @@
 				F1011C7519C7F0C700602446 /* orbit.cpp in Sources */,
 				F111F26B19D48F8C00DD4439 /* text.cpp in Sources */,
 				F15E8EA619BD4696003E566C /* LoadShader.cpp in Sources */,
+				F111F26E19D9E94200DD4439 /* input.cpp in Sources */,
 				F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */,
 				F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */,
 				F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */,

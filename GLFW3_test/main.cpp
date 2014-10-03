@@ -25,6 +25,7 @@
 #include "tiny_obj_loader.h"
 #include "spatial.h"
 #include "text.h"
+#include "gameLogic.h"
 
 #define CUSTOM_VSYNC 2
 #define VSYNC 1
@@ -258,62 +259,6 @@ void initFontStash()
 
 }
 
-void addSatellite(body &);
-float timeWarp;
-glm::vec3 cameraVector;
-vector<Spatial> sGlobe, sOrbit, sShip;
-static void key(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	if (key == GLFW_KEY_F && action == GLFW_PRESS)
-		sys[1].incCustom(.1, cameraVector);
-	if (key == GLFW_KEY_G && action == GLFW_PRESS)
-		sys[1].incPrograde(-.1);
-	if (key == GLFW_KEY_COMMA && action == GLFW_PRESS)
-        timeWarp /= 2;
-	if (key == GLFW_KEY_PERIOD && action == GLFW_PRESS)
-        timeWarp *= 2;
-    
-    float deltaMove = 2;
-	if (key == GLFW_KEY_A)// && action == GLFW_PRESS)
-        sShip[0].rotate(deltaMove, 0, 0);
-	if (key == GLFW_KEY_D)// && action == GLFW_PRESS)
-        sShip[0].rotate(-deltaMove, 0, 0);
-	if (key == GLFW_KEY_W)// && action == GLFW_PRESS)
-        sShip[0].rotate(0, -deltaMove, 0);
-	if (key == GLFW_KEY_S)// && action == GLFW_PRESS)
-        sShip[0].rotate(0, deltaMove, 0);
-	if (key == GLFW_KEY_Q)// && action == GLFW_PRESS)
-        sShip[0].rotate(0, 0, -deltaMove);
-	if (key == GLFW_KEY_E)// && action == GLFW_PRESS)
-        sShip[0].rotate(0, 0, deltaMove);
-    
-    
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-    {
-        double m = 1e-42;
-        double G = 6.673e-11;
-        double gm = m * G;
-        auto shipVector = glm::vec3(sShip[0].orientation * glm::vec4(0,0,1,1));
-        cout << "ship orientation: " << printVec3(shipVector) << "\n";
-        auto pos = sys[1].sn.pos
-                   + glm::normalize(shipVector)
-                   * 10.0f;
-        auto vel = sys[1].sn.vel
-                   + glm::normalize(shipVector)
-                   * 3.0f;
-        body bullet(state(pos, vel), 10, gm, nullptr, objType::SHIP);
-        addSatellite(bullet);
-    }
-#if 0
-	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-		blowup = !blowup;
-	if (key == GLFW_KEY_P && action == GLFW_PRESS)
-		premult = !premult;
-#endif
-}
-
 bool lmbPressed, rmbPressed;
 static void mb(GLFWwindow* window, int button, int action, int mods)
 {
@@ -364,7 +309,7 @@ GLFWwindow* initGraphics(int width, int height)
         assert(false);
     }
    	
-	glfwSetKeyCallback(window, key);
+	glfwSetKeyCallback(window, UserInput::keycallback_dispatch);
     glfwSetMouseButtonCallback(window, mb);
     glfwSetScrollCallback(window, scroll);
     
@@ -473,15 +418,7 @@ void initPhysics()
         k.resize(sys.size());
 }
 
-void addSatellite(body &b)
-{
-    sys.push_back(b);
-    for (auto &k : ks)
-    {
-        k.clear();
-        k.resize(sys.size());
-    }
-}
+
 
 
 void initCamera(Camera & camera, int width, int height) {
@@ -599,16 +536,10 @@ int main(int argc, const char * argv[])
     
     initPhysics();
     Scene scene;
+    UserInput inputObject;
+    GameLogic gameLogic;
     
-    //create Spatial objects for each thing FIXME not done yet
-    sGlobe.resize(3);
-    sGlobe[0].scale(glm::vec3(10));
-    sGlobe[1].scale(glm::vec3(.05));
-    sGlobe[2].scale(glm::vec3(.05));
-    sOrbit.push_back(Spatial());
-    sShip.push_back(Spatial());
-    sShip[0].scale(glm::vec3(.001));
- 
+    //setting up game assets (meshes, shaders)
     glm::vec3 lightPos(0, 0, -1000);
     
     OGL globe(GL_TRIANGLES);
@@ -657,9 +588,6 @@ int main(int argc, const char * argv[])
     int winWidth, winHeight;
     int fbWidth, fbHeight;
     
-    glm::mat4 orientation2;
-    glm::vec3 cameraGrade;
-    glm::mat4 mvp;
     
     // text rendering
     auto pushClear = [](vector<string> &vec, stringstream & ss)
@@ -695,7 +623,7 @@ int main(int argc, const char * argv[])
     guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(orbit.apo)));
     guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(orbit.peri)));
     
-    timeWarp = 1.0f;
+    glm::mat4 mvp;
     while (!glfwWindowShouldClose(window))
     {
         /* performance measurement setup */
@@ -714,15 +642,39 @@ int main(int argc, const char * argv[])
         auto pxRatio = (float)fbWidth / (float)winWidth;
 		
         /* Set up a blank screen */
+//        glClearColor(0.1,0.1,0.1,1);
         glClearColor(0.5,0.5,0.5,1);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         check_gl_error();
         
-        /* physics */
-        auto tmp = dt * timeWarp;
-        orbitDelta(tmp, ks, sys, false);
+        /* physics, handle user input, ai, game states, 
+         * it's a lot here 
+         */
+        gameLogic.processActionList(inputObject.actionList);
+        gameLogic.update(dt);
+        
+        double mx, my;
+        static double prevMX = 0, prevMY = 0;
+        glfwGetCursorPos(window, &mx, &my);
+        double _x = mx - prevMX;
+        double _y = my - prevMY;
+        prevMX = mx;
+        prevMY = my;
+        double mouseScale = .1;
+        
+        if (rmbPressed) {
+            camera.rotate(_y*mouseScale, _x*mouseScale);
+        } else if (lmbPressed) {
+            gameLogic.sShip[0].rotate(_y*mouseScale, _x*mouseScale, 0.0f);
+        }
+        
+        //scroll behavior
+        camera.offsetPos(glm::vec3(0,0,-yScroll));
+        yScroll = 0;
+        
+        //calculate trajectories -- FIXME: should go in gamelogic
         static int orbitCount = 0;
         if (orbitCount++ % 30 == 0) {
             orbit.update();
@@ -732,6 +684,7 @@ int main(int argc, const char * argv[])
         vector<string> textOuts;
         getText(textOuts);
         
+        //GUI setup
 #if 1
         auto get2d = [&](glm::vec3 _pos)
         {
@@ -739,12 +692,7 @@ int main(int argc, const char * argv[])
             pos.x /= pos.z;
             pos.y /= pos.z;
             pos.x = ( pos.x+1.0f) / 2;
-            pos.y = (-pos.y+1.0f) / 2; //fixme why y has to be negative?
-            stringstream textOut;
-//            textOut << "x " << pos.x;
-//            pushClear(textOuts, textOut);
-//            textOut << "y " << pos.y;
-//            pushClear(textOuts, textOut);
+            pos.y = (-pos.y+1.0f) / 2; //FIXME: why y has to be negative?
             return glm::vec2(pos.x, pos.y);
         };
         guiText[0].pos = get2d(sys[0].sn.pos);
@@ -762,25 +710,6 @@ int main(int argc, const char * argv[])
         check_gl_error();
 
         /* render meshes */
-        double mx, my;
-        static double prevMX = 0, prevMY = 0;
-        glfwGetCursorPos(window, &mx, &my);
-        double _x = mx - prevMX;
-        double _y = my - prevMY;
-        prevMX = mx;
-        prevMY = my;
-        double mouseScale = .1;
-        
-        if (rmbPressed) {
-            camera.rotate(_y*mouseScale, _x*mouseScale);
-        } else if (lmbPressed) {
-            sShip[0].rotate(_y*mouseScale, _x*mouseScale, 0.0f);
-        }
-        
-        //scroll behavior
-        camera.offsetPos(glm::vec3(0,0,-yScroll));
-        yScroll = 0;
-        
         auto _camera = camera.matrix();
         world = glm::translate(glm::mat4(), -sys[1].sn.pos);
         
@@ -788,22 +717,14 @@ int main(int argc, const char * argv[])
         glm::vec3 shipColor     (0.0, 0.7, 0.0);
         glm::vec3 shipOrbitColor(0.4, 0.8, 0.0);
         glm::vec3 gridColor     (0.5, 0.6, 0.6);
-        
-        //central planet
-        sGlobe[0].move(sys[0].sn.pos);
-        //UI
-        //prograde
-        auto progradeOffset = glm::normalize(sys[1].sn.vel);
-        sGlobe[1].move(sys[1].sn.pos+progradeOffset);
-        //retrograde
-        sGlobe[2].move(sys[1].sn.pos-progradeOffset);
 
         glUseProgram(globe.shaderProgram);
-        for (auto &s : sGlobe) {
+        for (auto &s : gameLogic.sGlobe) {
             mvp = _camera * world * s.transform();
             globe.draw(mvp, planetColor);
             check_gl_error();
         }
+        
         auto projectileOffset = 2;
         for (int i=projectileOffset; i < sys.size(); i++)
         {
@@ -815,21 +736,13 @@ int main(int argc, const char * argv[])
             check_gl_error();
         }
         
-//        //camera grade
-        cameraVector = camera.forward();
-        cameraVector = glm::normalize(cameraVector);
-        cameraVector = glm::rotateX(cameraVector, y);
-        cameraVector = glm::rotateZ(cameraVector, -x);
-//        cameraGrade = glm::vec3(cameraVector);
-        
         //ship
         glUseProgram(ship.shaderProgram);
-        //ship
         int shipOffset = 1;
-        for (int i=0; i < sShip.size(); i++) {
-            sShip[i].move(sys[i+shipOffset].sn.pos);
+        for (int i=0; i < gameLogic.sShip.size(); i++) {
+            gameLogic.sShip[i].move(sys[i+shipOffset].sn.pos);
             mvp = world
-            * sShip[i].transform();
+            * gameLogic.sShip[i].transform();
 //                  * glm::rotate(glm::inverse(camera.orientation()),
 //                                180.0f,
 //                                glm::vec3(0,1,0));

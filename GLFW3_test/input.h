@@ -10,5 +10,49 @@
 #define __GLFW3_test__input__
 
 #include <iostream>
+#include "includes.h"
+#include <GLFW/glfw3.h>
+#include "camera.h"
+using namespace std;
 
+
+enum class ActionType {
+    pitchUp, pitchDown,
+    yawLeft, yawRight,
+    rollCCW, rollCW,
+    transForward, transBackward,
+    transLeft, transRight,
+    transUp, transDown,
+    timeWarpMore, timeWarpLess,
+    fireGun, fireMissile, fireBeam,
+    invalid
+};
+
+class UserInput
+{
+public:
+    static UserInput *event_handling_instance;
+    /* Contains all data members for user input states */
+    float yScroll, xScroll;
+    float xMouse, yMouse;
+    bool lmbPressed, rmbPressed;
+    vector<ActionType> actionList;
+public:
+    UserInput();
+    virtual void setEventHandling() { event_handling_instance = this; }
+    void key(GLFWwindow* window, int key, int scancode, int action, int mods);
+    
+    static void keycallback_dispatch(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        if (event_handling_instance)
+        {
+            event_handling_instance->key(window, key, scancode, action, mods);
+        }
+    }
+#if 0
+    void mb(GLFWwindow* window, int button, int action, int mods);
+    
+    void scroll(GLFWwindow* window, double xoffset, double yoffset);
+    
+#endif
+};
 #endif /* defined(__GLFW3_test__input__) */

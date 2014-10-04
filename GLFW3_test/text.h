@@ -25,4 +25,13 @@ public:
     float fontSize;
     string text;
 };
+
+void loadBufferData();
+void initTestTexture();
+void loadShader();
+void display();
+void initFontStash();
+void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight);
+
+extern vector<Text> guiText;
 #endif /* defined(__GLFW3_test__text__) */

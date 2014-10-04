@@ -111,6 +111,13 @@ void Scene::update()
     //scroll behavior
     camera.offsetPos(glm::vec3(0,0,-_userInput->yScroll));
     _userInput->yScroll = 0;
+    
+    
+    //calculate trajectories -- FIXME: should go in gamelogic
+    static int orbitCount = 0;
+    if (orbitCount++ % 30 == 0) {
+        orbit.update();
+    }
 }
 void Scene::render()
 {

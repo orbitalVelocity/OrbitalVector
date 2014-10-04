@@ -197,6 +197,8 @@
 			isa = PBXGroup;
 			children = (
 				F1B3C67318D935EC00971791 /* main.cpp */,
+				F1011C6519C68C6700602446 /* scene.cpp */,
+				F1011C6619C68C6700602446 /* scene.h */,
 				F151168A19DE1FE50018635B /* gameLogic.cpp */,
 				F151168B19DE1FE50018635B /* gameLogic.h */,
 				F111F26C19D9E94200DD4439 /* input.cpp */,
@@ -211,8 +213,6 @@
 				F1BB301119C1DB9200E349FE /* rk547m.h */,
 				F1011C6219C5F45A00602446 /* camera.cpp */,
 				F1011C6319C5F45A00602446 /* camera.h */,
-				F1011C6519C68C6700602446 /* scene.cpp */,
-				F1011C6619C68C6700602446 /* scene.h */,
 				F1011C7319C7F0C700602446 /* orbit.cpp */,
 				F1011C7419C7F0C700602446 /* orbit.h */,
 				F15E8E9A19BD406B003E566C /* ogl.cpp */,

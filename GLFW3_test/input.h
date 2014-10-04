@@ -39,20 +39,29 @@ public:
     vector<ActionType> actionList;
 public:
     UserInput();
-    virtual void setEventHandling() { event_handling_instance = this; }
+    void setEventHandling() {
+        if (event_handling_instance)
+            assert(false && "already exists an input instance");
+        event_handling_instance = this;
+    }
+    
     void key(GLFWwindow* window, int key, int scancode, int action, int mods);
     
-    static void keycallback_dispatch(GLFWwindow* window, int key, int scancode, int action, int mods) {
-        if (event_handling_instance)
-        {
-            event_handling_instance->key(window, key, scancode, action, mods);
-        }
-    }
-#if 0
     void mb(GLFWwindow* window, int button, int action, int mods);
     
     void scroll(GLFWwindow* window, double xoffset, double yoffset);
     
-#endif
+    static void key_callback_dispatch(GLFWwindow* window, int key, int scancode, int action, int mods) {
+        if (event_handling_instance)
+            event_handling_instance->key(window, key, scancode, action, mods);
+    }
+    static void mb_callback_dispatch(GLFWwindow* window, int button, int action, int mods) {
+        if (event_handling_instance)
+            event_handling_instance->mb(window, button, action, mods);
+    }
+    static void scroll_callback_dispatch(GLFWwindow* window, double xoffset, double yoffset) {
+        if (event_handling_instance)
+            event_handling_instance->scroll(window, xoffset, yoffset);
+    }
 };
 #endif /* defined(__GLFW3_test__input__) */

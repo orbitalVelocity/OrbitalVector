@@ -45,7 +45,6 @@ void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int m
         actionList.push_back(ActionType::rollCW);
 }
 
-#if 0
 void UserInput::mb(GLFWwindow* window, int button, int action, int mods)
 {
     if (action == GLFW_PRESS) {
@@ -64,9 +63,5 @@ void UserInput::mb(GLFWwindow* window, int button, int action, int mods)
 void UserInput::scroll(GLFWwindow* window, double xoffset, double yoffset)
 {
     yScroll = yoffset;
-    fov -= yScroll;
-    fov = (fov < 10 ) ? 10 : fov;
-    fov = (fov > 120) ? 120 : fov;
     xScroll = xoffset;
 }
-#endif

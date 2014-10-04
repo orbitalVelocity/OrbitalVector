@@ -27,36 +27,36 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "GLError.h"
 
-#include "rk547m.h"
-#define TRANSFORM 0
+
 using namespace std;
 
 string get_file_contents(string filename);
 string printVec3(glm::vec3 v);
 
-
-#if 0
-vector<unsigned> normCount, normIndex;
-class triangle {
-  public:
-    triangle(unsigned a, unsigned b, unsigned c): idx{a, b, c} {}
-    glm::vec3 &get(unsigned i) const { return glm::vec3[idx[i]]; }
-    unsigned getIdx(unsigned i) const { return idx[i]; }
-
-    GLuint *ptr() { return idx; }
-  private:
-    GLuint idx[3];
+template <class T>
+class RingBuffer{
+public:
+    RingBuffer(int size)
+    {
+        data.resize(size, 0);
+        index = 0;
+        _average = 0;
+    }
+    void push(T v)
+    {
+        data[index++%data.size()] = v;
+    }
+    float average()
+    {
+        if (index % data.size() == 0) {
+            _average = (float)std::accumulate(data.begin(), data.end(), 0.0f)/(float)data.size();
+        }
+        return _average;
+    }
+    
+    int index = 0;
+    float _average;
+    vector<T> data;
 };
 
-class Obj {
-public:
-    Obj(){}
-public:
-    vector<GLuint> triangles;
-    vector<glm::vec3> vertices, normals;
-    vector<unsigned> normCount, normIndex;
-};
-
-void readObj(string filename, Obj &obj);
-#endif
 #endif

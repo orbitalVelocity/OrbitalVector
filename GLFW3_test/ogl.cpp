@@ -222,27 +222,28 @@ void OGL::update()
 void OGL::drawIndexed(Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
                       glm::vec3 color, GLuint *indices)
 {
-    glm::mat4 camera = _camera.matrix();
-    GLint uColor = glGetUniformLocation(shaderProgram, "color");
+    GLint uniformID;
+    uniformID = glGetUniformLocation(shaderProgram, "color");
+    glUniform3fv(uniformID, 1, glm::value_ptr(color));
     check_gl_error();
-    glUniform3fv(uColor, 1, glm::value_ptr(color));
+    
+    uniformID = glGetUniformLocation(shaderProgram, "cameraPos");
+    glUniform3fv(uniformID, 1, glm::value_ptr(_camera.position));
     check_gl_error();
-    GLint uCamera = glGetUniformLocation(shaderProgram, "cameraPos");
+    
+    uniformID = glGetUniformLocation(shaderProgram, "lightPos");
+    glUniform3fv(uniformID, 1, glm::value_ptr(lightPos));
     check_gl_error();
-    glUniform3fv(uCamera, 1, glm::value_ptr(_camera.position));
+    
+    uniformID = glGetUniformLocation(shaderProgram, "camera");
+    glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(_camera.matrix()));
     check_gl_error();
-    GLint uLight = glGetUniformLocation(shaderProgram, "lightPos");
-    check_gl_error();
-    glUniform3fv(uLight, 1, glm::value_ptr(lightPos));
-    check_gl_error();
-    uCamera = glGetUniformLocation(shaderProgram, "camera");
-    glUniformMatrix4fv(uCamera, 1, GL_FALSE, glm::value_ptr(camera));
-    check_gl_error();
-    GLint uModel = glGetUniformLocation(shaderProgram, "model");
-    glUniformMatrix4fv(uModel, 1, GL_FALSE, glm::value_ptr(model));
-    check_gl_error();
+    
+    uniformID = glGetUniformLocation(shaderProgram, "model");
+    glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(model));
     glBindVertexArray(vao);
     check_gl_error();
+    
     glDrawElements(drawType, drawCount, GL_UNSIGNED_INT, (void*)0);
     check_gl_error();
     

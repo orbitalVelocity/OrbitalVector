@@ -22,8 +22,8 @@ public:
     ~OGL()
     {
         glDeleteProgram(shaderProgram);
-        glDeleteShader(fragmentShader);
-        glDeleteShader(vertexShader);
+        for (auto &shaderID : shaderIDs)
+            glDeleteShader(shaderID);
         
         for (auto &v : vbo)
             glDeleteBuffers(1, &v);
@@ -32,8 +32,8 @@ public:
         glDeleteVertexArrays(1, &vao);
     }
     void init();
-    void loadShaders(string vs, string fs);
-    void newProgram(map<GLuint, string> &shaders);
+    void loadShaders(string vs, string fs, bool useProg=true);
+    void newProgram(map<GLuint, string> &shaders, bool useProg=true);
     void loadIco();
     void loadGrid();
     void loadAttrib(string name, vector<float> &input,
@@ -43,7 +43,8 @@ public:
                      glm::vec3 color, GLuint* indices);
     void draw(glm::mat4 &camera, glm::vec3 color);
 public:
-    GLuint fragmentShader, shaderProgram, vertexShader;
+    GLuint shaderProgram;
+    vector<GLuint> shaderIDs;
     GLuint vao, elementBuffer;
     vector<GLuint> vbo;
     int vboIdx;

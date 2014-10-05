@@ -24,11 +24,13 @@ void OGL::init()
         loadGrid();
 }
 
-void OGL::newProgram(map<GLuint, string> &shaders)
+void OGL::newProgram(map<GLuint, string> &shaders, bool useProg)
 {
-    vector<GLuint> shaderIDs(shaders.size());
+    shaderIDs.resize(shaders.size());
     
     // Create and compile the vertex shader
+    GLint Result = GL_FALSE;
+    int InfoLogLength;
     int i = 0;
     for (auto &shader: shaders) {
         auto shaderType = shader.first;
@@ -37,9 +39,15 @@ void OGL::newProgram(map<GLuint, string> &shaders)
         shaderIDs[i] = glCreateShader(shaderType);
         
         glShaderSource(shaderIDs[i], 1, &src, NULL);
-        check_gl_error();
         glCompileShader(shaderIDs[i]);
-        check_gl_error();
+        
+        glGetShaderiv(shaderIDs[i], GL_COMPILE_STATUS, &Result);
+        glGetShaderiv(shaderIDs[i], GL_INFO_LOG_LENGTH, &InfoLogLength);
+        if ( InfoLogLength > 0 ){
+            std::vector<char> ShaderErrorMessage(InfoLogLength+1);
+            glGetShaderInfoLog(shaderIDs[i], InfoLogLength, NULL, &ShaderErrorMessage[0]);
+            printf("%s\n", &ShaderErrorMessage[0]);
+        }
         i++;
     }
     
@@ -53,9 +61,21 @@ void OGL::newProgram(map<GLuint, string> &shaders)
     glBindFragDataLocation(shaderProgram, 0, "outColor");
     check_gl_error();
     glLinkProgram(shaderProgram);
-    check_gl_error();
-    glUseProgram(shaderProgram);
-    check_gl_error();
+    
+    // Check the program
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &Result);
+    glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &InfoLogLength);
+    
+    if ( InfoLogLength > 0 ){
+        std::vector<char> ProgramErrorMessage(InfoLogLength+1);
+        glGetProgramInfoLog(shaderProgram, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+        printf("%s\n", &ProgramErrorMessage[0]);
+    }
+    
+    if (useProg) {
+        glUseProgram(shaderProgram);
+        check_gl_error();
+    }
 }
 
 void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, vector<GLfloat> &buffer)
@@ -98,14 +118,16 @@ void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, vector<G
     }
 }
 
-void OGL::loadShaders(string vs, string fs)
+void OGL::loadShaders(string vs, string fs, bool useProg)
 {
     map<GLuint, string> shaders;
     auto vShader = get_file_contents(vs);
-    auto fragmentSource = get_file_contents(fs);
+    auto fShader= get_file_contents(fs);
+    cout << "VERTEX SHADER: " << vs << "\n" << vShader << endl;
+    cout << "FRAGMENT SHADER: " << fs << "\n" << fShader << endl;
     shaders.insert({GL_VERTEX_SHADER, vShader});
-    shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
-    newProgram(shaders);
+    shaders.insert({GL_FRAGMENT_SHADER, fShader});
+    newProgram(shaders, useProg);
 }
 
 void OGL::loadIco() {

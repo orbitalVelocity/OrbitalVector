@@ -241,9 +241,22 @@ void initFontStash()
 
 }
 
+void TextRenderer::updateSettings(int r, int w, int h)
+{
+    pxRatio = r;
+    fbWidth = w;
+    fbHeight = h;
+}
 
+void TextRenderer::pushBackDebug(stringstream &ss)
+{
+    debugTexts.push_back(ss.str());
+    ss.str(string());
+    ss.clear();
+}
 
-void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight)
+//void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight)
+void TextRenderer::render()
 {
 	float sx,sy,dx,dy;
    
@@ -256,7 +269,7 @@ void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight)
     float leftMargin = 10 * pxRatio;
     dy = 0;
  
-    for (auto &text : texts)
+    for (auto &text : debugTexts)
     {
         const char *txt = text.c_str();
         sth_draw_text(stash, droidRegular, size1, leftMargin, dy, txt, &dx, fbWidth,fbHeight);

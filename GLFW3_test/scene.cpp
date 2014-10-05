@@ -56,6 +56,8 @@ void initCamera(Camera & camera, int width, int height) {
 
 void Scene::init(int width, int height)
 {
+    fbWidth = width;
+    fbHeight = height;
     shipIdx = 0;
     initCamera(camera, width, height);
     
@@ -89,8 +91,80 @@ void Scene::init(int width, int height)
                  GL_STATIC_DRAW
                  );
     ship.drawCount = (int)shapes[shipIdx].mesh.indices.size();
+    
+    rt.init(fbWidth, fbHeight);
+    static const GLfloat g_quad_vertex_buffer_data[] = {
+        -1.0f, -1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f,
+        -1.0f,  1.0f, 0.0f,
+        1.0f, -1.0f, 0.0f,
+        1.0f,  1.0f, 0.0f,
+    };
+    
+    glGenBuffers(1, &quad_vertexbuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
+    
+    // Create and compile our GLSL program from the shaders
+    hdr.loadShaders("passthrough.vs", "wobblyTexture.fs", true);
+    quad_vertexPosition_modelspace = glGetAttribLocation(hdr.shaderProgram, "vertexPosition_modelspace");
+    texID = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
+    timeID = glGetUniformLocation(hdr.shaderProgram, "time");
 }
 
+#define KERNEL_SIZE   5
+float kernel[KERNEL_SIZE * KERNEL_SIZE] =
+{
+    1, 4, 6, 4, 1,
+    4, 16, 24, 16, 4,
+    6, 24, 36, 24, 6,
+    4, 16, 24, 16, 4,
+    1, 4, 6, 4, 1,
+};
+void RenderTarget::init(int fbWidth, int fbHeight)
+{
+    //from opengl-tutorial.org tutorial 14: render to target
+    
+    glGenFramebuffers(1, &FramebufferName);
+    glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
+    
+    glGenTextures(1, &renderedTexture);
+    
+    // "Bind" the newly created texture : all future texture functions will modify this texture
+    glBindTexture(GL_TEXTURE_2D, renderedTexture);
+    
+    // Give an empty image to OpenGL ( the last "0" means "empty" )
+    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, fbWidth, fbHeight, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+    
+    // Poor filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    
+    // The depth buffer
+    if ( !GLEW_ARB_framebuffer_object ){ // OpenGL 2.1 doesn't require this, 3.1+ does
+        assert(false && "no framebuffer object supported, use a texture instead.");
+    }
+    glGenRenderbuffers(1, &depthrenderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, fbWidth, fbHeight);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
+    
+    // Set "renderedTexture" as our colour attachement #0
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0);
+    
+    // Set the list of draw buffers.
+    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+    glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+    
+    // Always check that our framebuffer is ok
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+        assert(false && "framebuffer NOT OK@?");
+    
+
+}
 void Scene::update()
 {
     double mx, my;
@@ -120,6 +194,42 @@ void Scene::update()
     }
 }
 void Scene::render()
+{
+    //set to render to custom frame buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    forwardRender();
+    
+    //now switch to post process/render to screen
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glUseProgram(hdr.shaderProgram);
+    // Bind our texture in Texture Unit 0
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
+    // Set our "renderedTexture" sampler to user Texture Unit 0
+    glUniform1i(texID, 0);
+    
+    glUniform1f(timeID, (float)(glfwGetTime()*1.0f) );
+    
+    // 1rst attribute buffer : vertices
+    glEnableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
+    glVertexAttribPointer(
+                          quad_vertexPosition_modelspace, // attribute
+                          3,                              // size
+                          GL_FLOAT,                       // type
+                          GL_FALSE,                       // normalized?
+                          0,                              // stride
+                          (void*)0                        // array buffer offset
+                          );
+    
+    // Draw the triangles !
+    glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+}
+
+void Scene::forwardRender()
 {
     auto &gameLogic = *_gameLogic;
     
@@ -164,6 +274,7 @@ void Scene::render()
         check_gl_error();
     }
     
+    // orbit and grid
     {
         glUseProgram(orbit.shaderProgram);
         auto mvp = _camera * world;
@@ -172,4 +283,6 @@ void Scene::render()
         grid.draw(mvp, gridColor);
         check_gl_error();
     }
+    
+    
 }

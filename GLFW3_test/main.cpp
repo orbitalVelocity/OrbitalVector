@@ -148,6 +148,12 @@ int main(int argc, const char * argv[])
 {
     int width = 1280, height = 720;
     GLFWwindow* window = initGraphics(width, height);
+    int winWidth, winHeight;
+    int fbWidth, fbHeight;
+    
+    glfwGetWindowSize(window, &winWidth, &winHeight);
+    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+    glViewport(0, 0, fbWidth, fbHeight);
     
     initFontStash();
     initPhysics();
@@ -155,7 +161,8 @@ int main(int argc, const char * argv[])
     GameLogic gameLogic;
     Scene scene(&gameLogic, &inputObject);
     scene.window = window;
-    scene.init(width, height);
+    scene.init(fbWidth, fbHeight);
+        check_gl_error();
     
     // performance measurement
     glfwSetTime(0);
@@ -165,42 +172,41 @@ int main(int argc, const char * argv[])
     RingBuffer<float> fps(size), renderTimes(size);
     
     static float x=0, y=0;
-    int winWidth, winHeight;
-    int fbWidth, fbHeight;
+
+        
+        // Calculate pixel ratio for hi-dpi devices.
+        auto pxRatio = (float)fbWidth / (float)winWidth;
     
     // creating vector of string
-    auto pushClear = [](vector<string> &vec, stringstream & ss)
-    {
-        vec.push_back(ss.str());
-        ss.str(string());
-        ss.clear();
-    };
-    auto getText = [&](vector<string> & textOuts)
+
+    TextRenderer textObj(pxRatio, fbWidth, fbHeight);
+    auto getText = [&]()
     {
         stringstream textOut;
+        textObj.debugTexts.clear();
         textOut << "FPS: " << std::setprecision(4) << fps.average() << "";
-        pushClear(textOuts, textOut);
+        textObj.pushBackDebug(textOut);
         textOut << "render time: " << std::setprecision(4)
                 << renderTimes.average() << "ms";
-        pushClear(textOuts, textOut);
+        textObj.pushBackDebug(textOut);
         textOut << "mouse x: " << x << " y: " << y << " window size " << fbWidth << " x " << fbHeight;
-        pushClear(textOuts, textOut);
+        textObj.pushBackDebug(textOut);
         textOut << "ship (" << printVec3(sys[1].sn.pos) << ")";
-        pushClear(textOuts, textOut);
+        textObj.pushBackDebug(textOut);
         textOut << "ship dist: " << glm::length(sys[1].sn.pos);
-        pushClear(textOuts, textOut);
+        textObj.pushBackDebug(textOut);
         textOut << "ship vel: " << glm::length(sys[1].sn.vel);
-        pushClear(textOuts, textOut);
+        textObj.pushBackDebug(textOut);
         textOut << "projectiles: " << sys.size() - 2;
-        pushClear(textOuts, textOut);
+        textObj.pushBackDebug(textOut);
         textOut << "path size: " << scene.orbit.drawCount;
-        pushClear(textOuts, textOut);
+        textObj.pushBackDebug(textOut);
     };
     
     //init GUI text
-    guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
-    guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.apo)));
-    guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.peri)));
+    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
+    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.apo)));
+    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.peri)));
     
     while (!glfwWindowShouldClose(window))
     {
@@ -218,6 +224,7 @@ int main(int argc, const char * argv[])
         
         // Calculate pixel ratio for hi-dpi devices.
         auto pxRatio = (float)fbWidth / (float)winWidth;
+        textObj.updateSettings(pxRatio, fbWidth, fbHeight);
 		
         /* Set up a blank screen */
 //        glClearColor(0.1,0.1,0.1,1);
@@ -234,37 +241,25 @@ int main(int argc, const char * argv[])
         gameLogic.update(dt);
         scene.update();
 
-        
         /* render text  */
-        vector<string> textOuts;
-        getText(textOuts);
+        getText();
         
         //GUI setup
-#if 1
-        auto get2d = [&](glm::vec3 _pos)
-        {
-            glm::vec4 pos = scene.camera.matrix() * world * glm::vec4(_pos, 1.0f);
-            pos.x /= pos.z;
-            pos.y /= pos.z;
-            pos.x = ( pos.x+1.0f) / 2;
-            pos.y = (-pos.y+1.0f) / 2; //FIXME: why y has to be negative?
-            return glm::vec2(pos.x, pos.y);
-        };
-        guiText[0].pos = get2d(sys[0].sn.pos);
-        guiText[1].pos = get2d(scene.orbit.apoPos);
-        guiText[2].pos = get2d(scene.orbit.periPos);
+        auto vp = scene.camera.matrix() * world;
+        textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
+        textObj.guiText[1].pos = getVec2(vp, scene.orbit.apoPos);
+        textObj.guiText[2].pos = getVec2(vp, scene.orbit.periPos);
+
+        textObj.guiText[1].text = to_string(scene.orbit.apo);
+        textObj.guiText[2].text = to_string(scene.orbit.peri);
         
-        guiText[1].text = to_string(scene.orbit.apo);
-        guiText[2].text = to_string(scene.orbit.peri);
-#endif
-        
-        printText(textOuts, pxRatio, fbWidth, fbHeight);
+        textObj.render();
  
         /* render everything else */
 		glEnable(GL_DEPTH_TEST);
         check_gl_error();
 
-        scene.render();
+        scene.render();//fbWidth, fbHeight);
         
         renderTime = glfwGetTime() - t;
         /* Swap front and back buffers */

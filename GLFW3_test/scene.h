@@ -20,6 +20,16 @@
 
 using namespace std;
 
+class RenderTarget {
+public:
+    void init(int, int);
+public:
+    // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
+	GLuint FramebufferName;
+	GLuint renderedTexture;
+    GLuint depthrenderbuffer;
+};
+
 //Scene graph handles managements of all (?) objects
 //invokes game logic
 class Scene {
@@ -29,18 +39,20 @@ public:
           globe(GL_TRIANGLES),
           grid(GL_LINEAR_ATTENUATION),
           ship(GL_TRIANGLES),
+          hdr(GL_TRIANGLES),
           _gameLogic(_gl),
           _userInput(_ui)
         {};
     void init(int, int);
     void render();
+    void forwardRender();
     void update();
     void setActiveShip(int s) { shipIdx = s; }
     
 public:
     int shipIdx;
     GLFWwindow *window;
-    vector<OGL> renderables;
+//    vector<OGL> renderables;
     Orbit orbit;
     OGL globe, grid, ship;
     glm::vec3 lightPos;
@@ -49,6 +61,15 @@ public:
     GameLogic *_gameLogic;
     friend class UserInput;
     UserInput *_userInput;
+    
+    RenderTarget rt;
+    OGL hdr;
+    GLuint quad_vertexbuffer;
+    GLuint quad_vertexPosition_modelspace;
+    GLuint texID, timeID;
+    int fbWidth, fbHeight;
 };
+
+
 
 #endif /* defined(__GLFW3_test__scene__) */

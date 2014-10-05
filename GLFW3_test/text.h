@@ -26,6 +26,19 @@ public:
     string text;
 };
 
+class TextRenderer {
+public:
+    TextRenderer(int r, int w, int h) : pxRatio(r), fbWidth(w), fbHeight(h) {}
+    void updateSettings(int, int, int);
+    void render();
+    void pushBackDebug(stringstream &ss);
+public:
+    int pxRatio;
+    int fbWidth, fbHeight;
+    vector<string> debugTexts;
+    vector<Text> guiText;
+};
+
 void loadBufferData();
 void initTestTexture();
 void loadShader();
@@ -33,5 +46,5 @@ void display();
 void initFontStash();
 void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight);
 
-extern vector<Text> guiText;
+//extern vector<Text> guiText;
 #endif /* defined(__GLFW3_test__text__) */

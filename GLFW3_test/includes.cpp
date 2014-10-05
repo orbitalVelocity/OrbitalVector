@@ -32,6 +32,17 @@ string printVec3(glm::vec3 v)
     out << v.x << ", " << v.y << ", " << v.z;
     return out.str();
 }
+
+glm::vec2 getVec2(glm::mat4 vp, glm::vec3 _pos)
+{
+    glm::vec4 pos = vp * glm::vec4(_pos, 1.0f);
+    pos.x /= pos.z;
+    pos.y /= pos.z;
+    pos.x = ( pos.x+1.0f) / 2;
+    pos.y = (-pos.y+1.0f) / 2; //FIXME: why y has to be negative?
+    return glm::vec2(pos.x, pos.y);
+}
+
 /*
 void computeNormals(vector<glm::vec3> &normals,
                     vector<unsigned> &normCount,

@@ -20,6 +20,7 @@
 		F151168C19DE1FE50018635B /* gameLogic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F151168A19DE1FE50018635B /* gameLogic.cpp */; };
 		F151168F19E1A8080018635B /* passthrough.vs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F151168D19E17D690018635B /* passthrough.vs */; };
 		F151169019E1A8080018635B /* wobblyTexture.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F151168E19E17D690018635B /* wobblyTexture.fs */; };
+		F151169219E2292A0018635B /* bloom.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F151169119E228EC0018635B /* bloom.fs */; };
 		F159FF4D18DA86650003FF56 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67C18D9396300971791 /* libglfw3.a */; };
 		F15D70DE19CFD303008F6573 /* spatial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15D70DC19CFD303008F6573 /* spatial.cpp */; };
 		F15E8E9C19BD406B003E566C /* ogl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8E9A19BD406B003E566C /* ogl.cpp */; };
@@ -48,6 +49,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				F151169219E2292A0018635B /* bloom.fs in CopyFiles */,
 				F151168F19E1A8080018635B /* passthrough.vs in CopyFiles */,
 				F151169019E1A8080018635B /* wobblyTexture.fs in CopyFiles */,
 				F1C8EFBD19CD2CAA008CCC90 /* jet.obj in CopyFiles */,
@@ -83,6 +85,7 @@
 		F151168B19DE1FE50018635B /* gameLogic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameLogic.h; sourceTree = "<group>"; };
 		F151168D19E17D690018635B /* passthrough.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = passthrough.vs; path = glsl/passthrough.vs; sourceTree = "<group>"; };
 		F151168E19E17D690018635B /* wobblyTexture.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = wobblyTexture.fs; path = glsl/wobblyTexture.fs; sourceTree = "<group>"; };
+		F151169119E228EC0018635B /* bloom.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = bloom.fs; path = glsl/bloom.fs; sourceTree = "<group>"; };
 		F15D70DC19CFD303008F6573 /* spatial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = spatial.cpp; sourceTree = "<group>"; };
 		F15D70DD19CFD303008F6573 /* spatial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spatial.h; sourceTree = "<group>"; };
 		F15E8E9A19BD406B003E566C /* ogl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ogl.cpp; sourceTree = "<group>"; };
@@ -140,6 +143,7 @@
 			children = (
 				F151168D19E17D690018635B /* passthrough.vs */,
 				F151168E19E17D690018635B /* wobblyTexture.fs */,
+				F151169119E228EC0018635B /* bloom.fs */,
 				F1011C6B19C6953900602446 /* lineFragment.glsl */,
 				F1011C6C19C6953900602446 /* lineVertex.glsl */,
 				F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */,

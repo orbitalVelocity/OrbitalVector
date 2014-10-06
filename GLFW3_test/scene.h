@@ -66,7 +66,7 @@ public:
     OGL hdr;
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;
-    GLuint texID, timeID;
+    GLuint texID, timeID, coefficientID;
     int fbWidth, fbHeight;
 };
 

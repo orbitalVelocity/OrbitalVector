@@ -253,13 +253,14 @@ int main(int argc, const char * argv[])
         textObj.guiText[1].text = to_string(scene.orbit.apo);
         textObj.guiText[2].text = to_string(scene.orbit.peri);
         
-        textObj.render();
  
         /* render everything else */
 		glEnable(GL_DEPTH_TEST);
         check_gl_error();
 
         scene.render();//fbWidth, fbHeight);
+		glDisable(GL_DEPTH_TEST);
+        textObj.render();
         
         renderTime = glfwGetTime() - t;
         /* Swap front and back buffers */

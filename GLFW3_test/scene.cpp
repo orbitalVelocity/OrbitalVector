@@ -54,6 +54,16 @@ void initCamera(Camera & camera, int width, int height) {
     camera.setAspectRatio((float)width/(float)height);
 }
 
+#define KERNEL_SIZE   5
+float kernel[KERNEL_SIZE * KERNEL_SIZE] =
+{
+    1, 4, 6, 4, 1,      //16
+    4, 16, 24, 16, 4,   //64
+    6, 24, 36, 24, 6,   //96
+    4, 16, 24, 16, 4,
+    1, 4, 6, 4, 1,
+};
+
 void Scene::init(int width, int height)
 {
     fbWidth = width;
@@ -107,21 +117,15 @@ void Scene::init(int width, int height)
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
     
     // Create and compile our GLSL program from the shaders
-    hdr.loadShaders("passthrough.vs", "wobblyTexture.fs", true);
+    hdr.loadShaders("passthrough.vs", "bloom.fs", true);
+//    hdr.loadShaders("passthrough.vs", "wobblyTexture.fs", true);
     quad_vertexPosition_modelspace = glGetAttribLocation(hdr.shaderProgram, "vertexPosition_modelspace");
     texID = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
-    timeID = glGetUniformLocation(hdr.shaderProgram, "time");
+//    timeID = glGetUniformLocation(hdr.shaderProgram, "time");
+    coefficientID = glGetUniformLocation(hdr.shaderProgram, "kernel");
+    glUniform1fv(coefficientID, KERNEL_SIZE * KERNEL_SIZE, kernel);
 }
 
-#define KERNEL_SIZE   5
-float kernel[KERNEL_SIZE * KERNEL_SIZE] =
-{
-    1, 4, 6, 4, 1,
-    4, 16, 24, 16, 4,
-    6, 24, 36, 24, 6,
-    4, 16, 24, 16, 4,
-    1, 4, 6, 4, 1,
-};
 void RenderTarget::init(int fbWidth, int fbHeight)
 {
     //from opengl-tutorial.org tutorial 14: render to target
@@ -203,6 +207,8 @@ void Scene::render()
     
     //now switch to post process/render to screen
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    
+    
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(hdr.shaderProgram);
     // Bind our texture in Texture Unit 0
@@ -211,7 +217,7 @@ void Scene::render()
     // Set our "renderedTexture" sampler to user Texture Unit 0
     glUniform1i(texID, 0);
     
-    glUniform1f(timeID, (float)(glfwGetTime()*1.0f) );
+//    glUniform1f(timeID, (float)(glfwGetTime()*1.0f) );
     
     // 1rst attribute buffer : vertices
     glEnableVertexAttribArray(0);

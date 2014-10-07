@@ -217,7 +217,7 @@ void OGL::loadGrid()
 void OGL::loadAttrib(string attribName, vector<float> &path, GLuint drawHint, GLuint bufferType)
 {
     //transfer position data
-    vbo.resize(vboIdx+1);
+    vbo.resize(vboIdx+1);           //vbo only used in this funciton
     glGenBuffers(1, &vbo[vboIdx]);
     
     glBindVertexArray(vao);
@@ -229,9 +229,7 @@ void OGL::loadAttrib(string attribName, vector<float> &path, GLuint drawHint, GL
     
     //set position attribute
     GLint posAttrib = glGetAttribLocation(shaderProgram, attribName.c_str());
-        check_gl_error();
     glEnableVertexAttribArray(posAttrib);
-        check_gl_error();
     glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), NULL);
         check_gl_error();
     

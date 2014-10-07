@@ -112,18 +112,31 @@ void Scene::init(int width, int height)
         1.0f,  1.0f, 0.0f,
     };
     
+    // Create and compile our GLSL program from the shaders
+//    hdr.loadShaders("passthrough.vs", "wobblyTexture.fs", true);
+    hdr.loadShaders("passthrough.vs", "bloom.fs", true);
+#if 1
+#define __quad g_quad_vertex_buffer_data
+    vector<float> v(__quad, __quad + sizeof __quad / sizeof __quad[0]);
+    hdr.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+#else
+    glBindVertexArray(hdr.vao);
     glGenBuffers(1, &quad_vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
     
-    // Create and compile our GLSL program from the shaders
-    hdr.loadShaders("passthrough.vs", "bloom.fs", true);
-//    hdr.loadShaders("passthrough.vs", "wobblyTexture.fs", true);
-    quad_vertexPosition_modelspace = glGetAttribLocation(hdr.shaderProgram, "vertexPosition_modelspace");
-    texID = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
-//    timeID = glGetUniformLocation(hdr.shaderProgram, "time");
-    coefficientID = glGetUniformLocation(hdr.shaderProgram, "kernel");
-    glUniform1fv(coefficientID, KERNEL_SIZE * KERNEL_SIZE, kernel);
+    quad_vertexPosition_modelspace = glGetAttribLocation(hdr.shaderProgram, "position");
+    glEnableVertexAttribArray(quad_vertexPosition_modelspace);
+    glVertexAttribPointer(
+                          quad_vertexPosition_modelspace, // attribute
+                          3,                              // size
+                          GL_FLOAT,                       // type
+                          GL_FALSE,                       // normalized?
+                          3*sizeof(GLfloat),              // stride
+                          (void*)0                        // array buffer offset
+                          );
+#endif
+
 }
 
 void RenderTarget::init(int fbWidth, int fbHeight)
@@ -217,29 +230,23 @@ void Scene::render()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    glUseProgram(hdr.shaderProgram);
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
     glGenerateMipmap(GL_TEXTURE_2D);
+    
+    glUseProgram(hdr.shaderProgram);
+    
+    texID = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
+    coefficientID = glGetUniformLocation(hdr.shaderProgram, "kernel");
+    glUniform1fv(coefficientID, KERNEL_SIZE * KERNEL_SIZE, kernel);
     // Set our "renderedTexture" sampler to user Texture Unit 0
     glUniform1i(texID, 0);
     
+//    timeID = glGetUniformLocation(hdr.shaderProgram, "time");
 //    glUniform1f(timeID, (float)(glfwGetTime()*1.0f) );
     
-    // 1rst attribute buffer : vertices
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
-    glVertexAttribPointer(
-                          quad_vertexPosition_modelspace, // attribute
-                          3,                              // size
-                          GL_FLOAT,                       // type
-                          GL_FALSE,                       // normalized?
-                          0,                              // stride
-                          (void*)0                        // array buffer offset
-                          );
-    
-    // Draw the triangles !
+    glBindVertexArray(hdr.vao);
     glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
 #endif
 }
@@ -256,24 +263,7 @@ void Scene::forwardRender()
     glm::vec3 shipColor     (0.0, 0.7, 0.0);
     glm::vec3 shipOrbitColor(0.4, 0.8, 0.0);
     glm::vec3 gridColor     (0.5, 0.6, 0.6);
-    
-    glUseProgram(globe.shaderProgram);
-    for (auto &s : gameLogic.sGlobe) {
-        auto mvp = _camera * world * s.transform();
-        globe.draw(mvp, planetColor);
-        check_gl_error();
-    }
-    
-    auto projectileOffset = 2;
-    for (int i=projectileOffset; i < sys.size(); i++)
-    {
-        auto mvp = _camera
-        * world
-        * glm::translate(glm::mat4(), sys[i].sn.pos)
-        * glm::scale(glm::mat4(), glm::vec3(1.0f));
-        globe.draw(mvp, planetColor);
-        check_gl_error();
-    }
+
     
     // orbit and grid
     {
@@ -298,7 +288,24 @@ void Scene::forwardRender()
         ship.drawIndexed(camera, lightPos, mvp, planetColor, shapes[shipIdx].mesh.indices.data());
         check_gl_error();
     }
-   
+    
+    glUseProgram(globe.shaderProgram);
+    for (auto &s : gameLogic.sGlobe) {
+        auto mvp = _camera * world * s.transform();
+        globe.draw(mvp, planetColor);
+        check_gl_error();
+    }
+    
+    auto projectileOffset = 2;
+    for (int i=projectileOffset; i < sys.size(); i++)
+    {
+        auto mvp = _camera
+        * world
+        * glm::translate(glm::mat4(), sys[i].sn.pos)
+        * glm::scale(glm::mat4(), glm::vec3(1.0f));
+        globe.draw(mvp, planetColor);
+        check_gl_error();
+    }
     
     
 }

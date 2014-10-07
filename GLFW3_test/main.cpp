@@ -258,7 +258,8 @@ int main(int argc, const char * argv[])
 		glEnable(GL_DEPTH_TEST);
         check_gl_error();
 
-        scene.render();//fbWidth, fbHeight);
+        scene.render();
+        
 		glDisable(GL_DEPTH_TEST);
         textObj.render();
         

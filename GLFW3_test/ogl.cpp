@@ -72,10 +72,17 @@ void OGL::newProgram(map<GLuint, string> &shaders, bool useProg)
         printf("%s\n", &ProgramErrorMessage[0]);
     }
     
+    for (auto &shaderID : shaderIDs)
+    {
+        glDetachShader(shaderProgram, shaderID);
+        check_gl_error();
+    }
+    
     if (useProg) {
         glUseProgram(shaderProgram);
         check_gl_error();
     }
+
 }
 
 void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, vector<GLfloat> &buffer)

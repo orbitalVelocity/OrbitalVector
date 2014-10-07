@@ -140,10 +140,13 @@ void RenderTarget::init(int fbWidth, int fbHeight)
     
     // Give an empty image to OpenGL ( the last "0" means "empty" )
     glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, fbWidth, fbHeight, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
+        check_gl_error();
+    glGenerateMipmap(GL_TEXTURE_2D);
+        check_gl_error();
     
     // Poor filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
@@ -199,6 +202,11 @@ void Scene::update()
 }
 void Scene::render()
 {
+#if 0
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    forwardRender();
+#else
     //set to render to custom frame buffer
     glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -207,13 +215,13 @@ void Scene::render()
     
     //now switch to post process/render to screen
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    
-    
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
     glUseProgram(hdr.shaderProgram);
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
+    glGenerateMipmap(GL_TEXTURE_2D);
     // Set our "renderedTexture" sampler to user Texture Unit 0
     glUniform1i(texID, 0);
     
@@ -233,6 +241,7 @@ void Scene::render()
     
     // Draw the triangles !
     glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+#endif
 }
 
 void Scene::forwardRender()
@@ -266,6 +275,16 @@ void Scene::forwardRender()
         check_gl_error();
     }
     
+    // orbit and grid
+    {
+        auto mvp = _camera * world;
+        glUseProgram(grid.shaderProgram);
+        grid.draw(mvp, gridColor);
+        check_gl_error();
+        glUseProgram(orbit.shaderProgram);
+        orbit.draw(mvp, shipOrbitColor);
+        check_gl_error();
+    }
     //ship
     glUseProgram(ship.shaderProgram);
     int shipOffset = 1;
@@ -279,16 +298,7 @@ void Scene::forwardRender()
         ship.drawIndexed(camera, lightPos, mvp, planetColor, shapes[shipIdx].mesh.indices.data());
         check_gl_error();
     }
-    
-    // orbit and grid
-    {
-        glUseProgram(orbit.shaderProgram);
-        auto mvp = _camera * world;
-        orbit.draw(mvp, shipOrbitColor);
-        check_gl_error();
-        grid.draw(mvp, gridColor);
-        check_gl_error();
-    }
+   
     
     
 }

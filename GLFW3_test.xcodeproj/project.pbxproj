@@ -17,6 +17,8 @@
 		F1011C7719C7F17200602446 /* includes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1011C7619C7F17200602446 /* includes.cpp */; };
 		F111F26B19D48F8C00DD4439 /* text.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111F26919D48F8C00DD4439 /* text.cpp */; };
 		F111F26E19D9E94200DD4439 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111F26C19D9E94200DD4439 /* input.cpp */; };
+		F144C6D519E2DA9200C848B9 /* terran_corvette.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F144C6D419E2DA8800C848B9 /* terran_corvette.obj */; };
+		F144C6D719E3636600C848B9 /* DroidSerif-Regular.ttf in CopyFiles */ = {isa = PBXBuildFile; fileRef = F144C6D619E3636100C848B9 /* DroidSerif-Regular.ttf */; };
 		F151168C19DE1FE50018635B /* gameLogic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F151168A19DE1FE50018635B /* gameLogic.cpp */; };
 		F151168F19E1A8080018635B /* passthrough.vs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F151168D19E17D690018635B /* passthrough.vs */; };
 		F151169019E1A8080018635B /* wobblyTexture.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F151168E19E17D690018635B /* wobblyTexture.fs */; };
@@ -49,6 +51,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				F144C6D719E3636600C848B9 /* DroidSerif-Regular.ttf in CopyFiles */,
+				F144C6D519E2DA9200C848B9 /* terran_corvette.obj in CopyFiles */,
 				F151169219E2292A0018635B /* bloom.fs in CopyFiles */,
 				F151168F19E1A8080018635B /* passthrough.vs in CopyFiles */,
 				F151169019E1A8080018635B /* wobblyTexture.fs in CopyFiles */,
@@ -81,6 +85,8 @@
 		F111F26A19D48F8C00DD4439 /* text.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = text.h; sourceTree = "<group>"; };
 		F111F26C19D9E94200DD4439 /* input.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = input.cpp; sourceTree = "<group>"; };
 		F111F26D19D9E94200DD4439 /* input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = input.h; sourceTree = "<group>"; };
+		F144C6D419E2DA8800C848B9 /* terran_corvette.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = terran_corvette.obj; sourceTree = "<group>"; };
+		F144C6D619E3636100C848B9 /* DroidSerif-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DroidSerif-Regular.ttf"; sourceTree = "<group>"; };
 		F151168A19DE1FE50018635B /* gameLogic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gameLogic.cpp; sourceTree = "<group>"; };
 		F151168B19DE1FE50018635B /* gameLogic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameLogic.h; sourceTree = "<group>"; };
 		F151168D19E17D690018635B /* passthrough.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = passthrough.vs; path = glsl/passthrough.vs; sourceTree = "<group>"; };
@@ -241,6 +247,8 @@
 		F1C8EFB919CD2C86008CCC90 /* assets */ = {
 			isa = PBXGroup;
 			children = (
+				F144C6D619E3636100C848B9 /* DroidSerif-Regular.ttf */,
+				F144C6D419E2DA8800C848B9 /* terran_corvette.obj */,
 				F1C8EFBA19CD2C86008CCC90 /* jet.obj */,
 			);
 			path = assets;
@@ -402,6 +410,7 @@
 					/usr/include/,
 					/usr/local/include/,
 					/usr/local/Cellar/glew/1.10.0/include,
+					"$(SRCROOT)",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib/,
@@ -425,6 +434,7 @@
 					/usr/include/,
 					/usr/local/include/,
 					/usr/local/Cellar/glew/1.10.0/include,
+					"$(SRCROOT)",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib/,

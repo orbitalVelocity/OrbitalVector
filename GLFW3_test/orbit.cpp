@@ -259,9 +259,7 @@ void Orbit::draw(glm::mat4 &mvp, glm::vec3 color)
     glBindVertexArray(vao);
     check_gl_error();
     glDrawArrays(drawType, 0, drawCount);
-//    while (nextMesh()) {
-//        glDrawArrays(drawType, 0, drawCount);
-//    }
+
     check_gl_error();
     
 }

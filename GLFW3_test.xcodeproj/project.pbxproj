@@ -41,6 +41,7 @@
 		F1C8EFBC19CD2CA3008CCC90 /* shipFragment.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */; };
 		F1C8EFBD19CD2CAA008CCC90 /* jet.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFBA19CD2C86008CCC90 /* jet.obj */; };
 		F1C8EFC019CE1B26008CCC90 /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = F1C8EFBE19CE1B26008CCC90 /* tiny_obj_loader.cc */; };
+		F1F5236319E9D36D00B860DC /* highpass.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1F5236219E9D11D00B860DC /* highpass.fs */; };
 		F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */; };
 /* End PBXBuildFile section */
 
@@ -51,6 +52,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				F1F5236319E9D36D00B860DC /* highpass.fs in CopyFiles */,
 				F144C6D719E3636600C848B9 /* DroidSerif-Regular.ttf in CopyFiles */,
 				F144C6D519E2DA9200C848B9 /* terran_corvette.obj in CopyFiles */,
 				F151169219E2292A0018635B /* bloom.fs in CopyFiles */,
@@ -124,6 +126,7 @@
 		F1C8EFBA19CD2C86008CCC90 /* jet.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jet.obj; sourceTree = "<group>"; };
 		F1C8EFBE19CE1B26008CCC90 /* tiny_obj_loader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_obj_loader.cc; sourceTree = "<group>"; };
 		F1C8EFBF19CE1B26008CCC90 /* tiny_obj_loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
+		F1F5236219E9D11D00B860DC /* highpass.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = highpass.fs; path = glsl/highpass.fs; sourceTree = "<group>"; };
 		F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLError.cpp; sourceTree = "<group>"; };
 		F1FDDCF919BE68D4009CFEB0 /* GLError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLError.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -150,6 +153,7 @@
 				F151168D19E17D690018635B /* passthrough.vs */,
 				F151168E19E17D690018635B /* wobblyTexture.fs */,
 				F151169119E228EC0018635B /* bloom.fs */,
+				F1F5236219E9D11D00B860DC /* highpass.fs */,
 				F1011C6B19C6953900602446 /* lineFragment.glsl */,
 				F1011C6C19C6953900602446 /* lineVertex.glsl */,
 				F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */,

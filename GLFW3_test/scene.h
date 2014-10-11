@@ -40,6 +40,7 @@ public:
           grid(GL_LINEAR_ATTENUATION),
           ship(GL_TRIANGLES),
           hdr(GL_TRIANGLES),
+          highPass(GL_TRIANGLES),
           _gameLogic(_gl),
           _userInput(_ui)
         {};
@@ -63,7 +64,7 @@ public:
     UserInput *_userInput;
     
     RenderTarget rt, rtBloom;
-    OGL hdr;
+    OGL hdr, highPass;
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;
     GLuint texID, timeID, coefficientID;

@@ -130,50 +130,18 @@ void Scene::init(int width, int height)
         {
             
         auto &fArray = shapes[shipIdx].mesh.positions;
-//            auto &fArray = fArray1;
             fArray.resize(vecSizes[0]);
             fread((void *)fArray.data(), sizeof(float), vecSizes[0], pFile);
-//            cout << "positions: \n";
-//            for(auto &elm : fArray)
-//                cout << elm << ",\n";
         }
         {
             auto &fArray = shapes[shipIdx].mesh.normals;
-//            auto &fArray = fArray2;
             fArray.resize(vecSizes[1]);
             fread((void *)fArray.data(), sizeof(float), vecSizes[1], pFile);
-//            cout << "normals: \n";
-//            for(auto &elm : fArray)
-//                cout << elm << ",\n";
         }
         auto &iArray = shapes[shipIdx].mesh.indices;
-//        auto &iArray = iArray1;
         iArray.resize(vecSizes[2]);
         fread((void *)iArray.data(), sizeof(int), vecSizes[2], pFile);
-//        cout << "indices: \n";
-//        for(auto &elm : iArray)
-//            cout << elm << ",\n";
-        
-//        assert(std::equal(fArray1.begin(),
-//                          fArray1.end(),
-//                          shapes[shipIdx].mesh.positions.begin()
-//                          )
-//               );
-//        assert(std::equal(fArray2.begin(),
-//                          fArray2.end(),
-//                          shapes[shipIdx].mesh.normals.begin()
-//                          )
-//               );
-//        assert(std::equal(iArray1.begin(),
-//                          iArray1.end(),
-//                          shapes[shipIdx].mesh.indices.begin()
-//                          )
-//               );
-//        cout << "\nsize " << array.size() << endl
-//             << "of mismatches: " << mismatch << endl;
-//        assert(false);
     }
-    //    assert(true == TestLoadObj("marker.obj"));
     check_gl_error();
     
     ship.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
@@ -191,7 +159,9 @@ void Scene::init(int width, int height)
                  );
     ship.drawCount = (int)shapes[shipIdx].mesh.indices.size();
     
+    //setup hdr and associated rt
     rt.init(fbWidth, fbHeight);
+    rtBloom.init(fbWidth, fbHeight);
     static const GLfloat quad[] = {
         -1.0f, -1.0f, 0.0f,
         1.0f, -1.0f, 0.0f,
@@ -207,6 +177,8 @@ void Scene::init(int width, int height)
     vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
     hdr.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
 
+    highPass.loadShaders("passthrough.vs", "highpass.fs", true);
+    highPass.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
 }
 
 void RenderTarget::init(int fbWidth, int fbHeight)
@@ -239,6 +211,7 @@ void RenderTarget::init(int fbWidth, int fbHeight)
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, fbWidth, fbHeight);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
     
+    //TODO: add separate render buffer
     // Set "renderedTexture" as our colour attachement #0
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0);
     
@@ -294,29 +267,27 @@ void Scene::render()
     forwardRender();
     
     
+    GLuint loc;
+    //filter texture0 
+    glBindFramebuffer(GL_FRAMEBUFFER, rtBloom.FramebufferName);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+ 
+    // Bind our texture in Texture Unit 0
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
+        check_gl_error();
+    glGenerateMipmap(GL_TEXTURE_2D); //FIXME: should remove once done
     
-//    //filter texture0 
-//    glBindFramebuffer(GL_FRAMEBUFFER, rtBloom.FramebufferName);
-//    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-// 
-//    // Bind our texture in Texture Unit 0
-//    glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
-//    glGenerateMipmap(GL_TEXTURE_2D); //FIXME: should remove once done
-//    
-//    //setup and run hdr program
-//    glUseProgram(highPass.shaderProgram);
-//    GLuint loc;
-//    loc = glGetUniformLocation(highPass.shaderProgram, "renderedTexture");
-//    glUniform1i(loc, 0);
-//    loc = glGetUniformLocation(highPass.shaderProgram, "kernel");
-//    glUniform1fv(loc, KERNEL_SIZE * KERNEL_SIZE, kernel);
-//    loc = glGetUniformLocation(highPass.shaderProgram, "frameSize");
-//    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(fbWidth, fbHeight)));
-//    
-//    glBindVertexArray(highPass.vao);
-//    glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
-//    
+    //setup and run hdr program
+    glUseProgram(highPass.shaderProgram);
+    loc = glGetUniformLocation(highPass.shaderProgram, "renderedTexture");
+    glUniform1i(loc, 0);
+    loc = glGetUniformLocation(highPass.shaderProgram, "frameSize");
+    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(fbWidth, fbHeight)));
+    
+    glBindVertexArray(highPass.vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+        check_gl_error();
     
     
     //now switch to post process/render to screen
@@ -325,18 +296,20 @@ void Scene::render()
     
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
+    glBindTexture(GL_TEXTURE_2D, rtBloom.renderedTexture);
+        check_gl_error();
     glGenerateMipmap(GL_TEXTURE_2D); //FIXME: should remove once done
     
-//    glActiveTexture(GL_TEXTURE1);
-//    glBindTexture(GL_TEXTURE_2D, rtBloom.renderedTexture);
-//    glGenerateMipmap(GL_TEXTURE_2D);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
+    glGenerateMipmap(GL_TEXTURE_2D);
 
     //setup and run hdr program
     glUseProgram(hdr.shaderProgram);
-    GLuint loc;
     loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
     glUniform1i(loc, 0);
+    loc = glGetUniformLocation(hdr.shaderProgram, "forwardTexture");
+    glUniform1i(loc, 1);
     loc = glGetUniformLocation(hdr.shaderProgram, "kernel");
     glUniform1fv(loc, KERNEL_SIZE * KERNEL_SIZE, kernel);
     loc = glGetUniformLocation(hdr.shaderProgram, "frameSize");
@@ -344,6 +317,7 @@ void Scene::render()
     
     glBindVertexArray(hdr.vao);
     glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+        check_gl_error();
 #endif
 }
 

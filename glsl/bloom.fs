@@ -3,6 +3,7 @@
 in vec2 UV;
 
 uniform sampler2D renderedTexture;
+uniform sampler2D forwardTexture;
 uniform float kernel[25];
 uniform vec2 frameSize;
 out vec4 outColor;
@@ -65,6 +66,6 @@ void main(){
         }
         c = c / 256.0f / 6.0f;
     }
-    
+    c += texture(forwardTexture, UV);
     outColor = c;
 }

@@ -4,6 +4,7 @@ in vec3 normal;
 out vec3 fragNormal;
 out vec3 fragVertex;
 uniform mat4 model;
+uniform mat4 world;
 uniform mat4 camera;
 void main() {
     /*
@@ -17,5 +18,6 @@ void main() {
 //    vec4 tmp = transform * vec4(position, 1.0);
     fragNormal = normal;
     fragVertex = position;
+//    gl_Position = camera * world* model * vec4(position, 1.0);
     gl_Position = camera * model * vec4(position, 1.0);
 }

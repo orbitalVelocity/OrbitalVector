@@ -130,8 +130,8 @@ void OGL::loadShaders(string vs, string fs, bool useProg)
     map<GLuint, string> shaders;
     auto vShader = get_file_contents(vs);
     auto fShader= get_file_contents(fs);
-    cout << "VERTEX SHADER: " << vs << "\n" << vShader << endl;
-    cout << "FRAGMENT SHADER: " << fs << "\n" << fShader << endl;
+//    cout << "VERTEX SHADER: " << vs << "\n" << vShader << endl;
+//    cout << "FRAGMENT SHADER: " << fs << "\n" << fShader << endl;
     shaders.insert({GL_VERTEX_SHADER, vShader});
     shaders.insert({GL_FRAGMENT_SHADER, fShader});
     newProgram(shaders, useProg);
@@ -246,7 +246,7 @@ void OGL::update()
 
 
 
-void OGL::drawIndexed(Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
+void OGL::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
                       glm::vec3 color, GLuint *indices)
 {
     GLint uniformID;
@@ -255,7 +255,7 @@ void OGL::drawIndexed(Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
     check_gl_error();
     
     uniformID = glGetUniformLocation(shaderProgram, "cameraPos");
-    glUniform3fv(uniformID, 1, glm::value_ptr(_camera.position));
+    glUniform3fv(uniformID, 1, glm::value_ptr(_camera.getPosition()));
     check_gl_error();
     
     uniformID = glGetUniformLocation(shaderProgram, "lightPos");
@@ -268,6 +268,10 @@ void OGL::drawIndexed(Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
     
     uniformID = glGetUniformLocation(shaderProgram, "model");
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(model));
+
+    uniformID = glGetUniformLocation(shaderProgram, "world");
+    glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(world));
+    
     glBindVertexArray(vao);
     check_gl_error();
     

@@ -4,12 +4,13 @@ in vec2 UV;
 
 uniform sampler2D renderedTexture;
 uniform float kernel[25];
+uniform vec2 frameSize;
 out vec4 outColor;
 
 //adapted from http://prideout.net/archive/bloom/
 void main(){
-    float width = 1280.0f;
-    float height = 720.0f;
+    float width = frameSize.x;
+    float height = frameSize.y;
     float offsetx = 1.0f / height;//width;
     float offsety = 1.0f / width ;
     vec4 c = vec4(0.0, 0.0, 0.0, 0.0);
@@ -25,7 +26,7 @@ void main(){
     if (true){//c.r + c.g + c.b > 1.0f) {
         c = vec4(0.0, 0.0, 0.0, 0.0);
         float lod = 0.0f;
-        for (i = 0; i < 4; i++) {
+        for (i = 0; i < 6; i++) {
             c += kernel[ 0] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
             c += kernel[ 1] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
             c += kernel[ 2] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
@@ -62,7 +63,7 @@ void main(){
             top = UV.t - 2 * offsety;
             tc = vec2(left, top);
         }
-        c = c / 256.0f / 4.0f;
+        c = c / 256.0f / 6.0f;
     }
     
     outColor = c;

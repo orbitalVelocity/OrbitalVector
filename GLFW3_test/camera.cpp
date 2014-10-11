@@ -24,12 +24,12 @@ void Camera::setPosition(const glm::vec3 pos)
     position = pos;
 }
 
-glm::vec3 Camera::getPosition() const {
-    auto pos = glm::rotateX(position, -vAngle);
-    pos = glm::rotateY(pos, -hAngle);
-    
-    return pos;
-}
+//glm::vec3 Camera::getPosition() const {
+//    auto pos = glm::rotateX(position, -vAngle);
+//    pos = glm::rotateY(pos, -hAngle);
+//    
+//    return pos;
+//}
 
 void Camera::setFocus(const glm::vec3 f)
 {
@@ -100,7 +100,9 @@ glm::vec3 Camera::up() const {
     return glm::vec3(up);
 }
 
-
+glm::vec3 Camera::getPosition() const {
+    return glm::vec3(orientation() * glm::vec4(position, 1.0));
+}
 glm::mat4 Camera::matrix() const {
     return projection() * view();
 }

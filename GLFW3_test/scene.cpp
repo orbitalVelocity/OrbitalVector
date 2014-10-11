@@ -42,7 +42,6 @@ TestLoadObj(
     }
     cout << "center of mass in local coord is " << printVec3(com);
     //PrintInfo(shapes, materials);
-    
     return true;
 }
 
@@ -83,7 +82,97 @@ void Scene::init(int width, int height)
     ship.loadShaders("shipVertex.glsl", "shipFragment.glsl");
     //    assert(true == TestLoadObj("cornell_box.obj"));
     //    assert(true == TestLoadObj("suzanne.obj"));
-    assert(true == TestLoadObj("terran_corvette.obj"));
+//    assert(true == TestLoadObj("olympus_1mesh.obj"));
+//    assert(true == TestLoadObj("terran_corvette.obj"));
+
+    FILE* pFile;
+    char outFileName[] = "olympus.bin";
+//    char outFileName[] = "terran_corvette.bin";
+    vector<int> vecSizes(3);
+
+        shapes.resize(1);
+    if (0)
+    {
+        //write to binary
+        pFile = fopen(outFileName, "wb");
+        //write size of each vector
+        vecSizes[0] = shapes[shipIdx].mesh.positions.size();
+        vecSizes[1] = shapes[shipIdx].mesh.normals.size();
+        vecSizes[2] = shapes[shipIdx].mesh.indices.size();
+                cout << "actual sizes of vectors: " << endl
+            << "positions: " << vecSizes[0] << endl
+            << "normals:   " << vecSizes[1] << endl
+            << "indices:   " << vecSizes[2] << endl;
+        fwrite(vecSizes.data(), sizeof(float), 3, pFile);
+        
+        auto &array = shapes[shipIdx].mesh.positions;
+        fwrite(array.data(), 1, array.size()*sizeof(float), pFile);
+        auto &array2 = shapes[shipIdx].mesh.normals;
+        fwrite(array2.data(), 1, array2.size()*sizeof(float), pFile);
+        auto & arrayIdx = shapes[shipIdx].mesh.indices;
+        fwrite(arrayIdx.data(), 1, arrayIdx.size()*sizeof(unsigned int), pFile);
+        fclose(pFile);
+        assert(false);
+    }
+    
+    if (1)
+    {
+        //read back and compare
+        pFile = fopen(outFileName, "r");
+        fread((void *)vecSizes.data(), sizeof(int), vecSizes.size(), pFile);
+        cout << "sizes of vectors: " << endl
+            << "positions: " << vecSizes[0] << endl
+            << "normals:   " << vecSizes[1] << endl
+            << "indices:   " << vecSizes[2] << endl;
+        
+        vector<float> fArray1, fArray2;
+        vector<unsigned int> iArray1;
+        {
+            
+        auto &fArray = shapes[shipIdx].mesh.positions;
+//            auto &fArray = fArray1;
+            fArray.resize(vecSizes[0]);
+            fread((void *)fArray.data(), sizeof(float), vecSizes[0], pFile);
+//            cout << "positions: \n";
+//            for(auto &elm : fArray)
+//                cout << elm << ",\n";
+        }
+        {
+            auto &fArray = shapes[shipIdx].mesh.normals;
+//            auto &fArray = fArray2;
+            fArray.resize(vecSizes[1]);
+            fread((void *)fArray.data(), sizeof(float), vecSizes[1], pFile);
+//            cout << "normals: \n";
+//            for(auto &elm : fArray)
+//                cout << elm << ",\n";
+        }
+        auto &iArray = shapes[shipIdx].mesh.indices;
+//        auto &iArray = iArray1;
+        iArray.resize(vecSizes[2]);
+        fread((void *)iArray.data(), sizeof(int), vecSizes[2], pFile);
+//        cout << "indices: \n";
+//        for(auto &elm : iArray)
+//            cout << elm << ",\n";
+        
+//        assert(std::equal(fArray1.begin(),
+//                          fArray1.end(),
+//                          shapes[shipIdx].mesh.positions.begin()
+//                          )
+//               );
+//        assert(std::equal(fArray2.begin(),
+//                          fArray2.end(),
+//                          shapes[shipIdx].mesh.normals.begin()
+//                          )
+//               );
+//        assert(std::equal(iArray1.begin(),
+//                          iArray1.end(),
+//                          shapes[shipIdx].mesh.indices.begin()
+//                          )
+//               );
+//        cout << "\nsize " << array.size() << endl
+//             << "of mismatches: " << mismatch << endl;
+//        assert(false);
+    }
     //    assert(true == TestLoadObj("marker.obj"));
     check_gl_error();
     
@@ -103,7 +192,7 @@ void Scene::init(int width, int height)
     ship.drawCount = (int)shapes[shipIdx].mesh.indices.size();
     
     rt.init(fbWidth, fbHeight);
-    static const GLfloat g_quad_vertex_buffer_data[] = {
+    static const GLfloat quad[] = {
         -1.0f, -1.0f, 0.0f,
         1.0f, -1.0f, 0.0f,
         -1.0f,  1.0f, 0.0f,
@@ -115,27 +204,8 @@ void Scene::init(int width, int height)
     // Create and compile our GLSL program from the shaders
 //    hdr.loadShaders("passthrough.vs", "wobblyTexture.fs", true);
     hdr.loadShaders("passthrough.vs", "bloom.fs", true);
-#if 1
-#define __quad g_quad_vertex_buffer_data
-    vector<float> v(__quad, __quad + sizeof __quad / sizeof __quad[0]);
+    vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
     hdr.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
-#else
-    glBindVertexArray(hdr.vao);
-    glGenBuffers(1, &quad_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(g_quad_vertex_buffer_data), g_quad_vertex_buffer_data, GL_STATIC_DRAW);
-    
-    quad_vertexPosition_modelspace = glGetAttribLocation(hdr.shaderProgram, "position");
-    glEnableVertexAttribArray(quad_vertexPosition_modelspace);
-    glVertexAttribPointer(
-                          quad_vertexPosition_modelspace, // attribute
-                          3,                              // size
-                          GL_FLOAT,                       // type
-                          GL_FALSE,                       // normalized?
-                          3*sizeof(GLfloat),              // stride
-                          (void*)0                        // array buffer offset
-                          );
-#endif
 
 }
 
@@ -147,10 +217,7 @@ void RenderTarget::init(int fbWidth, int fbHeight)
     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
     
     glGenTextures(1, &renderedTexture);
-    
-    // "Bind" the newly created texture : all future texture functions will modify this texture
     glBindTexture(GL_TEXTURE_2D, renderedTexture);
-    
     // Give an empty image to OpenGL ( the last "0" means "empty" )
     glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, fbWidth, fbHeight, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
         check_gl_error();
@@ -226,6 +293,32 @@ void Scene::render()
     
     forwardRender();
     
+    
+    
+//    //filter texture0 
+//    glBindFramebuffer(GL_FRAMEBUFFER, rtBloom.FramebufferName);
+//    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+// 
+//    // Bind our texture in Texture Unit 0
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
+//    glGenerateMipmap(GL_TEXTURE_2D); //FIXME: should remove once done
+//    
+//    //setup and run hdr program
+//    glUseProgram(highPass.shaderProgram);
+//    GLuint loc;
+//    loc = glGetUniformLocation(highPass.shaderProgram, "renderedTexture");
+//    glUniform1i(loc, 0);
+//    loc = glGetUniformLocation(highPass.shaderProgram, "kernel");
+//    glUniform1fv(loc, KERNEL_SIZE * KERNEL_SIZE, kernel);
+//    loc = glGetUniformLocation(highPass.shaderProgram, "frameSize");
+//    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(fbWidth, fbHeight)));
+//    
+//    glBindVertexArray(highPass.vao);
+//    glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+//    
+    
+    
     //now switch to post process/render to screen
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -233,18 +326,21 @@ void Scene::render()
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
-    glGenerateMipmap(GL_TEXTURE_2D);
+    glGenerateMipmap(GL_TEXTURE_2D); //FIXME: should remove once done
     
+//    glActiveTexture(GL_TEXTURE1);
+//    glBindTexture(GL_TEXTURE_2D, rtBloom.renderedTexture);
+//    glGenerateMipmap(GL_TEXTURE_2D);
+
+    //setup and run hdr program
     glUseProgram(hdr.shaderProgram);
-    
-    texID = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
-    coefficientID = glGetUniformLocation(hdr.shaderProgram, "kernel");
-    glUniform1fv(coefficientID, KERNEL_SIZE * KERNEL_SIZE, kernel);
-    // Set our "renderedTexture" sampler to user Texture Unit 0
-    glUniform1i(texID, 0);
-    
-//    timeID = glGetUniformLocation(hdr.shaderProgram, "time");
-//    glUniform1f(timeID, (float)(glfwGetTime()*1.0f) );
+    GLuint loc;
+    loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
+    glUniform1i(loc, 0);
+    loc = glGetUniformLocation(hdr.shaderProgram, "kernel");
+    glUniform1fv(loc, KERNEL_SIZE * KERNEL_SIZE, kernel);
+    loc = glGetUniformLocation(hdr.shaderProgram, "frameSize");
+    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(fbWidth, fbHeight)));
     
     glBindVertexArray(hdr.vao);
     glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
@@ -259,12 +355,11 @@ void Scene::forwardRender()
     auto _camera = camera.matrix();
     world = glm::translate(glm::mat4(), -sys[1].sn.pos);
     
-    glm::vec3 planetColor   (0.6, 0.0, 0.0);
-    glm::vec3 shipColor     (0.0, 0.7, 0.0);
+    glm::vec3 planetColor   (0.4, 0.0, 0.0);
+    glm::vec3 shipColor     (0.9, 0.9, 0.9);
     glm::vec3 shipOrbitColor(0.4, 0.8, 0.0);
     glm::vec3 gridColor     (0.5, 0.6, 0.6);
 
-    
     // orbit and grid
     {
         auto mvp = _camera * world;
@@ -275,17 +370,19 @@ void Scene::forwardRender()
         orbit.draw(mvp, shipOrbitColor);
         check_gl_error();
     }
+    
     //ship
     glUseProgram(ship.shaderProgram);
     int shipOffset = 1;
     for (int i=0; i < gameLogic.sShip.size(); i++) {
         gameLogic.sShip[i].move(sys[i+shipOffset].sn.pos);
-        auto mvp = world
-        * gameLogic.sShip[i].transform();
+        auto mvp = gameLogic.sShip[i].orientation
+                 * gameLogic.sShip[i].size;
+//        auto mvp = gameLogic.sShip[i].transform();
         //                  * glm::rotate(glm::inverse(camera.orientation()),
         //                                180.0f,
         //                                glm::vec3(0,1,0));
-        ship.drawIndexed(camera, lightPos, mvp, planetColor, shapes[shipIdx].mesh.indices.data());
+        ship.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
         check_gl_error();
     }
     

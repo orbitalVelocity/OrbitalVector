@@ -11,7 +11,7 @@ out vec4 outColor;
 void main() {
     vec3 light2 = vec3(0.3,0.5,0.4);
     vec3 specularColor = vec3(0, 1, 1);
-    
+    float intensity = 3.0f;
     //specular lighting
 //    vec3 _cameraPos= vec3(world * vec4(cameraPos, 1.0));
 //    vec3 normal = normalize(transpose(inverse(mat3(model)))*fragNormal);
@@ -29,7 +29,7 @@ void main() {
     float cosAngle = max(0.0, dot(surfToCamera, reflectionVector));
     float specularCoefficient = pow(cosAngle, 12);
     
-    vec3 finalColor = color * max(0.0, dot(normal, -surfToLight))
+    vec3 finalColor = color * max(0.0, dot(normal, -surfToLight) * intensity)
     ;// + specularCoefficient * specularColor;
 //    finalColor = cameraPos;
     outColor = vec4(finalColor, 1.0);

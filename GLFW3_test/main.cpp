@@ -46,7 +46,7 @@ GLFWwindow* initGraphics(int width, int height)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
+	glfwWindowHint(GLFW_SAMPLES, 8);
 	
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
     /* Create a windowed mode window and its OpenGL context */
@@ -227,8 +227,8 @@ int main(int argc, const char * argv[])
         textObj.updateSettings(pxRatio, fbWidth, fbHeight);
 		
         /* Set up a blank screen */
-//        glClearColor(0.1,0.1,0.1,1);
-        glClearColor(0.5,0.5,0.5,1);
+        glClearColor(0.0,0.0,0.0,1);
+//        glClearColor(0.5,0.5,0.5,1);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

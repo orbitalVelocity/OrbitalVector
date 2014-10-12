@@ -22,7 +22,7 @@ using namespace std;
 
 class RenderTarget {
 public:
-    void init(int, int);
+    void init(int, int, bool depthTexture=false);
 public:
     // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
 	GLuint FramebufferName;
@@ -41,6 +41,7 @@ public:
           ship(GL_TRIANGLES),
           hdr(GL_TRIANGLES),
           highPass(GL_TRIANGLES),
+          shadowMap(GL_TRIANGLES),
           _gameLogic(_gl),
           _userInput(_ui)
         {};
@@ -64,7 +65,7 @@ public:
     UserInput *_userInput;
     
     RenderTarget rt, rtBloom;
-    OGL hdr, highPass;
+    OGL hdr, highPass, shadowMap;
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;
     GLuint texID, timeID, coefficientID;

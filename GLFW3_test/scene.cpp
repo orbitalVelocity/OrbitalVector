@@ -172,17 +172,25 @@ void Scene::init(int width, int height)
     };
     
     // Create and compile our GLSL program from the shaders
-//    hdr.loadShaders("passthrough.vs", "wobblyTexture.fs", true);
     hdr.loadShaders("passthrough.vs", "bloom.fs", true);
     vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
     hdr.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
 
     highPass.loadShaders("passthrough.vs", "highpass.fs", true);
     highPass.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+
+    shadowMap.loadShaders("passthrough.vs", "depth.fs", true);
+    shadowMap.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
 }
 
-void RenderTarget::init(int fbWidth, int fbHeight)
+void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
 {
+    GLint internalFormat = GL_RGB16F;
+    GLenum format = GL_RGB;
+    if (depthTexture) {
+        internalFormat = GL_DEPTH_COMPONENT16;
+        format = GL_DEPTH_COMPONENT;
+    }
     //from opengl-tutorial.org tutorial 14: render to target
     
     glGenFramebuffers(1, &FramebufferName);
@@ -191,34 +199,48 @@ void RenderTarget::init(int fbWidth, int fbHeight)
     glGenTextures(1, &renderedTexture);
     glBindTexture(GL_TEXTURE_2D, renderedTexture);
     // Give an empty image to OpenGL ( the last "0" means "empty" )
-    glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, fbWidth, fbHeight, 0,GL_RGB, GL_UNSIGNED_BYTE, 0);
-        check_gl_error();
-    glGenerateMipmap(GL_TEXTURE_2D);
+    glTexImage2D(GL_TEXTURE_2D, 0,
+                 internalFormat,
+                 fbWidth,
+                 fbHeight,
+                 0,
+                 format,
+                 GL_HALF_FLOAT,
+                 0);
         check_gl_error();
     
-    // Poor filtering
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
-    // The depth buffer
-    if ( !GLEW_ARB_framebuffer_object ){ // OpenGL 2.1 doesn't require this, 3.1+ does
-        assert(false && "no framebuffer object supported, use a texture instead.");
+    if (depthTexture) {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, renderedTexture, 0);
+        glDrawBuffer(GL_NONE);
+    } else {
+        glGenerateMipmap(GL_TEXTURE_2D);
+        check_gl_error();
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        // The depth buffer
+        if ( !GLEW_ARB_framebuffer_object ){ // OpenGL 2.1 doesn't require this, 3.1+ does
+            assert(false && "no framebuffer object supported, use a texture instead.");
+        }
+        glGenRenderbuffers(1, &depthrenderbuffer);
+        glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, fbWidth, fbHeight);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
+    
+        //TODO: add separate render buffer
+        // Set "renderedTexture" as our colour attachement #0
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0);
+        
+        // Set the list of draw buffers.
+        GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
+        glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
+    
     }
-    glGenRenderbuffers(1, &depthrenderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, fbWidth, fbHeight);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
-    
-    //TODO: add separate render buffer
-    // Set "renderedTexture" as our colour attachement #0
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0);
-    
-    // Set the list of draw buffers.
-    GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-    glDrawBuffers(1, DrawBuffers); // "1" is the size of DrawBuffers
-    
     // Always check that our framebuffer is ok
     if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         assert(false && "framebuffer NOT OK@?");
@@ -266,9 +288,8 @@ void Scene::render()
     
     forwardRender();
     
-    
+    // high pass to get highlights onto rtBloom
     GLuint loc;
-    //filter texture0 
     glBindFramebuffer(GL_FRAMEBUFFER, rtBloom.FramebufferName);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  
@@ -290,7 +311,7 @@ void Scene::render()
         check_gl_error();
     
     
-    //now switch to post process/render to screen
+    //blur rtBloom's texture and add it back to rt's texture
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -332,7 +353,7 @@ void Scene::forwardRender()
     glm::vec3 planetColor   (0.4, 0.0, 0.0);
     glm::vec3 shipColor     (0.9, 0.9, 0.9);
     glm::vec3 shipOrbitColor(0.4, 0.8, 0.0);
-    glm::vec3 gridColor     (0.5, 0.6, 0.6);
+    glm::vec3 gridColor     (0.2, 0.21, 0.2);
 
     // orbit and grid
     {

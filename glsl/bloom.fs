@@ -27,7 +27,7 @@ void main(){
     if (true){//c.r + c.g + c.b > 1.0f) {
         c = vec4(0.0, 0.0, 0.0, 0.0);
         float lod = 0.0f;
-        for (i = 0; i < 6; i++) {
+        for (i = 0; i < 8; i++) {
             c += kernel[ 0] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
             c += kernel[ 1] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
             c += kernel[ 2] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
@@ -64,8 +64,21 @@ void main(){
             top = UV.t - 2 * offsety;
             tc = vec2(left, top);
         }
-        c = c / 256.0f / 6.0f;
+        c = c / 256.0f / 8.0f;
     }
     c += texture(forwardTexture, UV);
+    
+    //tone mapping
+    //Jim Hejl and Richard Burgess-Dawson
+//    vec3 x;
+//    x.r= max(0,c.r-0.004);
+//    x.g= max(0,c.g-0.004);
+//    x.b= max(0,c.b-0.004);
+//    c.rgb = (x*(6.2*x+.5))/(x*(6.2*x+1.7)+0.06);
+    //Reinhard
+//    c = c / (1.0 + c);
+//    c.x = pow(c.x, 1.0/2.2);
+//    c.y = pow(c.y, 1.0/2.2);
+//    c.z = pow(c.z, 1.0/2.2);
     outColor = c;
 }

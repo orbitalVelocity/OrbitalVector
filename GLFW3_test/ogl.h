@@ -43,6 +43,11 @@ public:
                      Camera &camera,
                      glm::vec3 light, glm::mat4 &mvp,
                      glm::vec3 color, GLuint* indices);
+    void drawIndexed(glm::mat4 &world,
+                     Camera &camera,
+                     glm::mat4 &mvp,
+                     GLuint* indices);
+    void draw(glm::mat4 &camera);
     void draw(glm::mat4 &camera, glm::vec3 color);
 public:
     GLuint shaderProgram;

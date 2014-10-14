@@ -1,7 +1,18 @@
 #version 150 core
 
+#if 0
+out vec4 outColor;
+
+void main(){
+    vec3 color = vec3(gl_FragCoord.z/gl_FragCoord.w);
+    outColor = vec4(color, 1.0);
+}
+
+#else
+
 out float outColor;
 
 void main(){
-//    outColor = gl_FragCoord.z;
+    outColor = gl_FragCoord.z;
 }
+#endif

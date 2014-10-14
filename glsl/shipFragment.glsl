@@ -1,12 +1,16 @@
 #version 150 core
 in vec3 fragNormal;
 in vec3 fragVertex;
+in vec4 shadowCoord;
 uniform vec3 lightPos;
 uniform mat4 model;
 uniform mat4 world;
 uniform vec3 cameraPos;
 uniform vec3 color;
 out vec4 outColor;
+
+uniform sampler2D shadowMap;
+//uniform sampler2DShadow shadowMap;
 
 void main() {
     vec3 light2 = vec3(0.3,0.5,0.4);
@@ -32,5 +36,11 @@ void main() {
     vec3 finalColor = color * max(0.0, dot(normal, -surfToLight) * intensity)
     ;// + specularCoefficient * specularColor;
 //    finalColor = cameraPos;
+//    finalColor.xyz = vec3(gl_FragCoord.w);
+    float visibility = 1.0f;
+    if ( texture(shadowMap, shadowCoord.xy).z < shadowCoord.z)
+        visibility = 0.5;
+    finalColor = vec3(visibility);//visibility * finalColor;
+//    finalColor = visibiity * finalColor;
     outColor = vec4(finalColor, 1.0);
 }

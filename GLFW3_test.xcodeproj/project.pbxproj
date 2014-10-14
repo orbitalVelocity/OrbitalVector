@@ -43,6 +43,7 @@
 		F1C8EFC019CE1B26008CCC90 /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = F1C8EFBE19CE1B26008CCC90 /* tiny_obj_loader.cc */; };
 		F1F5236319E9D36D00B860DC /* highpass.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1F5236219E9D11D00B860DC /* highpass.fs */; };
 		F1F5236519EA2F8D00B860DC /* depth.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1F5236419EA2F2E00B860DC /* depth.fs */; };
+		F1F5236819EA351500B860DC /* simplePassThrough.vs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1F5236719EA333D00B860DC /* simplePassThrough.vs */; };
 		F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +54,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				F1F5236819EA351500B860DC /* simplePassThrough.vs in CopyFiles */,
 				F1F5236519EA2F8D00B860DC /* depth.fs in CopyFiles */,
 				F1F5236319E9D36D00B860DC /* highpass.fs in CopyFiles */,
 				F144C6D719E3636600C848B9 /* DroidSerif-Regular.ttf in CopyFiles */,
@@ -130,6 +132,7 @@
 		F1C8EFBF19CE1B26008CCC90 /* tiny_obj_loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
 		F1F5236219E9D11D00B860DC /* highpass.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = highpass.fs; path = glsl/highpass.fs; sourceTree = "<group>"; };
 		F1F5236419EA2F2E00B860DC /* depth.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = depth.fs; path = glsl/depth.fs; sourceTree = "<group>"; };
+		F1F5236719EA333D00B860DC /* simplePassThrough.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = simplePassThrough.vs; path = glsl/simplePassThrough.vs; sourceTree = "<group>"; };
 		F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLError.cpp; sourceTree = "<group>"; };
 		F1FDDCF919BE68D4009CFEB0 /* GLError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLError.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -154,6 +157,7 @@
 			isa = PBXGroup;
 			children = (
 				F151168D19E17D690018635B /* passthrough.vs */,
+				F1F5236719EA333D00B860DC /* simplePassThrough.vs */,
 				F151168E19E17D690018635B /* wobblyTexture.fs */,
 				F151169119E228EC0018635B /* bloom.fs */,
 				F1F5236219E9D11D00B860DC /* highpass.fs */,

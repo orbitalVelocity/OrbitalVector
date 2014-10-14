@@ -64,7 +64,7 @@ public:
     friend class UserInput;
     UserInput *_userInput;
     
-    RenderTarget rt, rtBloom;
+    RenderTarget rt, rtBloom, rtShadow;
     OGL hdr, highPass, shadowMap;
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;

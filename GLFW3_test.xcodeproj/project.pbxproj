@@ -30,6 +30,7 @@
 		F15E8EA619BD4696003E566C /* LoadShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EA219BD4696003E566C /* LoadShader.cpp */; };
 		F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB319BD47C9003E566C /* fontstash.cpp */; };
 		F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB519BD47C9003E566C /* opengl_fontstashcallbacks.cpp */; };
+		F1764D8219ECDE2B0031443F /* simplePassThrough.vs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1764D8119ECDE250031443F /* simplePassThrough.vs */; };
 		F1B3C67418D935EC00971791 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1B3C67318D935EC00971791 /* main.cpp */; };
 		F1B3C67618D935EC00971791 /* GLFW3_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1B3C67518D935EC00971791 /* GLFW3_test.1 */; };
 		F1B3C67F18D9397400971791 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67E18D9397400971791 /* IOKit.framework */; };
@@ -53,6 +54,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				F1764D8219ECDE2B0031443F /* simplePassThrough.vs in CopyFiles */,
 				F1F5236519EA2F8D00B860DC /* depth.fs in CopyFiles */,
 				F1F5236319E9D36D00B860DC /* highpass.fs in CopyFiles */,
 				F144C6D719E3636600C848B9 /* DroidSerif-Regular.ttf in CopyFiles */,
@@ -113,6 +115,7 @@
 		F15E8EB619BD47C9003E566C /* opengl_fontstashcallbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opengl_fontstashcallbacks.h; sourceTree = "<group>"; };
 		F15E8EB719BD47C9003E566C /* stb_image_write.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		F15E8EB819BD47C9003E566C /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
+		F1764D8119ECDE250031443F /* simplePassThrough.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = simplePassThrough.vs; path = glsl/simplePassThrough.vs; sourceTree = "<group>"; };
 		F1B3C67018D935EC00971791 /* GLFW3_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GLFW3_test; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1B3C67318D935EC00971791 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F1B3C67518D935EC00971791 /* GLFW3_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GLFW3_test.1; sourceTree = "<group>"; };
@@ -153,6 +156,7 @@
 		F1011C6919C6933D00602446 /* glsl */ = {
 			isa = PBXGroup;
 			children = (
+				F1764D8119ECDE250031443F /* simplePassThrough.vs */,
 				F151168D19E17D690018635B /* passthrough.vs */,
 				F151168E19E17D690018635B /* wobblyTexture.fs */,
 				F151169119E228EC0018635B /* bloom.fs */,

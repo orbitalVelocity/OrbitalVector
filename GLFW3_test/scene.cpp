@@ -63,6 +63,66 @@ float kernel[KERNEL_SIZE * KERNEL_SIZE] =
     1, 4, 6, 4, 1,
 };
 
+void writeBinObject(string _fileName)
+{
+    auto fileName = _fileName + ".obj";
+    assert(true == TestLoadObj(fileName.c_str()));
+    //write to binary
+    vector<int> vecSizes(3);
+    int shipIdx = 0;
+    fileName = _fileName + ".bin";
+    FILE* pFile = fopen(fileName.c_str(), "wb");
+    //write size of each vector
+    vecSizes[0] = (float)shapes[shipIdx].mesh.positions.size();
+    vecSizes[1] = (float)shapes[shipIdx].mesh.normals.size();
+    vecSizes[2] = (float)shapes[shipIdx].mesh.indices.size();
+    cout << "actual sizes of vectors: " << endl
+    << "positions: " << vecSizes[0] << endl
+    << "normals:   " << vecSizes[1] << endl
+    << "indices:   " << vecSizes[2] << endl;
+    fwrite(vecSizes.data(), sizeof(float), 3, pFile);
+    
+    auto &array = shapes[shipIdx].mesh.positions;
+    fwrite(array.data(), 1, array.size()*sizeof(float), pFile);
+    auto &array2 = shapes[shipIdx].mesh.normals;
+    fwrite(array2.data(), 1, array2.size()*sizeof(float), pFile);
+    auto & arrayIdx = shapes[shipIdx].mesh.indices;
+    fwrite(arrayIdx.data(), 1, arrayIdx.size()*sizeof(unsigned int), pFile);
+    fclose(pFile);
+}
+
+void readBinObject(string _fileName)
+{
+    auto shipIdx = shapes.size();
+    shapes.resize(shapes.size()+1);
+    //read back and compare
+    vector<int> vecSizes(3);
+    auto fileName = _fileName + ".bin";
+    FILE* pFile = fopen(fileName.c_str(), "r");
+    fread((void *)vecSizes.data(), sizeof(int), vecSizes.size(), pFile);
+    cout << "sizes of vectors: " << endl
+    << "positions: " << vecSizes[0] << endl
+    << "normals:   " << vecSizes[1] << endl
+    << "indices:   " << vecSizes[2] << endl;
+    
+    vector<float> fArray1, fArray2;
+    vector<unsigned int> iArray1;
+    {
+        
+        auto &fArray = shapes[shipIdx].mesh.positions;
+        fArray.resize(vecSizes[0]);
+        fread((void *)fArray.data(), sizeof(float), vecSizes[0], pFile);
+    }
+    {
+        auto &fArray = shapes[shipIdx].mesh.normals;
+        fArray.resize(vecSizes[1]);
+        fread((void *)fArray.data(), sizeof(float), vecSizes[1], pFile);
+    }
+    auto &iArray = shapes[shipIdx].mesh.indices;
+    iArray.resize(vecSizes[2]);
+    fread((void *)iArray.data(), sizeof(int), vecSizes[2], pFile);
+}
+
 void Scene::init(int width, int height)
 {
     fbWidth = width;
@@ -79,71 +139,19 @@ void Scene::init(int width, int height)
     grid.init();
     check_gl_error();
     
-    ship.loadShaders("shipVertex.glsl", "shipFragment.glsl");
-    //    assert(true == TestLoadObj("cornell_box.obj"));
-    //    assert(true == TestLoadObj("suzanne.obj"));
+    /* mesh loading */
+//    assert(true == TestLoadObj("cornell_box.obj"));
+//    assert(true == TestLoadObj("suzanne.obj"));
 //    assert(true == TestLoadObj("olympus_1mesh.obj"));
 //    assert(true == TestLoadObj("terran_corvette.obj"));
 
-    FILE* pFile;
-    char outFileName[] = "olympus.bin";
-//    char outFileName[] = "terran_corvette.bin";
-    vector<int> vecSizes(3);
-
-        shapes.resize(1);
-    if (0)
-    {
-        //write to binary
-        pFile = fopen(outFileName, "wb");
-        //write size of each vector
-        vecSizes[0] = shapes[shipIdx].mesh.positions.size();
-        vecSizes[1] = shapes[shipIdx].mesh.normals.size();
-        vecSizes[2] = shapes[shipIdx].mesh.indices.size();
-                cout << "actual sizes of vectors: " << endl
-            << "positions: " << vecSizes[0] << endl
-            << "normals:   " << vecSizes[1] << endl
-            << "indices:   " << vecSizes[2] << endl;
-        fwrite(vecSizes.data(), sizeof(float), 3, pFile);
-        
-        auto &array = shapes[shipIdx].mesh.positions;
-        fwrite(array.data(), 1, array.size()*sizeof(float), pFile);
-        auto &array2 = shapes[shipIdx].mesh.normals;
-        fwrite(array2.data(), 1, array2.size()*sizeof(float), pFile);
-        auto & arrayIdx = shapes[shipIdx].mesh.indices;
-        fwrite(arrayIdx.data(), 1, arrayIdx.size()*sizeof(unsigned int), pFile);
-        fclose(pFile);
-        assert(false);
-    }
+    char fileName[] = "olympus";
+    if (0) writeBinObject(fileName);
+    if (1) readBinObject(fileName);
     
-    if (1)
-    {
-        //read back and compare
-        pFile = fopen(outFileName, "r");
-        fread((void *)vecSizes.data(), sizeof(int), vecSizes.size(), pFile);
-        cout << "sizes of vectors: " << endl
-            << "positions: " << vecSizes[0] << endl
-            << "normals:   " << vecSizes[1] << endl
-            << "indices:   " << vecSizes[2] << endl;
-        
-        vector<float> fArray1, fArray2;
-        vector<unsigned int> iArray1;
-        {
-            
-        auto &fArray = shapes[shipIdx].mesh.positions;
-            fArray.resize(vecSizes[0]);
-            fread((void *)fArray.data(), sizeof(float), vecSizes[0], pFile);
-        }
-        {
-            auto &fArray = shapes[shipIdx].mesh.normals;
-            fArray.resize(vecSizes[1]);
-            fread((void *)fArray.data(), sizeof(float), vecSizes[1], pFile);
-        }
-        auto &iArray = shapes[shipIdx].mesh.indices;
-        iArray.resize(vecSizes[2]);
-        fread((void *)iArray.data(), sizeof(int), vecSizes[2], pFile);
-    }
-    check_gl_error();
-    
+    /* loading shaders and render targets */
+    //ship.id = shipIdx;
+    ship.loadShaders("shipVertex.glsl", "shipFragment.glsl");
     ship.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
     check_gl_error();
     ship.loadAttrib("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
@@ -158,10 +166,7 @@ void Scene::init(int width, int height)
                  GL_STATIC_DRAW
                  );
     ship.drawCount = (int)shapes[shipIdx].mesh.indices.size();
-    
-    //setup hdr and associated rt
-    rt.init(fbWidth, fbHeight);
-    rtBloom.init(fbWidth, fbHeight);
+
     static const GLfloat quad[] = {
         -1.0f, -1.0f, 0.0f,
         1.0f, -1.0f, 0.0f,
@@ -179,17 +184,36 @@ void Scene::init(int width, int height)
     highPass.loadShaders("passthrough.vs", "highpass.fs", true);
     highPass.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
 
-    shadowMap.loadShaders("passthrough.vs", "depth.fs", true);
-    shadowMap.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+    {
+        shadowMap.depthTexture = true;
+        shadowMap.loadShaders("simplePassthrough.vs", "depth.fs", true);
+        shadowMap.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
+        glBindVertexArray(shadowMap.vao);
+        glGenBuffers(1, &shadowMap.elementBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shadowMap.elementBuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                     shapes[shipIdx].mesh.indices.size() * sizeof(GLuint),
+                     shapes[shipIdx].mesh.indices.data(),
+                     GL_STATIC_DRAW
+                     );
+        shadowMap.drawCount = (int)shapes[shipIdx].mesh.indices.size();
+    }
+    
+    //setup hdr and associated rt
+    rt.init(fbWidth, fbHeight);
+    rtBloom.init(fbWidth, fbHeight);
+    rtShadowMap.init(fbWidth, fbHeight, true);
 }
 
 void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
 {
     GLint internalFormat = GL_RGB16F;
     GLenum format = GL_RGB;
+    auto type = GL_HALF_FLOAT;
     if (depthTexture) {
-        internalFormat = GL_DEPTH_COMPONENT16;
+        internalFormat = GL_DEPTH_COMPONENT;
         format = GL_DEPTH_COMPONENT;
+        type = GL_FLOAT;
     }
     //from opengl-tutorial.org tutorial 14: render to target
     
@@ -205,7 +229,7 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
                  fbHeight,
                  0,
                  format,
-                 GL_HALF_FLOAT,
+                 type,
                  0);
         check_gl_error();
     
@@ -215,8 +239,14 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
     if (depthTexture) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+//        glTexParameteri (GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+        
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, renderedTexture, 0);
         glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
     } else {
         glGenerateMipmap(GL_TEXTURE_2D);
         check_gl_error();
@@ -247,6 +277,8 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
     
 
 }
+
+
 void Scene::update()
 {
     double mx, my;
@@ -274,7 +306,15 @@ void Scene::update()
     if (orbitCount++ % 30 == 0) {
         orbit.update();
     }
+
+    world = glm::translate(glm::mat4(), -sys[1].sn.pos);
 }
+    glm::vec3 srcPerspective(0,0,-4);
+	glm::mat4 depthProjectionMatrix = glm::ortho<float>(-6,6,-6,6,-10,20);
+//		glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
+    glm::mat4 depthViewMatrix = glm::lookAt(srcPerspective, glm::vec3(0,0,0), glm::vec3(0,1,0));
+glm::mat4 depthMVP;
+
 void Scene::render()
 {
 #if 0
@@ -282,24 +322,58 @@ void Scene::render()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     forwardRender();
 #else
-    //set to render to custom frame buffer
-    glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    debug = false;
+auto showDepth = true;
+auto renderDepth = true;
+ 
+    if (debug) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    } else if (renderDepth) {
+        glBindFramebuffer(GL_FRAMEBUFFER, rtShadowMap.FramebufferName);
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    } else {
+        glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
     
-    forwardRender();
+    if (renderDepth) {
+        glUseProgram(shadowMap.shaderProgram);
+          auto &gameLogic = *_gameLogic;
+        depthMVP = depthProjectionMatrix * depthViewMatrix *
+                    gameLogic.sShip[0].orientation
+                    * gameLogic.sShip[0].size;
+        shadowMap.drawIndexed(world, camera, depthMVP, shapes[shipIdx].mesh.indices.data());
+    } else {
+        forwardRender();
+    }
+    
+    if (debug) {
+        return;
+    }
+ 
     
     // high pass to get highlights onto rtBloom
     GLuint loc;
-    glBindFramebuffer(GL_FRAMEBUFFER, rtBloom.FramebufferName);
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
- 
+    if (showDepth) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);  //FIXME: remove this
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    } else {
+        glBindFramebuffer(GL_FRAMEBUFFER, rtBloom.FramebufferName);
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    }
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
-        check_gl_error();
+    if (renderDepth) {
+        glBindTexture(GL_TEXTURE_2D, rtShadowMap.renderedTexture);
+    } else {
+        glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
+    }
+    
+    check_gl_error();
+
     glGenerateMipmap(GL_TEXTURE_2D); //FIXME: should remove once done
     
-    //setup and run hdr program
     glUseProgram(highPass.shaderProgram);
     loc = glGetUniformLocation(highPass.shaderProgram, "renderedTexture");
     glUniform1i(loc, 0);
@@ -309,6 +383,9 @@ void Scene::render()
     glBindVertexArray(highPass.vao);
     glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
         check_gl_error();
+    if (showDepth) {
+        return;
+    }
     
     
     //blur rtBloom's texture and add it back to rt's texture
@@ -318,14 +395,12 @@ void Scene::render()
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, rtBloom.renderedTexture);
-        check_gl_error();
     glGenerateMipmap(GL_TEXTURE_2D); //FIXME: should remove once done
     
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
     glGenerateMipmap(GL_TEXTURE_2D);
 
-    //setup and run hdr program
     glUseProgram(hdr.shaderProgram);
     loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
     glUniform1i(loc, 0);
@@ -348,7 +423,6 @@ void Scene::forwardRender()
     
     /* render meshes */
     auto _camera = camera.matrix();
-    world = glm::translate(glm::mat4(), -sys[1].sn.pos);
     
     glm::vec3 planetColor   (0.4, 0.0, 0.0);
     glm::vec3 shipColor     (0.9, 0.9, 0.9);

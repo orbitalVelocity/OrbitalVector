@@ -12,7 +12,10 @@
 using namespace std;
 
 
-OGL::OGL(GLenum _drawType) : drawType(_drawType), vboIdx(0) {
+OGL::OGL(GLenum _drawType) : drawType(_drawType),
+                             vboIdx(0),
+                             depthTexture(false)
+{
     glGenVertexArrays(1, &vao);
 }
 
@@ -58,7 +61,9 @@ void OGL::newProgram(map<GLuint, string> &shaders, bool useProg)
         glAttachShader(shaderProgram, shaderID);
         check_gl_error();
     }
-    glBindFragDataLocation(shaderProgram, 0, "outColor");
+    if (not depthTexture) {
+        glBindFragDataLocation(shaderProgram, 0, "outColor");
+    }
     check_gl_error();
     glLinkProgram(shaderProgram);
     
@@ -245,7 +250,6 @@ void OGL::update()
 }
 
 
-
 void OGL::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
                       glm::vec3 color, GLuint *indices)
 {
@@ -262,13 +266,19 @@ void OGL::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPos, glm
     glUniform3fv(uniformID, 1, glm::value_ptr(lightPos));
     check_gl_error();
     
-    uniformID = glGetUniformLocation(shaderProgram, "camera");
+    drawIndexed(world, _camera, model, indices);
+    
+}
+
+void OGL::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model, GLuint *indices)
+{
+    auto uniformID = glGetUniformLocation(shaderProgram, "camera");
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(_camera.matrix()));
     check_gl_error();
     
     uniformID = glGetUniformLocation(shaderProgram, "model");
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(model));
-
+    
     uniformID = glGetUniformLocation(shaderProgram, "world");
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(world));
     
@@ -280,19 +290,25 @@ void OGL::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPos, glm
     
 }
 
+void OGL::draw(glm::mat4 &mvp)
+{
+    
+    GLint uTransform = glGetUniformLocation(shaderProgram, "transform");
+    //    glm::mat4 mvp = camera * world * position * size * orientation;
+    glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(mvp));
+    check_gl_error();
+    glBindVertexArray(vao);
+    check_gl_error();
+    glDrawArrays(drawType, 0, drawCount);
+    check_gl_error();
+    
+}
 void OGL::draw(glm::mat4 &mvp, glm::vec3 color)
 {
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
-        check_gl_error();
+    check_gl_error();
     glUniform3fv(uColor, 1, glm::value_ptr(color));
-        check_gl_error();
-    GLint uTransform = glGetUniformLocation(shaderProgram, "transform");
-//    glm::mat4 mvp = camera * world * position * size * orientation;
-    glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(mvp));
-        check_gl_error();
-    glBindVertexArray(vao);
-        check_gl_error();
-    glDrawArrays(drawType, 0, drawCount);
-        check_gl_error();
- 
+    check_gl_error();
+    
+    draw(mvp);
 }

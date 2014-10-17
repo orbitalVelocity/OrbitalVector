@@ -43,7 +43,8 @@ public:
           highPass(GL_TRIANGLES),
           shadowMap(GL_TRIANGLES),
           _gameLogic(_gl),
-          _userInput(_ui)
+          _userInput(_ui),
+          debug(false)
         {};
     void init(int, int);
     void render();
@@ -64,12 +65,14 @@ public:
     friend class UserInput;
     UserInput *_userInput;
     
-    RenderTarget rt, rtBloom;
+    RenderTarget rt, rtBloom, rtShadowMap;
     OGL hdr, highPass, shadowMap;
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;
     GLuint texID, timeID, coefficientID;
     int fbWidth, fbHeight;
+    
+    bool debug;
 };
 
 

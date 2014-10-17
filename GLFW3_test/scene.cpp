@@ -12,6 +12,8 @@
 std::vector<tinyobj::shape_t> shapes;
 std::vector<tinyobj::material_t> materials;
 
+auto showDepth = false;
+auto renderDepth = true;
 static bool
 TestLoadObj(
             const char* filename,
@@ -202,7 +204,8 @@ void Scene::init(int width, int height)
     //setup hdr and associated rt
     rt.init(fbWidth, fbHeight);
     rtBloom.init(fbWidth, fbHeight);
-    rtShadowMap.init(fbWidth, fbHeight, true);
+    rtShadowMap.init(fbWidth/1, fbHeight/1, true);
+//    rtShadowMap.init(fbWidth, fbHeight, true);
 }
 
 void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
@@ -211,7 +214,7 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
     GLenum format = GL_RGB;
     auto type = GL_HALF_FLOAT;
     if (depthTexture) {
-        internalFormat = GL_DEPTH_COMPONENT;
+        internalFormat = GL_DEPTH_COMPONENT16;
         format = GL_DEPTH_COMPONENT;
         type = GL_FLOAT;
     }
@@ -237,12 +240,15 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     
     if (depthTexture) {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+        if (not showDepth) {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE); //comment out to view depth texture
+        }
 //        glTexParameteri (GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
 //        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
+//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
         
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, renderedTexture, 0);
         glDrawBuffer(GL_NONE);
@@ -310,7 +316,7 @@ void Scene::update()
     world = glm::translate(glm::mat4(), -sys[1].sn.pos);
 }
     glm::vec3 srcPerspective(0,0,-4);
-	glm::mat4 depthProjectionMatrix = glm::ortho<float>(-6,6,-6,6,-10,20);
+	glm::mat4 depthProjectionMatrix = glm::ortho<float>(-1,1,-1,1,-10,10);
 //		glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
     glm::mat4 depthViewMatrix = glm::lookAt(srcPerspective, glm::vec3(0,0,0), glm::vec3(0,1,0));
 glm::mat4 depthMVP;
@@ -322,20 +328,14 @@ void Scene::render()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     forwardRender();
 #else
-    debug = false;
-auto showDepth = true;
-auto renderDepth = true;
+    debug = true;
  
-    if (debug) {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    } else if (renderDepth) {
+    if (renderDepth) {
         glBindFramebuffer(GL_FRAMEBUFFER, rtShadowMap.FramebufferName);
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     } else {
         glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     if (renderDepth) {
         glUseProgram(shadowMap.shaderProgram);
@@ -344,19 +344,21 @@ auto renderDepth = true;
                     gameLogic.sShip[0].orientation
                     * gameLogic.sShip[0].size;
         shadowMap.drawIndexed(world, camera, depthMVP, shapes[shipIdx].mesh.indices.data());
-    } else {
+    }
+    if (not showDepth)
+    {
+//        glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, rtShadowMap.renderedTexture);
         forwardRender();
     }
-    
-    if (debug) {
-        return;
-    }
- 
+    return;
     
     // high pass to get highlights onto rtBloom
-    GLuint loc;
-    if (showDepth) {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);  //FIXME: remove this
+    if (debug || showDepth) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     } else {
         glBindFramebuffer(GL_FRAMEBUFFER, rtBloom.FramebufferName);
@@ -364,26 +366,22 @@ auto renderDepth = true;
     }
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
-    if (renderDepth) {
+    if (showDepth) {
         glBindTexture(GL_TEXTURE_2D, rtShadowMap.renderedTexture);
     } else {
         glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
     }
-    
+//    glGenerateMipmap(GL_TEXTURE_2D); //FIXME: should remove once done
     check_gl_error();
-
-    glGenerateMipmap(GL_TEXTURE_2D); //FIXME: should remove once done
     
     glUseProgram(highPass.shaderProgram);
-    loc = glGetUniformLocation(highPass.shaderProgram, "renderedTexture");
+    auto loc = glGetUniformLocation(highPass.shaderProgram, "renderedTexture");
     glUniform1i(loc, 0);
-    loc = glGetUniformLocation(highPass.shaderProgram, "frameSize");
-    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(fbWidth, fbHeight)));
     
     glBindVertexArray(highPass.vao);
     glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
         check_gl_error();
-    if (showDepth) {
+    if (debug || showDepth) {
         return;
     }
     
@@ -447,10 +445,21 @@ void Scene::forwardRender()
         gameLogic.sShip[i].move(sys[i+shipOffset].sn.pos);
         auto mvp = gameLogic.sShip[i].orientation
                  * gameLogic.sShip[i].size;
-//        auto mvp = gameLogic.sShip[i].transform();
-        //                  * glm::rotate(glm::inverse(camera.orientation()),
-        //                                180.0f,
-        //                                glm::vec3(0,1,0));
+        
+        auto loc = glGetUniformLocation(ship.shaderProgram, "shadowMap");
+        glUniform1i(loc, 0);
+        loc = glGetUniformLocation(ship.shaderProgram, "depthBiasMVP");
+
+        //add shadow related uniforms
+        glm::mat4 biasMatrix(
+                             0.5, 0.0, 0.0, 0.0,
+                             0.0, 0.5, 0.0, 0.0,
+                             0.0, 0.0, 0.5, 0.0,
+                             0.5, 0.5, 0.5, 1.0
+                             );
+        
+		glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
+		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
         ship.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
         check_gl_error();
     }

@@ -12,27 +12,28 @@ out vec4 outColor;
 void main(){
     float width = frameSize.x;
     float height = frameSize.y;
-    float offsetx = 1.0f / height;//width;
-    float offsety = 1.0f / width ;
-    vec4 c = vec4(0.0, 0.0, 0.0, 0.0);
+    float scale = 2;
+    float offsetx = scale / width;//height;
+    float offsety = scale / height;//width;
     int i;
-    float left = UV.s - 2 * offsetx;
-    float top = UV.t - 2 * offsety;
+    float offsetFactor = 2;
+    float left = UV.x - offsetFactor * offsetx;
+    float top = UV.y;// - offsetFactor * offsety;
     vec2 tc = vec2(left, top);
-    
-    //    for (i = 0; i < 25; i++) {
-    //        color += kernel[i] * textureLod(renderedTexture, UV + vec2(1/width*offsetx, 1/height*offsety)) / 256.0f;
-    //    }
-    c = texture(renderedTexture, UV);
-    if (true){//c.r + c.g + c.b > 1.0f) {
-        c = vec4(0.0, 0.0, 0.0, 0.0);
-        float lod = 0.0f;
-        for (i = 0; i < 8; i++) {
-            c += kernel[ 0] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
-            c += kernel[ 1] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
-            c += kernel[ 2] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
-            c += kernel[ 3] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
-            c += kernel[ 4] * textureLod(renderedTexture, tc, lod); tc.y += offsety;
+    scale = 2;
+
+    vec4 c = texture(renderedTexture, UV);
+    int passes = 8;
+    c = vec4(0.0, 0.0, 0.0, 0.0);
+    float lod = 2.0f;
+    for (i = 0; i < passes; i++) {
+        c += kernel[ 0] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
+        c += kernel[ 1] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
+        c += kernel[ 2] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
+        c += kernel[ 3] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
+        c += kernel[ 4] * textureLod(renderedTexture, tc, lod);
+        //            tc.y += offsety;
+        if (false) {
             tc.x = left;
             c += kernel[ 5] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
             c += kernel[ 6] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
@@ -57,15 +58,15 @@ void main(){
             c += kernel[22] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
             c += kernel[23] * textureLod(renderedTexture, tc, lod); tc.x += offsetx;
             c += kernel[24] * textureLod(renderedTexture, tc, lod);
-            lod += 1.0f;
-            offsety *= 2.0f;
-            offsetx *= 2.0f;
-            left = UV.s - 2 * offsetx;
-            top = UV.t - 2 * offsety;
-            tc = vec2(left, top);
         }
-        c = c / 256.0f / 8.0f;
+        lod += 1.0f;
+        left = UV.x - offsetFactor * offsetx;
+        offsetx *= scale;
+//        offsety *= scale;
+//        top = UV.y - offsetFactor * offsety;
+        tc = vec2(left, top);
     }
+    c = c / 16.0f / float(passes);
     c += texture(forwardTexture, UV);
     
     //tone mapping

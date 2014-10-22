@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "GLError.h"
 // Load the shader from the source text
 void gltLoadShaderSrc(const char *szShaderSrc, GLuint shader)
 {
@@ -31,13 +31,9 @@ GLuint gltLoadShaderPair(const char *szVertexProg, const char *szFragmentProg)
 	
 	// Compile them
 	glCompileShader(hVertexShader);
-	GLuint err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
     glCompileShader(hFragmentShader);
-    err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
 	// Check for errors
 	glGetShaderiv(hVertexShader, GL_COMPILE_STATUS, &testVal);
 	if(testVal == GL_FALSE)

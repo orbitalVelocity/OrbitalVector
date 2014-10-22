@@ -147,6 +147,7 @@ void Scene::init(int width, int height)
 //    assert(true == TestLoadObj("olympus_1mesh.obj"));
 //    assert(true == TestLoadObj("terran_corvette.obj"));
 
+//    char fileName[] = "terran_corvette";
     char fileName[] = "olympus";
     if (0) writeBinObject(fileName);
     if (1) readBinObject(fileName);
@@ -202,9 +203,11 @@ void Scene::init(int width, int height)
     }
     
     //setup hdr and associated rt
+    rt.useMipMap = true;
     rt.init(fbWidth, fbHeight);
+    rtBloom.useMipMap = true;
     rtBloom.init(fbWidth, fbHeight);
-    rtShadowMap.init(fbWidth/1, fbHeight/1, true);
+    rtShadowMap.init(fbWidth, fbHeight, true);
 //    rtShadowMap.init(fbWidth, fbHeight, true);
 }
 
@@ -242,19 +245,19 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
     if (depthTexture) {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
         if (not showDepth) {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE); //comment out to view depth texture
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE); //comment out to view depth texture
         }
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LESS);
 //        glTexParameteri (GL_TEXTURE_2D, GL_DEPTH_TEXTURE_MODE, GL_INTENSITY);
-//        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_R_TO_TEXTURE);
 //        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE);
         
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, renderedTexture, 0);
         glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);
     } else {
-        glGenerateMipmap(GL_TEXTURE_2D);
+        if (useMipMap)
+            glGenerateMipmap(GL_TEXTURE_2D);
         check_gl_error();
         
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//_MIPMAP_LINEAR);
@@ -328,33 +331,43 @@ void Scene::render()
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     forwardRender();
 #else
-    debug = true;
- 
+    debug = false;
+//    renderDepth = false;
+    //shadow map rendering
     if (renderDepth) {
         glBindFramebuffer(GL_FRAMEBUFFER, rtShadowMap.FramebufferName);
-    } else {
-        glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
+//    } else {
+//        glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
     }
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if (renderDepth) {
+//        glViewport(0, 0, fbWidth/2, fbHeight/2);
         glUseProgram(shadowMap.shaderProgram);
           auto &gameLogic = *_gameLogic;
         depthMVP = depthProjectionMatrix * depthViewMatrix *
                     gameLogic.sShip[0].orientation
                     * gameLogic.sShip[0].size;
         shadowMap.drawIndexed(world, camera, depthMVP, shapes[shipIdx].mesh.indices.data());
+//        glViewport(0, 0, fbWidth, fbHeight);
     }
+    
+    //regular forward rendering
     if (not showDepth)
     {
-//        glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        if (debug) {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        } else {
+            glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
+        }
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, rtShadowMap.renderedTexture);
         forwardRender();
     }
-    return;
+    if (debug) {
+        return;
+    }
     
     // high pass to get highlights onto rtBloom
     if (debug || showDepth) {
@@ -371,7 +384,6 @@ void Scene::render()
     } else {
         glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
     }
-//    glGenerateMipmap(GL_TEXTURE_2D); //FIXME: should remove once done
     check_gl_error();
     
     glUseProgram(highPass.shaderProgram);
@@ -393,11 +405,11 @@ void Scene::render()
     // Bind our texture in Texture Unit 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, rtBloom.renderedTexture);
-    glGenerateMipmap(GL_TEXTURE_2D); //FIXME: should remove once done
+    glGenerateMipmap(GL_TEXTURE_2D);
     
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
-    glGenerateMipmap(GL_TEXTURE_2D);
+//    glGenerateMipmap(GL_TEXTURE_2D); // don't need it
 
     glUseProgram(hdr.shaderProgram);
     loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");

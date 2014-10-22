@@ -22,12 +22,16 @@ using namespace std;
 
 class RenderTarget {
 public:
+    RenderTarget()
+    { useMipMap = false;
+    }
     void init(int, int, bool depthTexture=false);
 public:
     // The framebuffer, which regroups 0, 1, or more textures, and 0 or 1 depth buffer.
 	GLuint FramebufferName;
 	GLuint renderedTexture;
     GLuint depthrenderbuffer;
+    bool useMipMap;
 };
 
 //Scene graph handles managements of all (?) objects

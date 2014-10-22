@@ -36,14 +36,15 @@ void main() {
 //    vec3 P =vec3(shadowCoord.x, shadowCoord.y, shadowCoord.z);///shadowCoord.w);
     float visibility = 1.0;
 //    vec3 P = vec3(shadowCoord.xy, shadowCoord.z / shadowCoord.w);
-    vec3 P = shadowCoord.xyz / shadowCoord.w;
+    vec3 P = shadowCoord.xyz;// / shadowCoord.w;
     visibility = texture( shadowMap, P);
-    vec3 textureCoord = shadowCoord.xyz/ shadowCoord.w;
+//    vec3 textureCoord = shadowCoord.xyz/ shadowCoord.w;
 //    if (texture(shadowMap, textureCoord.xy).x < textureCoord.z)
 //    if (texture(shadowMap, shadowCoord.xy).z ==0)// shadowCoord.z)
 //    if (shadowCoord.z == 0)
 //        visibility = 0.06;
     
     finalColor *= visibility;
+//    finalColor = vec3(visibility);
     outColor = vec4(finalColor, 1.0);
 }

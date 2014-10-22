@@ -42,6 +42,7 @@
 		F1C8EFBC19CD2CA3008CCC90 /* shipFragment.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */; };
 		F1C8EFBD19CD2CAA008CCC90 /* jet.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFBA19CD2C86008CCC90 /* jet.obj */; };
 		F1C8EFC019CE1B26008CCC90 /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = F1C8EFBE19CE1B26008CCC90 /* tiny_obj_loader.cc */; };
+		F1DBBA1219F6758F0022F107 /* GPUTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */; };
 		F1F5236319E9D36D00B860DC /* highpass.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1F5236219E9D11D00B860DC /* highpass.fs */; };
 		F1F5236519EA2F8D00B860DC /* depth.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1F5236419EA2F2E00B860DC /* depth.fs */; };
 		F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */; };
@@ -131,6 +132,8 @@
 		F1C8EFBA19CD2C86008CCC90 /* jet.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jet.obj; sourceTree = "<group>"; };
 		F1C8EFBE19CE1B26008CCC90 /* tiny_obj_loader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_obj_loader.cc; sourceTree = "<group>"; };
 		F1C8EFBF19CE1B26008CCC90 /* tiny_obj_loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
+		F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GPUTimer.cpp; sourceTree = "<group>"; };
+		F1DBBA1119F6758F0022F107 /* GPUTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUTimer.h; sourceTree = "<group>"; };
 		F1F5236219E9D11D00B860DC /* highpass.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = highpass.fs; path = glsl/highpass.fs; sourceTree = "<group>"; };
 		F1F5236419EA2F2E00B860DC /* depth.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = depth.fs; path = glsl/depth.fs; sourceTree = "<group>"; };
 		F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLError.cpp; sourceTree = "<group>"; };
@@ -247,6 +250,8 @@
 				F1011C7419C7F0C700602446 /* orbit.h */,
 				F15E8E9A19BD406B003E566C /* ogl.cpp */,
 				F15E8E9B19BD406B003E566C /* ogl.h */,
+				F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */,
+				F1DBBA1119F6758F0022F107 /* GPUTimer.h */,
 				F1011C7619C7F17200602446 /* includes.cpp */,
 				F15E8E9D19BD40C2003E566C /* includes.h */,
 				F1B3C67518D935EC00971791 /* GLFW3_test.1 */,
@@ -323,6 +328,7 @@
 				F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */,
 				F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */,
 				F1011C7719C7F17200602446 /* includes.cpp in Sources */,
+				F1DBBA1219F6758F0022F107 /* GPUTimer.cpp in Sources */,
 				F1B3C67418D935EC00971791 /* main.cpp in Sources */,
 				F1011C6419C5F45A00602446 /* camera.cpp in Sources */,
 				F1011C7519C7F0C700602446 /* orbit.cpp in Sources */,

@@ -22,12 +22,17 @@
 #include "spatial.h"
 #include "text.h"
 #include "gameLogic.h"
-
+#include "GPUTimer.h"
 #define CUSTOM_VSYNC 2
 #define VSYNC 1
 
 using namespace std;
 
+#define QUERY_BUFFERS 2
+#define QUERY_COUNT 1
+
+
+GPUtimer gpuTimer;
 
 void errorcb(int error, const char* desc)
 {
@@ -46,11 +51,12 @@ GLFWwindow* initGraphics(int width, int height)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 8);
+//	glfwWindowHint(GLFW_SAMPLES, 8);
 	
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(width, height, "Hello world", NULL, NULL);
+//    window = glfwCreateWindow(width, height, "Hello world", glfwGetPrimaryMonitor(), NULL);
     if (!window)
     {
         glfwTerminate();
@@ -64,7 +70,8 @@ GLFWwindow* initGraphics(int width, int height)
     /* Make the window's context current */
     glfwMakeContextCurrent(window);
     
-    glfwSwapInterval(1);
+    // set to 1 for v-sync
+    glfwSwapInterval(0);
     
     glewExperimental = GL_TRUE;
     if(glewInit() != GLEW_OK) {
@@ -73,6 +80,7 @@ GLFWwindow* initGraphics(int width, int height)
 	}
     glGetError(); //throws away benign error from glewInit on mac
  
+    initGPUTimer(&gpuTimer);
     return window;
 }
 
@@ -147,6 +155,9 @@ static void PrintInfo(const std::vector<tinyobj::shape_t>& shapes, const std::ve
 int main(int argc, const char * argv[])
 {
     int width = 1280, height = 720;
+//    int width = 960, height = 540;
+//    int width = 1440*2, height = 900*2;
+//    int width = 1920, height = 1080;
     GLFWwindow* window = initGraphics(width, height);
     int winWidth, winHeight;
     int fbWidth, fbHeight;
@@ -168,26 +179,35 @@ int main(int argc, const char * argv[])
     glfwSetTime(0);
     auto prevt = glfwGetTime();
     float renderTime = 0.0f;
-    auto size = 60;
-    RingBuffer<float> fps(size), renderTimes(size);
+    auto size = 120;
+    RingBuffer<float> fps(size), renderTimes(size), gpuRenderTimes(size);
+    vector<float> gpuTimes;
+    gpuTimes.resize(3);
     
     static float x=0, y=0;
-
-        
-        // Calculate pixel ratio for hi-dpi devices.
-        auto pxRatio = (float)fbWidth / (float)winWidth;
+    
+    // Calculate pixel ratio for hi-dpi devices.
+    auto pxRatio = (float)fbWidth / (float)winWidth;
     
     // creating vector of string
-
     TextRenderer textObj(pxRatio, fbWidth, fbHeight);
     auto getText = [&]()
     {
         stringstream textOut;
         textObj.debugTexts.clear();
-        textOut << "FPS: " << std::setprecision(4) << fps.average() << "";
+        textOut << "Frame: " << std::fixed << std::setprecision(1)
+                << 1000.0/fps.average()
+                << "ms max: " << 1000.0/fps.min()
+                << "ms min: " << 1000.0/fps.max() << "ms";
         textObj.pushBackDebug(textOut);
-        textOut << "render time: " << std::setprecision(4)
-                << renderTimes.average() << "ms";
+        textOut << "cpu time: " << std::fixed << std::setprecision(2)
+                << renderTimes.average() << "ms max: " << renderTimes.max()
+                << "ms min: " << renderTimes.min();
+        textObj.pushBackDebug(textOut);
+        textOut << "gpu time: " << std::fixed << std::setprecision(2)
+                << gpuRenderTimes.average() << "ms max: " << gpuRenderTimes.max()
+                << "ms min: " << gpuRenderTimes.min();
+//        << std::accumulate(gpuTimes.begin(), gpuTimes.end(), 0) << "ms";
         textObj.pushBackDebug(textOut);
         textOut << "mouse x: " << x << " y: " << y << " window size " << fbWidth << " x " << fbHeight;
         textObj.pushBackDebug(textOut);
@@ -207,7 +227,7 @@ int main(int argc, const char * argv[])
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.apo)));
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.peri)));
-    
+    prevt = glfwGetTime();
     while (!glfwWindowShouldClose(window))
     {
         /* performance measurement setup */
@@ -216,6 +236,7 @@ int main(int argc, const char * argv[])
         prevt = t;
         fps.push(1.0f/dt);
         renderTimes.push(renderTime*1000.0f);
+		startGPUTimer(&gpuTimer);
     
         /* get window size */
    		glfwGetWindowSize(window, &winWidth, &winHeight);
@@ -227,9 +248,9 @@ int main(int argc, const char * argv[])
         textObj.updateSettings(pxRatio, fbWidth, fbHeight);
 		
         /* Set up a blank screen */
-        glClearColor(0.0,0.0,0.0,1);
+//        glClearColor(0.0,0.0,0.0,1);
 //        glClearColor(0.5,0.5,0.5,1);
-        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+//        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         check_gl_error();
@@ -252,8 +273,7 @@ int main(int argc, const char * argv[])
 
         textObj.guiText[1].text = to_string(scene.orbit.apo);
         textObj.guiText[2].text = to_string(scene.orbit.peri);
-        
- 
+       
         /* render everything else */
 		glEnable(GL_DEPTH_TEST);
         check_gl_error();
@@ -262,8 +282,13 @@ int main(int argc, const char * argv[])
         
 		glDisable(GL_DEPTH_TEST);
         textObj.render();
-        
+       
+//        glFinish(); //16ms w/o vsync, 32ms w/ vsync for some reason
         renderTime = glfwGetTime() - t;
+		stopGPUTimer(&gpuTimer, gpuTimes.data(), 3);
+        gpuRenderTimes.push(gpuTimes[0]*1000.0);
+
+        
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
         

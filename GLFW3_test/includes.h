@@ -41,7 +41,7 @@ public:
     {
         data.resize(size, 0);
         index = 0;
-        _average = 0;
+        _average = _min = _max = 0;
     }
     void push(T v)
     {
@@ -54,9 +54,27 @@ public:
         }
         return _average;
     }
+    float max()
+    {
+        if (index % data.size() == 0) {
+            auto mm = std::minmax_element(data.begin(), data.end());
+            _min = *mm.first;
+            _max = *mm.second;
+        }
+        return _max;
+    }
+    float min()
+    {
+        if (index % data.size() == 0) {
+            auto mm = std::minmax_element(data.begin(), data.end());
+            _min = *mm.first;
+            _max = *mm.second;
+        }
+        return _min;
+    }
     
     int index = 0;
-    float _average;
+    float _average, _min, _max;
     vector<T> data;
 };
 

@@ -84,9 +84,7 @@ void loadBufferData(){
     glGenBuffers(1, &sData.m_vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, sData.m_vertexBuffer);
     glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex), vertexData, GL_STATIC_DRAW);
-    GLuint err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
     
     
     glGenBuffers(1, &sData.m_indexBuffer);
@@ -95,17 +93,13 @@ void loadBufferData(){
     
     glEnableVertexAttribArray(sData.m_positionAttribute);
     glEnableVertexAttribArray(sData.m_colourAttribute);
-	err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
 	glEnableVertexAttribArray(sData.m_textureAttribute);
     
     glVertexAttribPointer(sData.m_positionAttribute, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)0);
     glVertexAttribPointer(sData.m_colourAttribute  , 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)sizeof(vec4));
     glVertexAttribPointer(sData.m_textureAttribute , 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)(sizeof(vec4)+sizeof(vec4)));
-	err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
 }
 
 void initTestTexture()
@@ -113,14 +107,10 @@ void initTestTexture()
     //	glEnable(GL_TEXTURE_2D);
 	glGenTextures(1,(GLuint*)&sData.m_texturehandle);
 	
-    GLint err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
     glBindTexture(GL_TEXTURE_2D,sData.m_texturehandle);
     
-    err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
 	int width=256;
 	int height=256;
 	unsigned char* image = (unsigned char*)malloc(width*height);
@@ -137,14 +127,10 @@ void initTestTexture()
 	}
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width,height,0,GL_RED,GL_UNSIGNED_BYTE,image);
 	
-    err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
     glGenerateMipmap(GL_TEXTURE_2D);
 	
-    err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
     free(image);
     
 }
@@ -177,9 +163,7 @@ void display() {
     glBindBuffer(GL_ARRAY_BUFFER, sData.m_vertexBuffer);
     glBindVertexArray(sData.m_vertexArrayObject);
     
-    GLuint err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
     vec2 p( 0.f,0.f);//?b?0.5f * sinf(timeValue), 0.5f * cosf(timeValue) );
     glUniform2fv(sData.m_positionUniform, 1, (const GLfloat *)&p);
     
@@ -190,14 +174,10 @@ void display() {
     glVertexAttribPointer(sData.m_positionAttribute, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)0);
     glVertexAttribPointer(sData.m_colourAttribute  , 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)sizeof(vec4));
     glVertexAttribPointer(sData.m_textureAttribute , 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const GLvoid *)(sizeof(vec4)+sizeof(vec4)));
-	err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sData.m_indexBuffer);
     
-    err = glGetError();
-    assert(err==GL_NO_ERROR);
-    
+    check_gl_error();
 }
 
 void initFontStash()

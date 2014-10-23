@@ -14,6 +14,7 @@ UserInput * UserInput::event_handling_instance;
 UserInput::UserInput()
 {
     setEventHandling();
+    globalReload = false;
 }
 
 void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int mods)
@@ -43,6 +44,8 @@ void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int m
         actionList.push_back(ActionType::rollCCW);
 	if (key == GLFW_KEY_E)// && action == GLFW_PRESS)
         actionList.push_back(ActionType::rollCW);
+	if (key == GLFW_KEY_R)// && action == GLFW_PRESS)
+        globalReload = true;
 }
 
 void UserInput::mb(GLFWwindow* window, int button, int action, int mods)

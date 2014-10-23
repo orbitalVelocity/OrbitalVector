@@ -30,6 +30,9 @@
 
 using namespace std;
 
+//FIXME: globals for prototyping ONLY
+extern bool globalReload;
+
 string get_file_contents(string filename);
 string printVec3(glm::vec3 v);
 glm::vec2 getVec2(glm::mat4 vp, glm::vec3 _pos);

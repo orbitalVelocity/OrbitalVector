@@ -10,6 +10,9 @@
 #include "rk547m.h"
 using namespace std;
 
+
+bool globalReload;
+
 string get_file_contents(string filename)
 {
     std::ifstream in(filename, std::ios::in | std::ios::binary);

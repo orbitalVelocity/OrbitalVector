@@ -183,6 +183,8 @@ void Scene::init(int width, int height)
     hdr.loadShaders("passthrough.vs", "bloom.fs", true);
     vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
     hdr.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+    hdrV.loadShaders("passthrough.vs", "bloom.fs", true);
+    hdrV.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
 
     highPass.loadShaders("passthrough.vs", "highpass.fs", true);
     highPass.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
@@ -203,16 +205,22 @@ void Scene::init(int width, int height)
     }
     
     //setup hdr and associated rt
-    rt.useMipMap = true;
+    rt.useMipMap = false;
     rt.init(fbWidth, fbHeight);
     rtBloom.useMipMap = true;
     rtBloom.init(fbWidth, fbHeight);
+    rtBloomV.useMipMap = true;
+    rtBloomV.init(fbWidth, fbHeight);
+    rtShadowMap.useMipMap = true;
     rtShadowMap.init(fbWidth, fbHeight, true);
-//    rtShadowMap.init(fbWidth, fbHeight, true);
 }
 
 void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
 {
+    if ( !GLEW_ARB_framebuffer_object ){ // OpenGL 2.1 doesn't require this, 3.1+ does
+        assert(false && "no framebuffer object supported, use a texture instead.");
+    }
+
     GLint internalFormat = GL_RGB16F;
     GLenum format = GL_RGB;
     auto type = GL_HALF_FLOAT;
@@ -256,22 +264,21 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
         glDrawBuffer(GL_NONE);
         glReadBuffer(GL_NONE);
     } else {
-        if (useMipMap)
+        if (useMipMap) {
             glGenerateMipmap(GL_TEXTURE_2D);
-        check_gl_error();
-        
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//_MIPMAP_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        // The depth buffer
-        if ( !GLEW_ARB_framebuffer_object ){ // OpenGL 2.1 doesn't require this, 3.1+ does
-            assert(false && "no framebuffer object supported, use a texture instead.");
+            check_gl_error();
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        } else {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);//_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         }
+        
         glGenRenderbuffers(1, &depthrenderbuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, fbWidth, fbHeight);
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthrenderbuffer);
     
-        //TODO: add separate render buffer
         // Set "renderedTexture" as our colour attachement #0
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, renderedTexture, 0);
         
@@ -336,12 +343,7 @@ void Scene::render()
     //shadow map rendering
     if (renderDepth) {
         glBindFramebuffer(GL_FRAMEBUFFER, rtShadowMap.FramebufferName);
-//    } else {
-//        glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
-    }
-    
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if (renderDepth) {
 //        glViewport(0, 0, fbWidth/2, fbHeight/2);
         glUseProgram(shadowMap.shaderProgram);
           auto &gameLogic = *_gameLogic;
@@ -352,6 +354,7 @@ void Scene::render()
 //        glViewport(0, 0, fbWidth, fbHeight);
     }
     
+    
     //regular forward rendering
     if (not showDepth)
     {
@@ -359,6 +362,7 @@ void Scene::render()
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         } else {
             glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
+//        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt.renderedTexture, 0);
         }
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glActiveTexture(GL_TEXTURE0);
@@ -369,12 +373,14 @@ void Scene::render()
         return;
     }
     
+    
     // high pass to get highlights onto rtBloom
     if (debug || showDepth) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     } else {
         glBindFramebuffer(GL_FRAMEBUFFER, rtBloom.FramebufferName);
+//        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rtBloom.renderedTexture, 0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     }
     // Bind our texture in Texture Unit 0
@@ -397,9 +403,13 @@ void Scene::render()
         return;
     }
     
-    
-    //blur rtBloom's texture and add it back to rt's texture
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    const bool onePassBloom = true;
+    //blur rtBloom Vertical texture and add it back to rt's texture
+    if (onePassBloom)
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    else
+        glBindFramebuffer(GL_FRAMEBUFFER, rtBloomV.FramebufferName);
+//        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rtBloomV.renderedTexture, 0);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     // Bind our texture in Texture Unit 0
@@ -409,19 +419,54 @@ void Scene::render()
     
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
-//    glGenerateMipmap(GL_TEXTURE_2D); // don't need it
-
+    
     glUseProgram(hdr.shaderProgram);
     loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
     glUniform1i(loc, 0);
     loc = glGetUniformLocation(hdr.shaderProgram, "forwardTexture");
     glUniform1i(loc, 1);
+#if 1
+    loc = glGetUniformLocation(hdr.shaderProgram, "offset");
+    float offsetx = 0, offsety = 0;
+    offsetx = 1.0f / fbWidth;
+    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(offsetx, offsety)));
+#else
     loc = glGetUniformLocation(hdr.shaderProgram, "kernel");
     glUniform1fv(loc, KERNEL_SIZE * KERNEL_SIZE, kernel);
     loc = glGetUniformLocation(hdr.shaderProgram, "frameSize");
     glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(fbWidth, fbHeight)));
+#endif
     
     glBindVertexArray(hdr.vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    check_gl_error();
+ 
+    if (onePassBloom)
+        return;
+    
+    //blur rtBloom's texture and add it back to rt's texture
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    // Bind our texture in Texture Unit 0
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, rtBloomV.renderedTexture);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    
+//    glActiveTexture(GL_TEXTURE1);
+//    glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
+
+//    glUseProgram(hdr.shaderProgram);
+//    loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
+//    glUniform1i(loc, 0);
+//    loc = glGetUniformLocation(hdr.shaderProgram, "forwardTexture");
+//    glUniform1i(loc, 1);
+//    loc = glGetUniformLocation(hdr.shaderProgram, "kernel");
+//    glUniform1fv(loc, KERNEL_SIZE * KERNEL_SIZE, kernel);
+//    loc = glGetUniformLocation(hdr.shaderProgram, "frameSize");
+//    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(fbWidth, fbHeight)));
+//    
+//    glBindVertexArray(hdr.vao);
     glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
         check_gl_error();
 #endif

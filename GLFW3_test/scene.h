@@ -44,6 +44,7 @@ public:
           grid(GL_LINEAR_ATTENUATION),
           ship(GL_TRIANGLES),
           hdr(GL_TRIANGLES),
+          hdrV(GL_TRIANGLES),
           highPass(GL_TRIANGLES),
           shadowMap(GL_TRIANGLES),
           _gameLogic(_gl),
@@ -69,8 +70,8 @@ public:
     friend class UserInput;
     UserInput *_userInput;
     
-    RenderTarget rt, rtBloom, rtShadowMap;
-    OGL hdr, highPass, shadowMap;
+    RenderTarget rt, rtBloom, rtBloomV, rtShadowMap;
+    OGL hdr, hdrV, highPass, shadowMap;
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;
     GLuint texID, timeID, coefficientID;

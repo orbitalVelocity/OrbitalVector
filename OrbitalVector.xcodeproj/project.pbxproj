@@ -117,7 +117,7 @@
 		F15E8EB719BD47C9003E566C /* stb_image_write.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		F15E8EB819BD47C9003E566C /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
 		F1764D8119ECDE250031443F /* simplePassThrough.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = simplePassThrough.vs; path = glsl/simplePassThrough.vs; sourceTree = "<group>"; };
-		F1B3C67018D935EC00971791 /* GLFW3_test */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = GLFW3_test; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1B3C67018D935EC00971791 /* OrbitalVector */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OrbitalVector; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1B3C67318D935EC00971791 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F1B3C67518D935EC00971791 /* GLFW3_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GLFW3_test.1; sourceTree = "<group>"; };
 		F1B3C67C18D9396300971791 /* libglfw3.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglfw3.a; path = ../../../../../usr/local/lib/libglfw3.a; sourceTree = "<group>"; };
@@ -209,7 +209,7 @@
 				F1B3C68018D9397B00971791 /* Cocoa.framework */,
 				F1B3C67E18D9397400971791 /* IOKit.framework */,
 				F1B3C67C18D9396300971791 /* libglfw3.a */,
-				F1B3C67218D935EC00971791 /* GLFW3_test */,
+				F1B3C67218D935EC00971791 /* OrbitalVector */,
 				F1011C6919C6933D00602446 /* glsl */,
 				F15E8E9E19BD4696003E566C /* rendertest */,
 				F15E8EB219BD47C9003E566C /* fontstash */,
@@ -221,12 +221,12 @@
 		F1B3C67118D935EC00971791 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F1B3C67018D935EC00971791 /* GLFW3_test */,
+				F1B3C67018D935EC00971791 /* OrbitalVector */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		F1B3C67218D935EC00971791 /* GLFW3_test */ = {
+		F1B3C67218D935EC00971791 /* OrbitalVector */ = {
 			isa = PBXGroup;
 			children = (
 				F1B3C67318D935EC00971791 /* main.cpp */,
@@ -258,7 +258,7 @@
 				F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */,
 				F1FDDCF919BE68D4009CFEB0 /* GLError.h */,
 			);
-			path = GLFW3_test;
+			path = OrbitalVector;
 			sourceTree = "<group>";
 		};
 		F1C8EFB919CD2C86008CCC90 /* assets */ = {
@@ -274,9 +274,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		F1B3C66F18D935EC00971791 /* GLFW3_test */ = {
+		F1B3C66F18D935EC00971791 /* OrbitalVector */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F1B3C67918D935EC00971791 /* Build configuration list for PBXNativeTarget "GLFW3_test" */;
+			buildConfigurationList = F1B3C67918D935EC00971791 /* Build configuration list for PBXNativeTarget "OrbitalVector" */;
 			buildPhases = (
 				F1B3C66C18D935EC00971791 /* Sources */,
 				F1B3C66D18D935EC00971791 /* Frameworks */,
@@ -286,9 +286,9 @@
 			);
 			dependencies = (
 			);
-			name = GLFW3_test;
+			name = OrbitalVector;
 			productName = GLFW3_test;
-			productReference = F1B3C67018D935EC00971791 /* GLFW3_test */;
+			productReference = F1B3C67018D935EC00971791 /* OrbitalVector */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -300,7 +300,7 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Si Li";
 			};
-			buildConfigurationList = F1B3C66B18D935EC00971791 /* Build configuration list for PBXProject "GLFW3_test" */;
+			buildConfigurationList = F1B3C66B18D935EC00971791 /* Build configuration list for PBXProject "OrbitalVector" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -312,7 +312,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F1B3C66F18D935EC00971791 /* GLFW3_test */,
+				F1B3C66F18D935EC00971791 /* OrbitalVector */,
 			);
 		};
 /* End PBXProject section */
@@ -436,7 +436,7 @@
 				);
 				OTHER_CFLAGS = "-O0";
 				OTHER_LDFLAGS = "-lGLEW";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = OrbitalVector;
 			};
 			name = Debug;
 		};
@@ -460,14 +460,14 @@
 				);
 				OTHER_CFLAGS = "-O0";
 				OTHER_LDFLAGS = "-lGLEW";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = OrbitalVector;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		F1B3C66B18D935EC00971791 /* Build configuration list for PBXProject "GLFW3_test" */ = {
+		F1B3C66B18D935EC00971791 /* Build configuration list for PBXProject "OrbitalVector" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F1B3C67718D935EC00971791 /* Debug */,
@@ -476,7 +476,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F1B3C67918D935EC00971791 /* Build configuration list for PBXNativeTarget "GLFW3_test" */ = {
+		F1B3C67918D935EC00971791 /* Build configuration list for PBXNativeTarget "OrbitalVector" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F1B3C67A18D935EC00971791 /* Debug */,

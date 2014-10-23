@@ -8,7 +8,9 @@ uniform mat4 model;
 uniform mat4 world;
 uniform mat4 camera;
 uniform mat4 DepthBiasMVP;
-
+out gl_PerVertex {
+    vec4 gl_Position;
+};
 void main() {
 
     fragNormal = normal;

@@ -55,8 +55,8 @@ GLFWwindow* initGraphics(int width, int height)
 	
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
     /* Create a windowed mode window and its OpenGL context */
-//    window = glfwCreateWindow(width, height, "Hello world", NULL, NULL);
-    window = glfwCreateWindow(width, height, "Hello world", glfwGetPrimaryMonitor(), NULL);
+    window = glfwCreateWindow(width, height, "Hello world", NULL, NULL);
+//    window = glfwCreateWindow(width, height, "Hello world", glfwGetPrimaryMonitor(), NULL);
     if (!window)
     {
         glfwTerminate();
@@ -154,9 +154,9 @@ static void PrintInfo(const std::vector<tinyobj::shape_t>& shapes, const std::ve
 
 int main(int argc, const char * argv[])
 {
-//    int width = 1280, height = 720;
+    int width = 1280, height = 720;
 //    int width = 960, height = 540;
-    int width = 1440*2, height = 900*2;
+//    int width = 1440*2, height = 900*2;
 //    int width = 1920, height = 1080;
     GLFWwindow* window = initGraphics(width, height);
     int winWidth, winHeight;

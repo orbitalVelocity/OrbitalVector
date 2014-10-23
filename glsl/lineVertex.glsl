@@ -3,6 +3,9 @@ in vec3 position;
 //out vec3 fragColor;
 uniform mat4 transform;
 out float depth;
+out gl_PerVertex {
+    vec4 gl_Position;
+};
 void main() {
 /*
     vec3 surfacePos = vec3(transform * vec4(position, 1.0));

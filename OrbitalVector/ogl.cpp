@@ -7,7 +7,6 @@
 //
 
 #include "ogl.h"
-#include "rk547m.h"
 
 using namespace std;
 
@@ -29,33 +28,54 @@ void OGL::init()
 
 void OGL::newProgram(map<GLuint, string> &shaders, bool useProg)
 {
+    GLint Result = GL_FALSE;
+    int InfoLogLength;
+    auto programInfo = [&](GLuint infoType)
+    {
+        // Check the program
+        glGetProgramiv(shaderProgram, infoType, &Result);
+        glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &InfoLogLength);
+        
+        if ( InfoLogLength > 0 ){
+            std::vector<char> ProgramErrorMessage(InfoLogLength+1);
+            glGetProgramInfoLog(shaderProgram, InfoLogLength, NULL, &ProgramErrorMessage[0]);
+            printf("%s\n", &ProgramErrorMessage[0]);
+        }
+    };
+    
+    auto shaderInfo = [&](GLuint shaderID, GLuint infoType)
+    {
+        glGetShaderiv(shaderID, infoType, &Result);
+        glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+        if ( InfoLogLength > 0 ){
+            std::vector<char> ShaderErrorMessage(InfoLogLength+1);
+            glGetShaderInfoLog(shaderID, InfoLogLength, NULL, &ShaderErrorMessage[0]);
+            printf("%s\n", &ShaderErrorMessage[0]);
+        }
+    };
+    
+    ////////////////////////////////////////////////////////////////////////////////
+    // Compile shaders, attach shaders, create programs, link program
+    ////////////////////////////////////////////////////////////////////////////////
     shaderIDs.resize(shaders.size());
     
     // Create and compile the vertex shader
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
     int i = 0;
-    for (auto &shader: shaders) {
-        auto shaderType = shader.first;
-        auto shaderSource = shader.second;
-        const char* src = shaderSource.c_str();
-        shaderIDs[i] = glCreateShader(shaderType);
+    for (auto &shader: shaders)
+    {
+        shaderIDs[i] = glCreateShader(shader.first);
+        const char* src = shader.second.c_str();
         
         glShaderSource(shaderIDs[i], 1, &src, NULL);
         glCompileShader(shaderIDs[i]);
         
-        glGetShaderiv(shaderIDs[i], GL_COMPILE_STATUS, &Result);
-        glGetShaderiv(shaderIDs[i], GL_INFO_LOG_LENGTH, &InfoLogLength);
-        if ( InfoLogLength > 0 ){
-            std::vector<char> ShaderErrorMessage(InfoLogLength+1);
-            glGetShaderInfoLog(shaderIDs[i], InfoLogLength, NULL, &ShaderErrorMessage[0]);
-            printf("%s\n", &ShaderErrorMessage[0]);
-        }
+        shaderInfo(shaderIDs[i], GL_COMPILE_STATUS);
         i++;
     }
     
     // Link the vertex and fragment shader into a shader program
     shaderProgram = glCreateProgram();
+    __glewProgramParameteri(shaderProgram, GL_PROGRAM_SEPARABLE, GL_TRUE);
     for (auto &shaderID : shaderIDs)
     {
         glAttachShader(shaderProgram, shaderID);
@@ -66,17 +86,11 @@ void OGL::newProgram(map<GLuint, string> &shaders, bool useProg)
     }
     check_gl_error();
     glLinkProgram(shaderProgram);
+    programInfo(GL_LINK_STATUS);
+//    glValidateProgram(shaderProgram);
+//    programInfo(GL_VALIDATE_STATUS);
     
-    // Check the program
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &Result);
-    glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    
-    if ( InfoLogLength > 0 ){
-        std::vector<char> ProgramErrorMessage(InfoLogLength+1);
-        glGetProgramInfoLog(shaderProgram, InfoLogLength, NULL, &ProgramErrorMessage[0]);
-        printf("%s\n", &ProgramErrorMessage[0]);
-    }
-    
+    // Clean up
     for (auto &shaderID : shaderIDs)
     {
         glDetachShader(shaderProgram, shaderID);

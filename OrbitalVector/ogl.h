@@ -50,7 +50,9 @@ public:
     void draw(glm::mat4 &camera, glm::vec3 color);
     void draw(glm::mat4 &camera);
 public:
+    GLuint programPipeline;
     GLuint shaderProgram;
+    GLuint vsProgram, fsProgram;
     vector<GLuint> shaderIDs;
     GLuint vao, elementBuffer;
     vector<GLuint> vbo;

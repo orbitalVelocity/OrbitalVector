@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F1B3C66F18D935EC00971791"
-               BuildableName = "GLFW3_test"
-               BlueprintName = "GLFW3_test"
-               ReferencedContainer = "container:GLFW3_test.xcodeproj">
+               BuildableName = "OrbitalVector"
+               BlueprintName = "OrbitalVector"
+               ReferencedContainer = "container:OrbitalVector.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F1B3C66F18D935EC00971791"
-            BuildableName = "GLFW3_test"
-            BlueprintName = "GLFW3_test"
-            ReferencedContainer = "container:GLFW3_test.xcodeproj">
+            BuildableName = "OrbitalVector"
+            BlueprintName = "OrbitalVector"
+            ReferencedContainer = "container:OrbitalVector.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -52,9 +52,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F1B3C66F18D935EC00971791"
-            BuildableName = "GLFW3_test"
-            BlueprintName = "GLFW3_test"
-            ReferencedContainer = "container:GLFW3_test.xcodeproj">
+            BuildableName = "OrbitalVector"
+            BlueprintName = "OrbitalVector"
+            ReferencedContainer = "container:OrbitalVector.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -70,9 +70,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "F1B3C66F18D935EC00971791"
-            BuildableName = "GLFW3_test"
-            BlueprintName = "GLFW3_test"
-            ReferencedContainer = "container:GLFW3_test.xcodeproj">
+            BuildableName = "OrbitalVector"
+            BlueprintName = "OrbitalVector"
+            ReferencedContainer = "container:OrbitalVector.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

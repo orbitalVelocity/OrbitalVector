@@ -12,8 +12,7 @@
 std::vector<tinyobj::shape_t> shapes;
 std::vector<tinyobj::material_t> materials;
 
-auto showDepth = false;
-auto renderDepth = true;
+bool showDepth = false;
 static bool
 TestLoadObj(
             const char* filename,
@@ -125,6 +124,15 @@ void readBinObject(string _fileName)
     fread((void *)iArray.data(), sizeof(int), vecSizes[2], pFile);
 }
 
+static const GLfloat quad[] = {
+    -1.0f, -1.0f, 0.0f,
+    1.0f, -1.0f, 0.0f,
+    -1.0f,  1.0f, 0.0f,
+    -1.0f,  1.0f, 0.0f,
+    1.0f, -1.0f, 0.0f,
+    1.0f,  1.0f, 0.0f,
+};
+
 void Scene::init(int width, int height)
 {
     fbWidth = width;
@@ -147,8 +155,8 @@ void Scene::init(int width, int height)
 //    assert(true == TestLoadObj("olympus_1mesh.obj"));
 //    assert(true == TestLoadObj("terran_corvette.obj"));
 
-//    char fileName[] = "terran_corvette";
-    char fileName[] = "olympus";
+    char fileName[] = "terran_corvette";
+//    char fileName[] = "olympus";
     if (0) writeBinObject(fileName);
     if (1) readBinObject(fileName);
     
@@ -170,14 +178,7 @@ void Scene::init(int width, int height)
                  );
     ship.drawCount = (int)shapes[shipIdx].mesh.indices.size();
 
-    static const GLfloat quad[] = {
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        -1.0f,  1.0f, 0.0f,
-        -1.0f,  1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        1.0f,  1.0f, 0.0f,
-    };
+    
     
     // Create and compile our GLSL program from the shaders
     hdr.loadShaders("passthrough.vs", "bloom.fs", true);
@@ -188,6 +189,9 @@ void Scene::init(int width, int height)
 
     highPass.loadShaders("passthrough.vs", "highpass.fs", true);
     highPass.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+
+    blit.loadShaders("passthrough.vs", "passthrough.fs", true);
+    blit.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
 
     {
         shadowMap.depthTexture = true;
@@ -205,10 +209,10 @@ void Scene::init(int width, int height)
     }
     
     //setup hdr and associated rt
-    rt.useMipMap = false;
-    rt.init(fbWidth, fbHeight);
+    rt.useMipMap = true;
+    rt.init(fbWidth/4, fbHeight/4);
     rtBloom.useMipMap = true;
-    rtBloom.init(fbWidth, fbHeight);
+    rtBloom.init(fbWidth/4, fbHeight/4);
     rtBloomV.useMipMap = true;
     rtBloomV.init(fbWidth, fbHeight);
     rtShadowMap.useMipMap = true;
@@ -267,13 +271,13 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
         if (useMipMap) {
             glGenerateMipmap(GL_TEXTURE_2D);
             check_gl_error();
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);//_MIPMAP_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         } else {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);//_MIPMAP_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         }
-        
+
         glGenRenderbuffers(1, &depthrenderbuffer);
         glBindRenderbuffer(GL_RENDERBUFFER, depthrenderbuffer);
         glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, fbWidth, fbHeight);
@@ -325,11 +329,48 @@ void Scene::update()
 
     world = glm::translate(glm::mat4(), -sys[1].sn.pos);
 }
+
+void Scene::postFrame()
+{
+    //render done? (may need to take place after swap buffer
+    static int reloadCount = 1;
+    if (globalReload) {
+        globalReload = false;
+        cout << "reloading #" << reloadCount++ << "\n";
+        //shut down program and delete shaders
+        glUseProgram(0);
+        glDeleteProgram(hdr.shaderProgram);
+        for (auto &shaderID : hdr.shaderIDs)
+            glDeleteShader(shaderID);
+        
+        //reload bloom
+        hdr.loadShaders("passthrough.vs", "bloom.fs", true);
+        //        vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
+        //        hdr.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+    }
+}
+
     glm::vec3 srcPerspective(0,0,-4);
 	glm::mat4 depthProjectionMatrix = glm::ortho<float>(-1,1,-1,1,-10,10);
 //		glm::mat4 depthProjectionMatrix = glm::ortho<float>(-10,10,-10,10,-10,20);
     glm::mat4 depthViewMatrix = glm::lookAt(srcPerspective, glm::vec3(0,0,0), glm::vec3(0,1,0));
 glm::mat4 depthMVP;
+
+//TODO: move globals to include
+bool renderDepth = true;
+bool renderStage = 0;
+const int stage1  = 0x0001;     //shadowMap
+const int stage2  = 0x0002;     //forward
+const int stage3  = 0x0004;     //highpass
+const int stage4  = 0x0008;     //blur1
+const int stage5  = 0x0010;     //composite/tonemap
+const int stage6  = 0x0020;     //FXAA
+const int stage7  = 0x0040;
+const int stage8  = 0x0080;
+const int stage9  = 0x0010;
+const int stage10 = 0x0200;
+const int stage11 = 0x0400;
+const int stage12 = 0x0800;
 
 void Scene::render()
 {
@@ -339,7 +380,7 @@ void Scene::render()
     forwardRender();
 #else
     debug = false;
-//    renderDepth = false;
+    renderDepth = false;
     //shadow map rendering
     if (renderDepth) {
         glBindFramebuffer(GL_FRAMEBUFFER, rtShadowMap.FramebufferName);
@@ -356,6 +397,7 @@ void Scene::render()
     
     
     //regular forward rendering
+    glViewport(0, 0, fbWidth/4, fbHeight/4);
     if (not showDepth)
     {
         if (debug) {
@@ -373,7 +415,7 @@ void Scene::render()
         return;
     }
     
-    
+    glViewport(0, 0, fbWidth/4, fbHeight/4);
     // high pass to get highlights onto rtBloom
     if (debug || showDepth) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -390,6 +432,7 @@ void Scene::render()
     } else {
         glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
     }
+    glGenerateMipmap(GL_TEXTURE_2D);
     check_gl_error();
     
     glUseProgram(highPass.shaderProgram);
@@ -403,7 +446,9 @@ void Scene::render()
         return;
     }
     
-    const bool onePassBloom = true;
+    glViewport(0, 0, fbWidth, fbHeight);
+    glDisable(GL_DEPTH_TEST);
+    const bool onePassBloom = false;
     //blur rtBloom Vertical texture and add it back to rt's texture
     if (onePassBloom)
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -419,6 +464,7 @@ void Scene::render()
     
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
+    glGenerateMipmap(GL_TEXTURE_2D);
     
     glUseProgram(hdr.shaderProgram);
     loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
@@ -444,6 +490,29 @@ void Scene::render()
     if (onePassBloom)
         return;
     
+    glEnable(GL_DEPTH_TEST);
+    if (1)
+    {
+        //blit back
+        glViewport(0, 0, fbWidth, fbHeight);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, rtBloomV.renderedTexture);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glUseProgram(blit.shaderProgram);
+        check_gl_error();
+        loc = glGetUniformLocation(blit.shaderProgram, "renderedTexture");
+        glUniform1i(loc, 0);
+        check_gl_error();
+        
+        glBindVertexArray(blit.vao);
+        glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+        check_gl_error();
+    
+        return;
+    }
+
     //blur rtBloom's texture and add it back to rt's texture
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -453,6 +522,9 @@ void Scene::render()
     glBindTexture(GL_TEXTURE_2D, rtBloomV.renderedTexture);
     glGenerateMipmap(GL_TEXTURE_2D);
     
+    offsetx = 0.0;
+    offsety = 1.0f / fbHeight;
+    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(offsetx, offsety)));
 //    glActiveTexture(GL_TEXTURE1);
 //    glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
 
@@ -470,6 +542,8 @@ void Scene::render()
     glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
         check_gl_error();
 #endif
+    
+
 }
 
 void Scene::forwardRender()

@@ -47,6 +47,7 @@ public:
           hdrV(GL_TRIANGLES),
           highPass(GL_TRIANGLES),
           shadowMap(GL_TRIANGLES),
+          blit(GL_TRIANGLES),
           _gameLogic(_gl),
           _userInput(_ui),
           debug(false)
@@ -55,6 +56,7 @@ public:
     void render();
     void forwardRender();
     void update();
+    void postFrame();
     void setActiveShip(int s) { shipIdx = s; }
     
 public:
@@ -71,7 +73,8 @@ public:
     UserInput *_userInput;
     
     RenderTarget rt, rtBloom, rtBloomV, rtShadowMap;
-    OGL hdr, hdrV, highPass, shadowMap;
+    OGL hdr, hdrV, highPass, shadowMap,
+        blit;
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;
     GLuint texID, timeID, coefficientID;

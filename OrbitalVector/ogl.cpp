@@ -102,6 +102,7 @@ void OGL::newProgram(map<GLuint, string> &shaders, bool useProg)
         check_gl_error();
     }
 
+    cout << "compiled a new shader!\n";
 }
 
 void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, vector<GLfloat> &buffer)

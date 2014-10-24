@@ -154,9 +154,10 @@ static void PrintInfo(const std::vector<tinyobj::shape_t>& shapes, const std::ve
 
 int main(int argc, const char * argv[])
 {
-    int width = 1280, height = 720;
-//    int width = 960, height = 540;
+//    int width = 1280, height = 720;
+    int width = 960, height = 540;
 //    int width = 1440*2, height = 900*2;
+//    int width = 1440*1, height = 900*1;
 //    int width = 1920, height = 1080;
     GLFWwindow* window = initGraphics(width, height);
     int winWidth, winHeight;
@@ -187,7 +188,7 @@ int main(int argc, const char * argv[])
     static float x=0, y=0;
     
     // Calculate pixel ratio for hi-dpi devices.
-    auto pxRatio = (float)fbWidth / (float)winWidth;
+    auto pxRatio = (float)fbWidth / (float)width;
     
     // creating vector of string
     TextRenderer textObj(pxRatio, fbWidth, fbHeight);
@@ -241,6 +242,7 @@ int main(int argc, const char * argv[])
         /* get window size */
    		glfwGetWindowSize(window, &winWidth, &winHeight);
 		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+        
 		glViewport(0, 0, fbWidth, fbHeight);
         
         // Calculate pixel ratio for hi-dpi devices.
@@ -288,9 +290,9 @@ int main(int argc, const char * argv[])
 		stopGPUTimer(&gpuTimer, gpuTimes.data(), 3);
         gpuRenderTimes.push(gpuTimes[0]*1000.0);
 
-        
         /* Swap front and back buffers */
         glfwSwapBuffers(window);
+        scene.postFrame();
         
         /* Poll for and process events */
         glfwPollEvents();

@@ -42,6 +42,8 @@
 		F1C8EFBC19CD2CA3008CCC90 /* shipFragment.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */; };
 		F1C8EFBD19CD2CAA008CCC90 /* jet.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFBA19CD2C86008CCC90 /* jet.obj */; };
 		F1C8EFC019CE1B26008CCC90 /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = F1C8EFBE19CE1B26008CCC90 /* tiny_obj_loader.cc */; };
+		F1CFAEE819FAC5F3007CB974 /* fxaa.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1D04FBE19FAC2A100B3520F /* fxaa.fs */; };
+		F1CFAEE919FAC5F3007CB974 /* passthrough.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1D04FBD19FAC26B00B3520F /* passthrough.fs */; };
 		F1DBBA1219F6758F0022F107 /* GPUTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */; };
 		F1F5236319E9D36D00B860DC /* highpass.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1F5236219E9D11D00B860DC /* highpass.fs */; };
 		F1F5236519EA2F8D00B860DC /* depth.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1F5236419EA2F2E00B860DC /* depth.fs */; };
@@ -55,6 +57,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				F1CFAEE819FAC5F3007CB974 /* fxaa.fs in CopyFiles */,
+				F1CFAEE919FAC5F3007CB974 /* passthrough.fs in CopyFiles */,
 				F1764D8219ECDE2B0031443F /* simplePassThrough.vs in CopyFiles */,
 				F1F5236519EA2F8D00B860DC /* depth.fs in CopyFiles */,
 				F1F5236319E9D36D00B860DC /* highpass.fs in CopyFiles */,
@@ -132,6 +136,8 @@
 		F1C8EFBA19CD2C86008CCC90 /* jet.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jet.obj; sourceTree = "<group>"; };
 		F1C8EFBE19CE1B26008CCC90 /* tiny_obj_loader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_obj_loader.cc; sourceTree = "<group>"; };
 		F1C8EFBF19CE1B26008CCC90 /* tiny_obj_loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
+		F1D04FBD19FAC26B00B3520F /* passthrough.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = passthrough.fs; path = glsl/passthrough.fs; sourceTree = "<group>"; };
+		F1D04FBE19FAC2A100B3520F /* fxaa.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = fxaa.fs; sourceTree = "<group>"; };
 		F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GPUTimer.cpp; sourceTree = "<group>"; };
 		F1DBBA1119F6758F0022F107 /* GPUTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUTimer.h; sourceTree = "<group>"; };
 		F1F5236219E9D11D00B860DC /* highpass.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = highpass.fs; path = glsl/highpass.fs; sourceTree = "<group>"; };
@@ -159,18 +165,20 @@
 		F1011C6919C6933D00602446 /* glsl */ = {
 			isa = PBXGroup;
 			children = (
-				F1764D8119ECDE250031443F /* simplePassThrough.vs */,
-				F151168D19E17D690018635B /* passthrough.vs */,
 				F151168E19E17D690018635B /* wobblyTexture.fs */,
 				F151169119E228EC0018635B /* bloom.fs */,
-				F1F5236219E9D11D00B860DC /* highpass.fs */,
 				F1F5236419EA2F2E00B860DC /* depth.fs */,
+				F1D04FBE19FAC2A100B3520F /* fxaa.fs */,
+				F1F5236219E9D11D00B860DC /* highpass.fs */,
+				F151168D19E17D690018635B /* passthrough.vs */,
+				F1D04FBD19FAC26B00B3520F /* passthrough.fs */,
+				F1764D8119ECDE250031443F /* simplePassThrough.vs */,
 				F1011C6B19C6953900602446 /* lineFragment.glsl */,
 				F1011C6C19C6953900602446 /* lineVertex.glsl */,
-				F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */,
-				F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */,
 				F1011C6D19C6953900602446 /* planetFragment.glsl */,
 				F1011C6E19C6953900602446 /* planetVertex.glsl */,
+				F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */,
+				F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */,
 			);
 			name = glsl;
 			sourceTree = "<group>";

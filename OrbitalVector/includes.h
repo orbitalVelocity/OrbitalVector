@@ -32,7 +32,9 @@ using namespace std;
 
 //FIXME: globals for prototyping ONLY
 extern bool globalReload;
-
+extern bool globalShowFXAAAAirection;
+extern int renderStage;
+extern const int stage1, stage2, stage3, stage4, stage5, stage6, stage7, stage8, stage9, stage10;
 string get_file_contents(string filename);
 string printVec3(glm::vec3 v);
 glm::vec2 getVec2(glm::mat4 vp, glm::vec3 _pos);

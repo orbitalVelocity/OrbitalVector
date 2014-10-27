@@ -4,7 +4,6 @@
 in vec2 UV;
 
 uniform sampler2D renderedTexture;
-uniform sampler2D forwardTexture;
 out vec4 outColor;
 
 uniform vec2 offset;
@@ -46,7 +45,6 @@ void main(){
     c = c / float(passes)/1.8;// /2.0;
     //    c = textureLod(renderedTexture, tc,          lod);
     //    if (offset.y != 0.0)
-    c += texture(forwardTexture, tc);
     outColor = c;
 }
 

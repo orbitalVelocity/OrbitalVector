@@ -10,9 +10,21 @@
 #include "rk547m.h"
 using namespace std;
 
-
+bool globalShowFXAAAAirection = 0;
 bool globalReload;
-
+int renderStage = 0x7F;
+const int stage1  = 0x0001;     //shadowMap
+const int stage2  = 0x0002;     //forward
+const int stage3  = 0x0004;     //highpass
+const int stage4  = 0x0008;     //blur1
+const int stage5  = 0x0010;     //blur2
+const int stage6  = 0x0020;     //composite/tonemap
+const int stage7  = 0x0040;     //FXAA
+const int stage8  = 0x0080;
+const int stage9  = 0x0010;
+const int stage10 = 0x0200;
+const int stage11 = 0x0400;
+const int stage12 = 0x0800;
 string get_file_contents(string filename)
 {
     std::ifstream in(filename, std::ios::in | std::ios::binary);

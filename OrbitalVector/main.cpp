@@ -210,7 +210,8 @@ int main(int argc, const char * argv[])
                 << "ms min: " << gpuRenderTimes.min();
 //        << std::accumulate(gpuTimes.begin(), gpuTimes.end(), 0) << "ms";
         textObj.pushBackDebug(textOut);
-        textOut << "mouse x: " << x << " y: " << y << " window size " << fbWidth << " x " << fbHeight;
+        textOut << "win " << winWidth << " x " << winHeight
+                << " fb size " << fbWidth << " x " << fbHeight;
         textObj.pushBackDebug(textOut);
         textOut << "ship (" << printVec3(sys[1].sn.pos) << ")";
         textObj.pushBackDebug(textOut);
@@ -221,6 +222,20 @@ int main(int argc, const char * argv[])
         textOut << "projectiles: " << sys.size() - 2;
         textObj.pushBackDebug(textOut);
         textOut << "path size: " << scene.orbit.drawCount;
+        textObj.pushBackDebug(textOut);
+        textOut << "shadow pass: 1   " << ((renderStage & stage1) ? "On" : " ");
+        textObj.pushBackDebug(textOut);
+        textOut << "forward pass: 2  " << ((renderStage & stage2) ? "On" : " ");
+        textObj.pushBackDebug(textOut);
+        textOut << "highpass: 3           " << ((renderStage & stage3) ? "On" : " ");
+        textObj.pushBackDebug(textOut);
+        textOut << "blur1 pass: 4         " << ((renderStage & stage4) ? "On" : " ");
+        textObj.pushBackDebug(textOut);
+        textOut << "blur2 pass: 5         " << ((renderStage & stage5) ? "On" : " ");
+        textObj.pushBackDebug(textOut);
+        textOut << "composite pass: 6 " << ((renderStage & stage6) ? "On" : " ");
+        textObj.pushBackDebug(textOut);
+        textOut << "fxaa pass: 7            " << ((renderStage & stage7) ? "On" : " ");
         textObj.pushBackDebug(textOut);
     };
     

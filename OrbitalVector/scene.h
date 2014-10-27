@@ -17,13 +17,23 @@
 #include "gameLogic.h"
 #include "input.h"
 
-
+enum SN {
+    shadowMap,
+    forward,
+    highPass,
+    blur1,
+    blur2,
+    comp,
+    fxaa,
+    //don't need to worry about this last pass blit,
+    maxStages
+};
 using namespace std;
 
 class RenderTarget {
 public:
-    RenderTarget()
-    { useMipMap = false;
+    RenderTarget() : useMipMap(false), useHDR(true)
+    {
     }
     void init(int, int, bool depthTexture=false);
 public:
@@ -32,6 +42,7 @@ public:
 	GLuint renderedTexture;
     GLuint depthrenderbuffer;
     bool useMipMap;
+    bool useHDR;
 };
 
 //Scene graph handles managements of all (?) objects
@@ -44,14 +55,18 @@ public:
           grid(GL_LINEAR_ATTENUATION),
           ship(GL_TRIANGLES),
           hdr(GL_TRIANGLES),
-          hdrV(GL_TRIANGLES),
           highPass(GL_TRIANGLES),
+          composite(GL_TRIANGLES),
+          fxaa(GL_TRIANGLES),
           shadowMap(GL_TRIANGLES),
           blit(GL_TRIANGLES),
           _gameLogic(_gl),
           _userInput(_ui),
+          downSizeFactor(1.0),
           debug(false)
-        {};
+        {
+            rt.resize(maxStages);
+        };
     void init(int, int);
     void render();
     void forwardRender();
@@ -72,15 +87,17 @@ public:
     friend class UserInput;
     UserInput *_userInput;
     
-    RenderTarget rt, rtBloom, rtBloomV, rtShadowMap;
-    OGL hdr, hdrV, highPass, shadowMap,
-        blit;
+//    RenderTarget rt, rtBloom, rtBloomV, rtShadowMap;
+    vector<RenderTarget> rt;
+    OGL hdr, highPass, shadowMap,
+        blit, composite, fxaa;
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;
     GLuint texID, timeID, coefficientID;
     int fbWidth, fbHeight;
     
     bool debug;
+    float downSizeFactor;
 };
 
 

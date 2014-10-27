@@ -118,9 +118,9 @@ void texcoords(vec2 fragCoord, vec2 resolution,
 }
 
 in vec2 UV;
-in vec2 v_rgbNW; in vec2 v_rgbNE;
-in vec2 v_rgbSW; in vec2 v_rgbSE;
-in vec2 v_rgbM;
+//in vec2 v_rgbNW; in vec2 v_rgbNE;
+//in vec2 v_rgbSW; in vec2 v_rgbSE;
+//in vec2 v_rgbM;
 uniform sampler2D forwardTexture;
 out vec4 outColor;
 
@@ -135,9 +135,9 @@ void main()
     vec2 resolution = vec2(960.0, 540.0); //TODO: this should be a uniform
     //    vec2 resolution = vec2(2*960.0, 2*540.0);
     texcoords(UV, resolution, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
-    
-    if (true)
-        c += fxaa(forwardTexture, tc, resolution, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
+    vec4 c;
+    if (false)
+        c += fxaa(forwardTexture, UV, resolution, v_rgbNW, v_rgbNE, v_rgbSW, v_rgbSE, v_rgbM);
     else {
         vec3 rgbNW = texture(forwardTexture, v_rgbNW).xyz;
         vec3 rgbNE = texture(forwardTexture, v_rgbNE).xyz;
@@ -146,4 +146,5 @@ void main()
         vec3 rgbM  = texture(forwardTexture, v_rgbM).xyz;
         c += vec4(rgbNW + rgbNE + rgbSW + rgbSE + rgbM, 5.0)/5.0;
     }
+    outColor = c;
 }

@@ -37,6 +37,7 @@
 		F1B3C68118D9397B00971791 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68018D9397B00971791 /* Cocoa.framework */; };
 		F1B3C68318D9398100971791 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68218D9398100971791 /* OpenGL.framework */; };
 		F1B3C68518D93A5C00971791 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68418D93A5C00971791 /* QuartzCore.framework */; };
+		F1B68A2E19FADF970094CC41 /* composite.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1B68A2D19FADF8F0094CC41 /* composite.fs */; };
 		F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BB301019C1DB9200E349FE /* rk547m.cpp */; };
 		F1C8EFBB19CD2CA3008CCC90 /* shipVertex.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */; };
 		F1C8EFBC19CD2CA3008CCC90 /* shipFragment.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */; };
@@ -57,6 +58,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 16;
 			files = (
+				F1B68A2E19FADF970094CC41 /* composite.fs in CopyFiles */,
 				F1CFAEE819FAC5F3007CB974 /* fxaa.fs in CopyFiles */,
 				F1CFAEE919FAC5F3007CB974 /* passthrough.fs in CopyFiles */,
 				F1764D8219ECDE2B0031443F /* simplePassThrough.vs in CopyFiles */,
@@ -129,6 +131,7 @@
 		F1B3C68018D9397B00971791 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		F1B3C68218D9398100971791 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		F1B3C68418D93A5C00971791 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		F1B68A2D19FADF8F0094CC41 /* composite.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = composite.fs; path = glsl/composite.fs; sourceTree = "<group>"; };
 		F1BB301019C1DB9200E349FE /* rk547m.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rk547m.cpp; sourceTree = "<group>"; };
 		F1BB301119C1DB9200E349FE /* rk547m.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rk547m.h; sourceTree = "<group>"; };
 		F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = shipVertex.glsl; path = glsl/shipVertex.glsl; sourceTree = "<group>"; };
@@ -167,6 +170,7 @@
 			children = (
 				F151168E19E17D690018635B /* wobblyTexture.fs */,
 				F151169119E228EC0018635B /* bloom.fs */,
+				F1B68A2D19FADF8F0094CC41 /* composite.fs */,
 				F1F5236419EA2F2E00B860DC /* depth.fs */,
 				F1D04FBE19FAC2A100B3520F /* fxaa.fs */,
 				F1F5236219E9D11D00B860DC /* highpass.fs */,
@@ -435,12 +439,12 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					/usr/include/,
 					/usr/local/include/,
-					/usr/local/Cellar/glew/1.10.0/include,
+					/usr/local/Cellar/glew/1.11.0/include/,
 					"$(SRCROOT)",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib/,
-					/usr/local/Cellar/glew/1.10.0/lib,
+					/usr/local/Cellar/glew/1.11.0/lib,
 				);
 				OTHER_CFLAGS = "-O0";
 				OTHER_LDFLAGS = "-lGLEW";
@@ -459,12 +463,12 @@
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
 					/usr/include/,
 					/usr/local/include/,
-					/usr/local/Cellar/glew/1.10.0/include,
+					/usr/local/Cellar/glew/1.11.0/include/,
 					"$(SRCROOT)",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib/,
-					/usr/local/Cellar/glew/1.10.0/lib,
+					/usr/local/Cellar/glew/1.11.0/lib,
 				);
 				OTHER_CFLAGS = "-O0";
 				OTHER_LDFLAGS = "-lGLEW";

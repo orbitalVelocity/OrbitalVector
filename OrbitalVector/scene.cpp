@@ -184,8 +184,11 @@ void Scene::init(int width, int height)
     hdr.loadShaders("passthrough.vs", "bloom.fs", true);
     vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
     hdr.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
-    hdrV.loadShaders("passthrough.vs", "bloom.fs", true);
-    hdrV.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+    composite.loadShaders("passthrough.vs", "composite.fs", true);
+    composite.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+
+    fxaa.loadShaders("passthrough.vs", "fxaa.fs", true);
+    fxaa.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
 
     highPass.loadShaders("passthrough.vs", "highpass.fs", true);
     highPass.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
@@ -209,14 +212,17 @@ void Scene::init(int width, int height)
     }
     
     //setup hdr and associated rt
-    rt.useMipMap = true;
-    rt.init(fbWidth/4, fbHeight/4);
-    rtBloom.useMipMap = true;
-    rtBloom.init(fbWidth/4, fbHeight/4);
-    rtBloomV.useMipMap = true;
-    rtBloomV.init(fbWidth, fbHeight);
-    rtShadowMap.useMipMap = true;
-    rtShadowMap.init(fbWidth, fbHeight, true);
+    rt[SN::shadowMap   ].useMipMap = true;
+    rt[SN::shadowMap   ].init(fbWidth, fbHeight, true);
+    
+    rt[SN::comp].useHDR = false;
+    rt[SN::fxaa].useHDR = false;
+    rt[SN::forward].init(fbWidth, fbHeight);
+    for (int i=SN::highPass; i < SN::fxaa; i++) {
+        rt[i].useMipMap = true;         //TODO: forward rt doesn't need mipmap
+        rt[i].init(fbWidth/downSizeFactor, fbHeight/downSizeFactor);
+    }
+    rt[SN::fxaa].init(fbWidth, fbHeight);
 }
 
 void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
@@ -228,6 +234,10 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
     GLint internalFormat = GL_RGB16F;
     GLenum format = GL_RGB;
     auto type = GL_HALF_FLOAT;
+    if (not useHDR) {
+        internalFormat = GL_RGB8;
+        type = GL_UNSIGNED_BYTE;
+    }
     if (depthTexture) {
         internalFormat = GL_DEPTH_COMPONENT16;
         format = GL_DEPTH_COMPONENT;
@@ -339,12 +349,12 @@ void Scene::postFrame()
         cout << "reloading #" << reloadCount++ << "\n";
         //shut down program and delete shaders
         glUseProgram(0);
-        glDeleteProgram(hdr.shaderProgram);
+        glDeleteProgram(fxaa.shaderProgram);
         for (auto &shaderID : hdr.shaderIDs)
             glDeleteShader(shaderID);
         
         //reload bloom
-        hdr.loadShaders("passthrough.vs", "bloom.fs", true);
+        fxaa.loadShaders("passthrough.vs", "fxaa.fs", false);
         //        vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
         //        hdr.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
     }
@@ -356,192 +366,199 @@ void Scene::postFrame()
     glm::mat4 depthViewMatrix = glm::lookAt(srcPerspective, glm::vec3(0,0,0), glm::vec3(0,1,0));
 glm::mat4 depthMVP;
 
-//TODO: move globals to include
-bool renderDepth = true;
-bool renderStage = 0;
-const int stage1  = 0x0001;     //shadowMap
-const int stage2  = 0x0002;     //forward
-const int stage3  = 0x0004;     //highpass
-const int stage4  = 0x0008;     //blur1
-const int stage5  = 0x0010;     //composite/tonemap
-const int stage6  = 0x0020;     //FXAA
-const int stage7  = 0x0040;
-const int stage8  = 0x0080;
-const int stage9  = 0x0010;
-const int stage10 = 0x0200;
-const int stage11 = 0x0400;
-const int stage12 = 0x0800;
+
 
 void Scene::render()
 {
-#if 0
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    forwardRender();
-#else
-    debug = false;
-    renderDepth = false;
-    //shadow map rendering
-    if (renderDepth) {
-        glBindFramebuffer(GL_FRAMEBUFFER, rtShadowMap.FramebufferName);
+    if (0 == renderStage) {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//        glViewport(0, 0, fbWidth/2, fbHeight/2);
-        glUseProgram(shadowMap.shaderProgram);
-          auto &gameLogic = *_gameLogic;
-        depthMVP = depthProjectionMatrix * depthViewMatrix *
-                    gameLogic.sShip[0].orientation
-                    * gameLogic.sShip[0].size;
-        shadowMap.drawIndexed(world, camera, depthMVP, shapes[shipIdx].mesh.indices.data());
-//        glViewport(0, 0, fbWidth, fbHeight);
-    }
-    
-    
-    //regular forward rendering
-    glViewport(0, 0, fbWidth/4, fbHeight/4);
-    if (not showDepth)
-    {
-        if (debug) {
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        } else {
-            glBindFramebuffer(GL_FRAMEBUFFER, rt.FramebufferName);
-//        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rt.renderedTexture, 0);
-        }
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, rtShadowMap.renderedTexture);
         forwardRender();
-    }
-    if (debug) {
-        return;
-    }
-    
-    glViewport(0, 0, fbWidth/4, fbHeight/4);
-    // high pass to get highlights onto rtBloom
-    if (debug || showDepth) {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     } else {
-        glBindFramebuffer(GL_FRAMEBUFFER, rtBloom.FramebufferName);
-//        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rtBloom.renderedTexture, 0);
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    }
-    // Bind our texture in Texture Unit 0
-    glActiveTexture(GL_TEXTURE0);
-    if (showDepth) {
-        glBindTexture(GL_TEXTURE_2D, rtShadowMap.renderedTexture);
-    } else {
-        glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
-    }
-    glGenerateMipmap(GL_TEXTURE_2D);
-    check_gl_error();
-    
-    glUseProgram(highPass.shaderProgram);
-    auto loc = glGetUniformLocation(highPass.shaderProgram, "renderedTexture");
-    glUniform1i(loc, 0);
-    
-    glBindVertexArray(highPass.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
-        check_gl_error();
-    if (debug || showDepth) {
-        return;
-    }
-    
-    glViewport(0, 0, fbWidth, fbHeight);
-    glDisable(GL_DEPTH_TEST);
-    const bool onePassBloom = false;
-    //blur rtBloom Vertical texture and add it back to rt's texture
-    if (onePassBloom)
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    else
-        glBindFramebuffer(GL_FRAMEBUFFER, rtBloomV.FramebufferName);
-//        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, rtBloomV.renderedTexture, 0);
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    // Bind our texture in Texture Unit 0
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, rtBloom.renderedTexture);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    
-    glUseProgram(hdr.shaderProgram);
-    loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
-    glUniform1i(loc, 0);
-    loc = glGetUniformLocation(hdr.shaderProgram, "forwardTexture");
-    glUniform1i(loc, 1);
-#if 1
-    loc = glGetUniformLocation(hdr.shaderProgram, "offset");
-    float offsetx = 0, offsety = 0;
-    offsetx = 1.0f / fbWidth;
-    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(offsetx, offsety)));
-#else
-    loc = glGetUniformLocation(hdr.shaderProgram, "kernel");
-    glUniform1fv(loc, KERNEL_SIZE * KERNEL_SIZE, kernel);
-    loc = glGetUniformLocation(hdr.shaderProgram, "frameSize");
-    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(fbWidth, fbHeight)));
-#endif
-    
-    glBindVertexArray(hdr.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    check_gl_error();
+        float rtForComp[3] {0,0,0};   //rt indices for comp stage input
+        int myRT = -1;
+        if (renderStage & stage1) //shadow map rendering
+        {
+            myRT++;
+            glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
+            glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glUseProgram(shadowMap.shaderProgram);
+            auto &gameLogic = *_gameLogic;
+            depthMVP = depthProjectionMatrix * depthViewMatrix *
+            gameLogic.sShip[0].orientation
+            * gameLogic.sShip[0].size;
+            shadowMap.drawIndexed(world, camera, depthMVP, shapes[shipIdx].mesh.indices.data());
+        }
+ //TODO: fix glViewPort toggle in stages too!
+        if (renderStage & stage2)  //regular forward rendering
+        {
+            auto lastRT = myRT++;
+            rtForComp[0] = myRT;
+            glViewport(0, 0, fbWidth, fbHeight);
+            glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, rt[lastRT].renderedTexture);
+            forwardRender();
+        }
  
-    if (onePassBloom)
-        return;
-    
-    glEnable(GL_DEPTH_TEST);
-    if (1)
-    {
-        //blit back
-        glViewport(0, 0, fbWidth, fbHeight);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, rtBloomV.renderedTexture);
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glUseProgram(blit.shaderProgram);
-        check_gl_error();
-        loc = glGetUniformLocation(blit.shaderProgram, "renderedTexture");
-        glUniform1i(loc, 0);
-        check_gl_error();
+        if (renderStage & stage3)  // high pass to get highlights onto rtBloom
+        {
+            auto lastRT = myRT++;
+            glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
+            
+            glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, rt[lastRT].renderedTexture);
+            check_gl_error();
+            
+            glUseProgram(highPass.shaderProgram);
+            auto loc = glGetUniformLocation(highPass.shaderProgram, "renderedTexture");
+            glUniform1i(loc, 0);
+            
+            glBindVertexArray(highPass.vao);
+            glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
+            check_gl_error();
+        }
         
-        glBindVertexArray(blit.vao);
-        glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
-        check_gl_error();
-    
-        return;
+        if (renderStage & stage4) //first blur
+        {
+            auto lastRT = myRT++;
+            rtForComp[1] = myRT;
+            glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
+            glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, rt[lastRT].renderedTexture);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            
+            glUseProgram(hdr.shaderProgram);
+            auto loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
+            glUniform1i(loc, 0);
+            loc = glGetUniformLocation(hdr.shaderProgram, "offset");
+            float offsetx = 0, offsety = 0;
+            offsetx = 1.0f / fbWidth / 4.0;
+            glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(offsetx, offsety)));
+
+            glBindVertexArray(hdr.vao);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            check_gl_error();
+        }
+       
+        if (renderStage & stage5) //second blur
+        {
+            auto lastRT = myRT++;
+            rtForComp[2] = myRT;
+            glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
+            glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, rt[lastRT-1].renderedTexture);
+            glGenerateMipmap(GL_TEXTURE_2D);
+            
+            glUseProgram(hdr.shaderProgram);
+            auto loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
+            glUniform1i(loc, 0);
+            loc = glGetUniformLocation(hdr.shaderProgram, "offset");
+            float offsetx = 0, offsety = 0;
+            offsety = 1.0f / fbHeight / 4.0;
+            glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(offsetx, offsety)));
+
+            glBindVertexArray(hdr.vao);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            check_gl_error();
+        }
+        
+        if (renderStage & stage6) //composite
+        {
+            myRT++;
+            glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
+            glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, rt[rtForComp[0]].renderedTexture);
+            
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, rt[rtForComp[1]].renderedTexture);
+            
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, rt[rtForComp[2]].renderedTexture);
+ 
+            glUseProgram(composite.shaderProgram);
+            auto loc = glGetUniformLocation(composite.shaderProgram, "tex0");
+            glUniform1i(loc, 0);
+            loc = glGetUniformLocation(composite.shaderProgram, "tex1");
+            glUniform1i(loc, 1);
+            loc = glGetUniformLocation(composite.shaderProgram, "tex2");
+            glUniform1i(loc, 2);
+            loc = glGetUniformLocation(composite.shaderProgram, "enable");
+            for (auto & r : rtForComp)
+                if (r != 0) {
+                    r = 1;
+                }
+            glUniform1fv(loc, 3, rtForComp);
+            
+            glBindVertexArray(composite.vao);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            check_gl_error();
+        }
+        
+        if (renderStage & stage7) //fxaa
+        {
+            auto lastRT = myRT++;
+            glViewport(0, 0, fbWidth, fbHeight);
+            glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, rt[lastRT].renderedTexture);
+            
+            glUseProgram(fxaa.shaderProgram);
+            auto loc = glGetUniformLocation(fxaa.shaderProgram, "forwardTexture");
+            glUniform1i(loc, 0);
+            loc = glGetUniformLocation(fxaa.shaderProgram, "resolution");
+            float resolution[2] = {(float)fbWidth, (float)fbHeight};
+            glUniform2f(loc, resolution[0], resolution[1]);
+            loc = glGetUniformLocation(fxaa.shaderProgram, "showDir");
+            glUniform1i(loc, globalShowFXAAAAirection);
+            
+            glBindVertexArray(fxaa.vao);
+            glDisable(GL_BLEND);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            glEnable(GL_BLEND);
+            check_gl_error();
+        }
+        
+        if (1) //always last stage
+        {
+            auto lastRT = myRT++;
+            //blit back
+            glViewport(0, 0, fbWidth, fbHeight);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, rt[lastRT].renderedTexture);
+            glUseProgram(blit.shaderProgram);
+            check_gl_error();
+            auto loc = glGetUniformLocation(blit.shaderProgram, "renderedTexture");
+            glUniform1i(loc, 0);
+            check_gl_error();
+            
+            glBindVertexArray(blit.vao);
+            glDrawArrays(GL_TRIANGLES, 0, 6);
+            check_gl_error();
+            
+            return;
+        }
+       
     }
-
-    //blur rtBloom's texture and add it back to rt's texture
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    // Bind our texture in Texture Unit 0
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, rtBloomV.renderedTexture);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    
-    offsetx = 0.0;
-    offsety = 1.0f / fbHeight;
-    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(offsetx, offsety)));
-//    glActiveTexture(GL_TEXTURE1);
-//    glBindTexture(GL_TEXTURE_2D, rt.renderedTexture);
-
-//    glUseProgram(hdr.shaderProgram);
-//    loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
-//    glUniform1i(loc, 0);
-//    loc = glGetUniformLocation(hdr.shaderProgram, "forwardTexture");
-//    glUniform1i(loc, 1);
-//    loc = glGetUniformLocation(hdr.shaderProgram, "kernel");
-//    glUniform1fv(loc, KERNEL_SIZE * KERNEL_SIZE, kernel);
-//    loc = glGetUniformLocation(hdr.shaderProgram, "frameSize");
-//    glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(fbWidth, fbHeight)));
-//    
-//    glBindVertexArray(hdr.vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
-        check_gl_error();
-#endif
     
 
 }

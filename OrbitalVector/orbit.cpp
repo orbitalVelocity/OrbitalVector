@@ -63,13 +63,8 @@ void Orbit::newProgram(map<GLuint, string> &shaders)
 
 void Orbit::calcTrajectory(int &pathSteps)
 {
-    //FIXME for some reason sending copies of ks/sys to orbitDelta
-    //does not work
-    //must copy original and move it back after for now
     auto &ks2 = ks;
     auto sys2 = sys;
-    
-//    auto sys3 = sys;
     
     
     float dt = 2.0;
@@ -129,14 +124,51 @@ void Orbit::calcTrajectory(int &pathSteps)
         {
             cout << "same radius across 2 time points! gotta solve this\n";
         }
+        
+        //collision detection
+        {
+            vector<body> sys2_copy;
+#if 1
+            vector<bool> removeElem(sys2.size(), false);
+            for (int i=0; i < sys2.size(); i++)
+            {
+                for (int j = 0; j < sys2.size(); j++)
+                {
+                    if (i == j) {
+                        continue;
+                    }
+                    if (glm::length(sys2[i].sn.pos - sys2[j].sn.pos) <= 10) {
+                        removeElem[j] = true;
+                        objectCrashed[j] = true;
+                    }
+                }
+            }
+#else
+            auto matchingBody = [&](const body &b)
+            {
+                auto match = [&](const body &bb)
+                {
+                    return glm::length(b.sn.pos - bb.sn.pos) > 10.0;
+                };
+                return std::all_of(sys2.begin(), sys2.end(), match);
+            };
+            vector<body> sys2_copy;
+            std::copy_if(sys2.begin(), sys2.end(), sys2_copy.begin(), matchingBody);
+#endif
+            
+            sys2.clear();
+            sys2 = std::move(sys2_copy);
+            for (auto &k : ks2)
+            {
+                k.resize(sys2.size());
+            }
+        }
    
         last2Distance = lastDistance;
         lastDistance = distance;
         for (int k=0; k < numTrajectories; k++) {
             //FIXME could be optimized
-            if (glm::length(sys2[k+offset].sn.pos) < 10.0f) {
-                objectCrashed[k] = true;
-            }
+            
             if (false){//objectCrashed[k]) {
                 paths[k].push_back(0.0f);
                 paths[k].push_back(0.0f);

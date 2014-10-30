@@ -80,7 +80,11 @@ void GameLogic::processActionList(vector<ActionType> &actionList)
                 break;
         }
         
-        
+        if (action == ActionType::newShip)
+        {
+            sShip.push_back(Spatial(200.0));
+            sShip.back().scale(glm::vec3(.002));
+        }
         if (action == ActionType::fireGun)
         {
             double m = 1e-42;

@@ -336,6 +336,25 @@ void Scene::update()
     if (orbitCount++ % 30 == 0) {
         orbit.update();
     }
+    for (int i=0; i < sys.size(); i++)
+    {
+        for (int j=i+1; j < sys.size(); j++)
+        {
+            auto tmp = (sys[i].sn.pos - sys[j].sn.pos);
+            auto dist = glm::length(tmp);
+            if ( dist < 10.0) {
+                cout << "collision detected between "
+                << i << ": " << printVec3(sys[i].sn.pos)
+                << " and " << j << ": "
+                << printVec3(sys[j].sn.pos) << "\n";
+                sys[j].sn.vel = glm::vec3();
+                sys[j].mu = 0;
+                sys[j].sn.pos = glm::vec3(10,0,0);
+            }
+        }
+        
+    }
+
 
     world = glm::translate(glm::mat4(), -sys[1].sn.pos);
 }
@@ -587,17 +606,6 @@ void Scene::forwardRender()
     }
     
     //ship
-    glUseProgram(ship.shaderProgram);
-    int shipOffset = 1;
-    for (int i=0; i < gameLogic.sShip.size(); i++) {
-        gameLogic.sShip[i].move(sys[i+shipOffset].sn.pos);
-        auto mvp = gameLogic.sShip[i].orientation
-                 * gameLogic.sShip[i].size;
-        
-        auto loc = glGetUniformLocation(ship.shaderProgram, "shadowMap");
-        glUniform1i(loc, 0);
-        loc = glGetUniformLocation(ship.shaderProgram, "depthBiasMVP");
-
         //add shadow related uniforms
         glm::mat4 biasMatrix(
                              0.5, 0.0, 0.0, 0.0,
@@ -605,11 +613,26 @@ void Scene::forwardRender()
                              0.0, 0.0, 0.5, 0.0,
                              0.5, 0.5, 0.5, 1.0
                              );
+    
+    glUseProgram(ship.shaderProgram);
+    int shipOffset = 1;
+    for (int i=0; i < gameLogic.sShip.size(); i++) {
+        gameLogic.sShip[i].move(sys[i+shipOffset].sn.pos);
+        auto mvp =
+                world *
+                glm::translate(glm::mat4(), sys[i+shipOffset].sn.pos) *
+                gameLogic.sShip[i].orientation
+                 * gameLogic.sShip[i].size;
         
+        auto loc = glGetUniformLocation(ship.shaderProgram, "shadowMap");
+        glUniform1i(loc, 0);
+        loc = glGetUniformLocation(ship.shaderProgram, "depthBiasMVP");
+
 		glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
         ship.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
         check_gl_error();
+        //break;
     }
     
     glUseProgram(globe.shaderProgram);
@@ -619,14 +642,24 @@ void Scene::forwardRender()
         check_gl_error();
     }
     
-    auto projectileOffset = 2;
+    auto projectileOffset = 1 + gameLogic.sShip.size();
     for (int i=projectileOffset; i < sys.size(); i++)
     {
         auto mvp = _camera
         * world
         * glm::translate(glm::mat4(), sys[i].sn.pos)
-        * glm::scale(glm::mat4(), glm::vec3(1.0f));
-        globe.draw(mvp, planetColor);
+        * glm::scale(glm::mat4(), glm::vec3(0.001f));
+//        globe.draw(mvp, planetColor);
+#if 1
+        shadowMap.drawIndexed(world, camera, mvp, shapes[shipIdx].mesh.indices.data());
+#else
+        auto loc = glGetUniformLocation(ship.shaderProgram, "shadowMap");
+        glUniform1i(loc, 0);
+        loc = glGetUniformLocation(ship.shaderProgram, "depthBiasMVP");
+		glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
+		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
+        ship.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
+#endif
         check_gl_error();
     }
     

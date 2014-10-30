@@ -19,6 +19,7 @@ public:
         xAxis = glm::vec3(0, 1.0f, 0);
         zAxis = glm::vec3(0, 0, 1.0f);
     }
+    Spatial(float r);
     void move(glm::vec3 move);
     void scale(glm::vec3 move);
     void rotate(glm::mat4 &m);

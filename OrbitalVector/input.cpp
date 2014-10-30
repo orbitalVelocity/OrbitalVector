@@ -19,56 +19,91 @@ UserInput::UserInput()
 
 void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GL_TRUE);
-    if (key == GLFW_KEY_F && action == GLFW_PRESS)
-        actionList.push_back(ActionType::transForward);
-    if (key == GLFW_KEY_G && action == GLFW_PRESS)
-        actionList.push_back(ActionType::transBackward);
-    if (key == GLFW_KEY_COMMA && action == GLFW_PRESS)
-        actionList.push_back(ActionType::timeWarpLess);
-    if (key == GLFW_KEY_PERIOD && action == GLFW_PRESS)
-        actionList.push_back(ActionType::timeWarpMore);
-    if (key == GLFW_KEY_SPACE && action == GLFW_PRESS)
-        actionList.push_back(ActionType::fireGun);
-
-    if (key == GLFW_KEY_A)// && action == GLFW_PRESS)
-        actionList.push_back(ActionType::yawLeft);
-	if (key == GLFW_KEY_D)// && action == GLFW_PRESS)
-        actionList.push_back(ActionType::yawRight);
-	if (key == GLFW_KEY_W)// && action == GLFW_PRESS)
-        actionList.push_back(ActionType::pitchDown);
-	if (key == GLFW_KEY_S)// && action == GLFW_PRESS)
-        actionList.push_back(ActionType::pitchUp);
-	if (key == GLFW_KEY_Q)// && action == GLFW_PRESS)
-        actionList.push_back(ActionType::rollCCW);
-	if (key == GLFW_KEY_E)// && action == GLFW_PRESS)
-        actionList.push_back(ActionType::rollCW);
-	if (key == GLFW_KEY_B && action == GLFW_PRESS)
-        globalShowFXAAAAirection ^= true;
-	if (key == GLFW_KEY_R)// && action == GLFW_PRESS)
-        globalReload = true;
-    
-	if (key == GLFW_KEY_1  && action == GLFW_PRESS)// && action == GLFW_PRESS)
-        renderStage ^= stage1;
-	if (key == GLFW_KEY_2 && action == GLFW_PRESS)// && action == GLFW_PRESS)
-        renderStage ^= stage2;
-	if (key == GLFW_KEY_3 && action == GLFW_PRESS)// && action == GLFW_PRESS)
-        renderStage ^= stage3;
-	if (key == GLFW_KEY_4 && action == GLFW_PRESS)// && action == GLFW_PRESS)
-        renderStage ^= stage4;
-	if (key == GLFW_KEY_5 && action == GLFW_PRESS)// && action == GLFW_PRESS)
-        renderStage ^= stage5;
-	if (key == GLFW_KEY_6 && action == GLFW_PRESS)// && action == GLFW_PRESS)
-        renderStage ^= stage6;
-	if (key == GLFW_KEY_7 && action == GLFW_PRESS)// && action == GLFW_PRESS)
-        renderStage ^= stage7;
-	if (key == GLFW_KEY_8 && action == GLFW_PRESS)// && action == GLFW_PRESS)
-        renderStage ^= stage8;
-	if (key == GLFW_KEY_9 && action == GLFW_PRESS)// && action == GLFW_PRESS)
-        renderStage ^= stage9;
-	if (key == GLFW_KEY_0 && action == GLFW_PRESS)// && action == GLFW_PRESS)
-        renderStage ^= stage10;
+    switch (key) {
+        case GLFW_KEY_A:
+            actionList.push_back(ActionType::yawLeft);
+            break;
+        case GLFW_KEY_D:
+            actionList.push_back(ActionType::yawRight);
+            break;
+        case GLFW_KEY_W:
+            actionList.push_back(ActionType::pitchDown);
+            break;
+        case GLFW_KEY_S:
+            actionList.push_back(ActionType::pitchUp);
+            break;
+        case GLFW_KEY_Q:
+            actionList.push_back(ActionType::rollCCW);
+            break;
+        case GLFW_KEY_E:
+            actionList.push_back(ActionType::rollCW);
+            break;
+            
+        default:
+            break;
+    }
+    if (action == GLFW_PRESS) {
+        switch (key) {
+            case GLFW_KEY_ESCAPE:
+                glfwSetWindowShouldClose(window, GL_TRUE);
+                break;
+            case GLFW_KEY_F:
+                actionList.push_back(ActionType::transForward);
+                break;
+            case GLFW_KEY_G:
+                actionList.push_back(ActionType::transBackward);
+                break;
+            case GLFW_KEY_COMMA:
+                actionList.push_back(ActionType::timeWarpLess);
+                break;
+            case GLFW_KEY_PERIOD:
+                actionList.push_back(ActionType::timeWarpMore);
+                break;
+            case GLFW_KEY_SPACE:
+                actionList.push_back(ActionType::fireGun);
+                break;
+            case GLFW_KEY_B:
+                globalShowFXAAAAirection ^= true;
+                break;
+            case GLFW_KEY_R:
+                globalReload = true;
+                break;
+            case GLFW_KEY_1 :
+                renderStage ^= stage1;
+                break;
+            case GLFW_KEY_2:
+                renderStage ^= stage2;
+                break;
+            case GLFW_KEY_3:
+                renderStage ^= stage3;
+                break;
+            case GLFW_KEY_4:
+                renderStage ^= stage4;
+                break;
+            case GLFW_KEY_5:
+                renderStage ^= stage5;
+                break;
+            case GLFW_KEY_6:
+                renderStage ^= stage6;
+                break;
+            case GLFW_KEY_7:
+                renderStage ^= stage7;
+                break;
+            case GLFW_KEY_8:
+                renderStage ^= stage8;
+                break;
+            case GLFW_KEY_9:
+                renderStage ^= stage9;
+                break;
+            case GLFW_KEY_0:
+                renderStage ^= stage10;
+                break;
+                
+            case GLFW_KEY_ENTER:
+                actionList.push_back(ActionType::newShip);
+                break;
+        }
+    }
 }
 
 void UserInput::mb(GLFWwindow* window, int button, int action, int mods)

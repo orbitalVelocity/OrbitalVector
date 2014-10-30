@@ -20,11 +20,16 @@ enum class ActionType {
     pitchUp, pitchDown,
     yawLeft, yawRight,
     rollCCW, rollCW,
+    
     transForward, transBackward,
     transLeft, transRight,
     transUp, transDown,
+    
     timeWarpMore, timeWarpLess,
+    
     fireGun, fireMissile, fireBeam,
+    
+    newShip,
     invalid
 };
 

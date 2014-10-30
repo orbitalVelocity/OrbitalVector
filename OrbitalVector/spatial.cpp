@@ -7,6 +7,44 @@
 //
 
 #include "spatial.h"
+#include "rk547m.h"
+#include "stdlib.h"
+#include "time.h"
+
+Spatial::Spatial(float r) : x(0), y(90) {
+    yAxis = glm::vec3(1.0f, 0, 0);
+    xAxis = glm::vec3(0, 1.0f, 0);
+    zAxis = glm::vec3(0, 0, 1.0f);
+    
+    double m = 7e12;
+    double G = 6.673e-11;
+    double gm = m * G;
+    
+    srand ((unsigned int)time(NULL));
+    
+    r = (rand() / 1000) % 300;
+    if (r < 50) {
+        r = 50;
+    }
+    float v = sqrt(gm/r);
+    glm::vec3 rad(r, 0, 0);
+    glm::vec3 vel(0, 0, v);
+    cout << "new ship: r: " << r << ", v: " << v << endl;
+    m = 1e1;
+    gm = m * G;
+    sys.push_back(body(state(rad, vel),
+                       gm,
+                       1,
+                       nullptr,
+                       objType::SHIP
+                       )
+                  );
+    
+    const int numTerms = 8;
+    ks.resize(numTerms);
+    for (auto &k : ks)
+        k.resize(sys.size());
+}
 
 void Spatial::scale(const glm::vec3 s)
 {

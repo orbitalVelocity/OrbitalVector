@@ -53,6 +53,7 @@ enum objType { PLANET, ORB, SHIP };
 
 class body {         // State of a planetary body
 public:
+    body() {};
     body(state s, float _mu, float r, body* p, objType t) :
     sn(s), mu(_mu), radius(r), parent(p), type(t), deltaV(0) {
         if (nullptr == parent) {

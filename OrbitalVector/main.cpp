@@ -221,8 +221,16 @@ int main(int argc, const char * argv[])
         textObj.pushBackDebug(textOut);
         textOut << "projectiles: " << sys.size() - 2;
         textObj.pushBackDebug(textOut);
+        textOut << "paths: " << scene.orbit.paths.size() << " | ";
+        for ( auto & path : scene.orbit.paths) {
+            textOut << path.size()/3 << " ";
+        }
+        textObj.pushBackDebug(textOut);
         textOut << "path size: " << scene.orbit.drawCount;
         textObj.pushBackDebug(textOut);
+        
+        
+        return;
         textOut << "shadow pass: 1   " << ((renderStage & stage1) ? "On" : " ");
         textObj.pushBackDebug(textOut);
         textOut << "forward pass: 2  " << ((renderStage & stage2) ? "On" : " ");

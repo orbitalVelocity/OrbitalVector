@@ -68,7 +68,15 @@ void Orbit::calcTrajectory(int &pathSteps)
     
     
     float dt = 2.0;
+    float initPos[3];
+    initPos[0] = sys2[0].sn.pos.x;
+    initPos[0] = sys2[0].sn.pos.y;
+    initPos[0] = sys2[0].sn.pos.z;
     int j = 1; //for testing
+    
+    vector<int> ids(sys2.size());       //ids index into paths
+    iota(ids.begin(), ids.end(), -1);
+    
     for (auto &p : paths)
         p.clear();
     paths.clear();
@@ -95,24 +103,23 @@ void Orbit::calcTrajectory(int &pathSteps)
         return (!apoFound or !periFound) and paths[0].size() < 1000;
     };
     
-    int offset = 1; //grav wells
-    int numTrajectories = sys2.size() - offset;
-    vector<bool> objectCrashed;
-    objectCrashed.resize(numTrajectories, false);
     
     while (loopCond())
     {
         orbitDelta(dt, ks2, sys2, true);
-        //check dist to parent
+        
+        //check if apoapsis and periapsis has been reached
         distance = glm::length(sys2[j].sn.pos - sys2[0].sn.pos);
-        if (last2Distance > lastDistance && lastDistance < distance)
+        if ((last2Distance > lastDistance && lastDistance < distance)
+            || distance < 15.0)
         {
             periFound = true;
             peri      = distance;
             periPos   = sys2[j].sn.pos;
         }
-        if (last2Distance < lastDistance && lastDistance > distance
+        if ((last2Distance < lastDistance && lastDistance > distance
             && last2Distance != 0 && lastDistance != 0)
+            || distance > 400)
         {
             apoFound = true;
             apo      = distance;
@@ -123,77 +130,73 @@ void Orbit::calcTrajectory(int &pathSteps)
             && last2Distance != 0.0f && lastDistance != 0.0f)
         {
             cout << "same radius across 2 time points! gotta solve this\n";
+            break;
         }
         
         //collision detection
+        if (true)
         {
-            vector<body> sys2_copy;
-#if 1
-            vector<bool> removeElem(sys2.size(), false);
-            for (int i=0; i < sys2.size(); i++)
+            //mark elements that needs to be removed
+            //TODO: due to collision, too far/escape velocity
+            vector<bool> markedForRemoval(sys2.size(), false);
+            markForDeletion(sys2, markedForRemoval);
+
+            //remove all marked elements
+            //FIXME: only works because first element never designed to be removed
+            auto it = --sys2.end();
+            auto itt = --ids.end();
+            for (int i = (int)sys2.size()-1; i >= 0; --i, --it, --itt)
             {
-                for (int j = 0; j < sys2.size(); j++)
-                {
-                    if (i == j) {
-                        continue;
-                    }
-                    if (glm::length(sys2[i].sn.pos - sys2[j].sn.pos) <= 10) {
-                        removeElem[j] = true;
-                        objectCrashed[j] = true;
-                    }
+                if (markedForRemoval[i]) {      //TODO: wrap sys2 and ids into 1 object
+                    sys2.erase(it);
+                    ids.erase(itt);
                 }
-            }
-#else
-            auto matchingBody = [&](const body &b)
-            {
-                auto match = [&](const body &bb)
-                {
-                    return glm::length(b.sn.pos - bb.sn.pos) > 10.0;
-                };
-                return std::all_of(sys2.begin(), sys2.end(), match);
-            };
-            vector<body> sys2_copy;
-            std::copy_if(sys2.begin(), sys2.end(), sys2_copy.begin(), matchingBody);
-#endif
-            
-            sys2.clear();
-            sys2 = std::move(sys2_copy);
-            for (auto &k : ks2)
-            {
-                k.resize(sys2.size());
             }
         }
    
         last2Distance = lastDistance;
         lastDistance = distance;
-        for (int k=0; k < numTrajectories; k++) {
-            //FIXME could be optimized
-            
-            if (false){//objectCrashed[k]) {
-                paths[k].push_back(0.0f);
-                paths[k].push_back(0.0f);
-                paths[k].push_back(0.0f);
-                if (!loopCond()) {
-                    continue;
-                }
-                paths[k].push_back(0.0f);
-                paths[k].push_back(0.0f);
-                paths[k].push_back(0.0f);
-            } else {
-                paths[k].push_back(sys2[k+offset].sn.pos.x);
-                paths[k].push_back(sys2[k+offset].sn.pos.y);
-                paths[k].push_back(sys2[k+offset].sn.pos.z);
-                if (!loopCond())
-                    continue;
-                paths[k].push_back(sys2[k+offset].sn.pos.x);
-                paths[k].push_back(sys2[k+offset].sn.pos.y);
-                paths[k].push_back(sys2[k+offset].sn.pos.z);
-            }
+        int offset = 1; //starting at 1 now
+        for (auto i=1; i < sys2.size(); i++) {
+            auto j = ids[i];
+#if 0
+            paths[j].push_back(sys2[i+offset].sn.pos.x
+                               - sys2[0].sn.pos.x
+                               + initPos[0]);
+            paths[j].push_back(sys2[i+offset].sn.pos.y
+                               - sys2[0].sn.pos.y
+                               + initPos[1]);
+            paths[j].push_back(sys2[i+offset].sn.pos.z
+                               - sys2[0].sn.pos.z
+                               + initPos[2]);
+
+            paths[j].push_back(sys2[i+offset].sn.pos.x
+                               - sys2[0].sn.pos.x
+                               + initPos[0]);
+            paths[j].push_back(sys2[i+offset].sn.pos.y
+                               - sys2[0].sn.pos.y
+                               + initPos[1]);
+            paths[j].push_back(sys2[i+offset].sn.pos.z
+                               - sys2[0].sn.pos.z
+                               + initPos[2]);
+#else
+            paths[j].push_back(sys2[j+offset].sn.pos.x);
+            paths[j].push_back(sys2[j+offset].sn.pos.y);
+            paths[j].push_back(sys2[j+offset].sn.pos.z);
+
+            paths[j].push_back(sys2[j+offset].sn.pos.x);
+            paths[j].push_back(sys2[j+offset].sn.pos.y);
+            paths[j].push_back(sys2[j+offset].sn.pos.z);
+#endif
         }
     }
-//    sys = std::move(sys3);
- 
-    pathSteps = paths[0].size();
+    
+    //delete the last three floats from each path
+    for (auto &path : paths) {
+        path.erase(path.end()-1);
+        path.erase(path.end()-1);
+        path.erase(path.end()-1);
+    }
 }
 
 void Orbit::loadPath()
@@ -230,29 +233,31 @@ void Orbit::loadPath()
 void Orbit::update()
 {
     static int count = 0;
-    int vecSize = 3;
     int pathSteps = 980;
 
     float  *pathGL;
-    drawCount = pathSteps/vecSize;
     calcTrajectory(pathSteps);
-    int pathSize = sizeof(float) * pathSteps;
-    int totalPathSize = (int)(paths.size()*paths[0].size() * sizeof(float));
+    
+    pathSteps = 0;
+    for (auto &p : paths) {
+        pathSteps += p.size();
+    }
+    int totalPathSize = (int)(pathSteps * sizeof(float));
 
-//    return; //FIXME so nextMesh is called from draw
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     check_gl_error();
     glBufferData(GL_ARRAY_BUFFER, totalPathSize, nullptr, GL_STREAM_DRAW);
     check_gl_error();
     pathGL = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    
     int pathOffset = 0;
     for (auto &path : paths)
     {
-        memcpy(&pathGL[pathOffset], path.data(), pathSize);
+        memcpy(&pathGL[pathOffset], path.data(), sizeof(float)*path.size());
         pathOffset += path.size();
     }
-    drawCount = (int)(paths.size() * paths[0].size());
-//    memcpy(pathGL, paths[0].data(), totalPathSize);)
+    drawCount = (int)(pathSteps)/3;
+ 
     check_gl_error();
     glUnmapBuffer(GL_ARRAY_BUFFER);
     check_gl_error();

@@ -12,7 +12,7 @@ using namespace std;
 
 bool globalShowFXAAAAirection = 0;
 bool globalReload;
-int renderStage = 0x7F;
+int renderStage = 0x3F;
 const int stage1  = 0x0001;     //shadowMap
 const int stage2  = 0x0002;     //forward
 const int stage3  = 0x0004;     //highpass

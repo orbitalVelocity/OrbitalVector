@@ -34,6 +34,29 @@ void printsys(vector<body> &sys)
         cout << "p: " << printVec3(body.sn.pos) << " v: " << printVec3(body.sn.vel) << "\n";
     }
 }
+
+void markForDeletion(vector<body> &sys, vector<bool> &markedForRemoval)
+{
+    //mark elements that needs to be removed
+    //TODO: due to collision, too far/escape velocity
+    markedForRemoval.resize(sys.size(), false);
+    
+    for (int i=0; i < sys.size(); i++) {
+        for (int j = i+1; j < sys.size(); j++) { //skip element 0 - planet
+            if (i == j ) {
+                continue;
+            }
+            if (glm::length(sys[i].sn.pos - sys[j].sn.pos) <= 10) {
+                markedForRemoval[j] = true;
+            }
+        }
+        if (not markedForRemoval[i] && glm::length(sys[i].sn.pos - sys[0].sn.pos) > 400)
+        {
+            markedForRemoval[i] = true;
+        }
+    }
+}
+
 void orbitDelta(GLfloat &delta,
                 vector<vector<state> > &ks, vector<body> &sys,
                 bool changeDT)

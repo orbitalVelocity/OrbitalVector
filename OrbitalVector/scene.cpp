@@ -336,23 +336,23 @@ void Scene::update()
     if (orbitCount++ % 30 == 0) {
         orbit.update();
     }
-    for (int i=0; i < sys.size(); i++)
+
+    //remove elements
     {
-        for (int j=i+1; j < sys.size(); j++)
+        //mark elements that needs to be removed
+        //TODO: due to collision, too far/escape velocity
+        vector<bool> markedForRemoval(sys.size(), false);
+        markForDeletion(sys, markedForRemoval);
+        
+        //remove all marked elements
+        //FIXME: only works because first element never designed to be removed
+        auto it = sys.end() - 1;
+        for (int i = (int)sys.size()-1; i >= 0; --i, --it)
         {
-            auto tmp = (sys[i].sn.pos - sys[j].sn.pos);
-            auto dist = glm::length(tmp);
-            if ( dist < 10.0) {
-                cout << "collision detected between "
-                << i << ": " << printVec3(sys[i].sn.pos)
-                << " and " << j << ": "
-                << printVec3(sys[j].sn.pos) << "\n";
-                sys[j].sn.vel = glm::vec3();
-                sys[j].mu = 0;
-                sys[j].sn.pos = glm::vec3(10,0,0);
+            if (markedForRemoval[i]) {      //TODO: wrap sys and ids into 1 object
+                sys.erase(it);
             }
         }
-        
     }
 
 

@@ -128,6 +128,7 @@ void RK45Int(float &dt, float absTol, float relTol,
              vector<vector<state> > &ks, vector<body> &sys,
              bool varialbeDT);
 
+void markForDeletion(vector<body> &sys, vector<bool> &markedForRemoval);
 extern glm::mat4 world;
 extern vector<vector<state> > ks;           //state of system
 extern vector<body> sys;                    //sys[planetID].sn is pos

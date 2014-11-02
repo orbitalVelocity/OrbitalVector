@@ -8,6 +8,7 @@
 
 #include "scene.h"
 #include "tiny_obj_loader.h"
+#include "glm/gtx/closest_point.hpp"
 
 std::vector<tinyobj::shape_t> shapes;
 std::vector<tinyobj::material_t> materials;
@@ -308,6 +309,56 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
 
 }
 
+void Scene::linePick(float &shortestDist, int &closestObj)
+{
+    //line pick
+    double mouseX, mouseY;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+    int screenWidth = fbWidth;
+    int screenHeight = fbHeight;
+    glm::vec4 lRayStart_NDC(
+                            ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f,
+                            ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f,
+                            -1.0, // The near plane maps to Z=-1 in Normalized Device Coordinates
+                            1.0f
+                            );
+    glm::vec4 lRayEnd_NDC(
+                          ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f,
+                          ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f,
+                          0.0,
+                          1.0f
+                          );
+    //    glm::mat4 M = glm::inverse(ProjectionMatrix * ViewMatrix);
+    glm::mat4 M = glm::inverse(camera.matrix());
+    glm::vec4 lRayStart_world  = M * lRayStart_NDC;
+    lRayStart_world /= lRayStart_world.w;
+    glm::vec4 lRayEnd_world    = M * lRayEnd_NDC  ;
+    lRayEnd_world   /= lRayEnd_world.w  ;
+	glm::vec3 lRayDir_world(lRayEnd_world - lRayStart_world);
+	lRayDir_world = glm::normalize(lRayDir_world);
+    
+    //iterate over all objects and find min distance
+    shortestDist = FLT_MAX;
+    auto objIdx = 0;
+//    const auto &b = sys[0];
+    for (auto &b : sys)
+    {
+        auto p = glm::vec3(world * glm::vec4(b.sn.pos, 1.0));
+        auto a = glm::vec3(lRayStart_world);
+        auto n = lRayDir_world;
+
+        // the following formula came from
+        // http://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
+        auto closestPoint = (a - p) - glm::dot((a - p), n) * n;
+        auto dist = glm::length(closestPoint);
+        if (shortestDist > dist) {
+            shortestDist = dist;
+            closestObj = objIdx;
+        }
+        
+        objIdx++;
+    }
+}
 
 void Scene::update()
 {
@@ -323,12 +374,13 @@ void Scene::update()
     if (_userInput->rmbPressed) {
         camera.rotate(_y*mouseScale, _x*mouseScale);
     } else if (_userInput->lmbPressed) {
-        _gameLogic->sShip[0].rotate(_y*mouseScale, _x*mouseScale, 0.0f);
+        _gameLogic->sShip[0].rotate(-_x*mouseScale, _y*mouseScale, 0.0f);
     }
     
     //scroll behavior
     camera.offsetPos(glm::vec3(0,0,-_userInput->yScroll));
     _userInput->yScroll = 0;
+    
     
     
     //calculate trajectories -- FIXME: should go in gamelogic
@@ -338,6 +390,7 @@ void Scene::update()
     }
 
     //remove elements
+    if (true)
     {
         //mark elements that needs to be removed
         //TODO: due to collision, too far/escape velocity
@@ -641,6 +694,8 @@ void Scene::forwardRender()
         globe.draw(mvp, planetColor);
         check_gl_error();
     }
+    auto mvp = _camera * world;
+    globe.draw(mvp, planetColor);
     
     auto projectileOffset = 1 + gameLogic.sShip.size();
     for (int i=projectileOffset; i < sys.size(); i++)

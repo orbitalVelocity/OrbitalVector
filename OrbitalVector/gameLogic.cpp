@@ -18,7 +18,7 @@ GameLogic::GameLogic()
     timeWarp = 1;
     //create Spatial objects for each thing FIXME not done yet
     sGlobe.resize(3);
-    sGlobe[0].scale(glm::vec3(10));
+    sGlobe[0].scale(glm::vec3(30));
     sGlobe[1].scale(glm::vec3(.05));
     sGlobe[2].scale(glm::vec3(.05));
     sOrbit.push_back(Spatial());
@@ -87,7 +87,7 @@ void GameLogic::processActionList(vector<ActionType> &actionList)
         }
         if (action == ActionType::fireGun)
         {
-            double m = 1e-42;
+            double m = 0.0;
             double G = 6.673e-11;
             double gm = m * G;
             auto shipVector = glm::vec3(sShip[activeShip].orientation * glm::vec4(0,0,1,1));

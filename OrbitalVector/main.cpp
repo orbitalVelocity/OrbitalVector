@@ -90,15 +90,15 @@ void initPhysics()
     double m = 7e12;
     double G = 6.673e-11;
     double gm = m * G;
-    sys.push_back(body(state(glm::vec3(), glm::vec3(0, 0, 0)),
+    sys.push_back(body(state(glm::vec3(), glm::vec3(0, 0, -.1)),
                        gm,
-                       100,
+                       10,
                        nullptr,
                        objType::PLANET
                        )
                   );
     glm::vec3 rad(110, 0, 0);
-    glm::vec3 vel(0, 0, 1.3);
+    glm::vec3 vel(0, 0, 2.3);
     m = 1e5;
     gm = m * G;
     sys.push_back(body(state(rad, vel),
@@ -185,8 +185,6 @@ int main(int argc, const char * argv[])
     vector<float> gpuTimes;
     gpuTimes.resize(3);
     
-    static float x=0, y=0;
-    
     // Calculate pixel ratio for hi-dpi devices.
     auto pxRatio = (float)fbWidth / (float)width;
     
@@ -213,9 +211,9 @@ int main(int argc, const char * argv[])
         textOut << "win " << winWidth << " x " << winHeight
                 << " fb size " << fbWidth << " x " << fbHeight;
         textObj.pushBackDebug(textOut);
-        textOut << "ship (" << printVec3(sys[1].sn.pos) << ")";
+        textOut << "planet (" << printVec3(sys[0].sn.pos) << ")";
         textObj.pushBackDebug(textOut);
-        textOut << "ship dist: " << glm::length(sys[1].sn.pos);
+        textOut << "planet v: " << glm::length(sys[0].sn.vel);
         textObj.pushBackDebug(textOut);
         textOut << "ship vel: " << glm::length(sys[1].sn.vel);
         textObj.pushBackDebug(textOut);
@@ -228,6 +226,30 @@ int main(int argc, const char * argv[])
         textObj.pushBackDebug(textOut);
         textOut << "path size: " << scene.orbit.drawCount;
         textObj.pushBackDebug(textOut);
+
+        //mouse debug
+        double mx, my;
+        glfwGetCursorPos(window, &mx, &my);
+        textOut << "mouse: x " << mx << " y " << my;
+        textObj.pushBackDebug(textOut);
+        float dist = FLT_MAX;
+        int obj = -1;
+        scene.linePick(dist, obj);
+        textOut << "nearest obj: " << obj << " dist: " << dist;
+        textObj.pushBackDebug(textOut);
+        textOut << "ray start: " << std::fixed
+                << std::setprecision(2)
+                << printVec3(scene.rayStart);
+        textObj.pushBackDebug(textOut);
+        textOut << "ray end: " <<std::fixed
+                << std::setprecision(2)
+                <<printVec3(scene.rayEnd);
+        textObj.pushBackDebug(textOut);
+        textOut << "planet camera coord: " << std::fixed
+                << std::setprecision(2)
+                << printVec3(scene.obj);
+        textObj.pushBackDebug(textOut);
+        
         
         
         return;
@@ -252,6 +274,8 @@ int main(int argc, const char * argv[])
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.apo)));
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.peri)));
     prevt = glfwGetTime();
+    
+    
     while (!glfwWindowShouldClose(window))
     {
         /* performance measurement setup */

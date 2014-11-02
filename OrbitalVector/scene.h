@@ -70,6 +70,7 @@ public:
     void init(int, int);
     void render();
     void forwardRender();
+    void linePick(float &dist, int &obj);
     void update();
     void postFrame();
     void setActiveShip(int s) { shipIdx = s; }
@@ -98,6 +99,8 @@ public:
     
     bool debug;
     float downSizeFactor;
+    glm::vec3 rayStart, rayEnd;
+    glm::vec3 obj;
 };
 
 

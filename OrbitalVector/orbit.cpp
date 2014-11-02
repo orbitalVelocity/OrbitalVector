@@ -68,10 +68,8 @@ void Orbit::calcTrajectory(int &pathSteps)
     
     
     float dt = 2.0;
-    float initPos[3];
-    initPos[0] = sys2[0].sn.pos.x;
-    initPos[0] = sys2[0].sn.pos.y;
-    initPos[0] = sys2[0].sn.pos.z;
+    glm::vec3 initPos = sys2[0].sn.pos;
+
     int j = 1; //for testing
     
     vector<int> ids(sys2.size());       //ids index into paths
@@ -115,7 +113,7 @@ void Orbit::calcTrajectory(int &pathSteps)
         {
             periFound = true;
             peri      = distance;
-            periPos   = sys2[j].sn.pos;
+            periPos   = sys2[j].sn.pos - sys2[0].sn.pos + initPos;
         }
         if ((last2Distance < lastDistance && lastDistance > distance
             && last2Distance != 0 && lastDistance != 0)
@@ -123,7 +121,7 @@ void Orbit::calcTrajectory(int &pathSteps)
         {
             apoFound = true;
             apo      = distance;
-            apoPos   = sys2[j].sn.pos;
+            apoPos   = sys2[j].sn.pos - sys2[0].sn.pos + initPos;
         }
         
         if ((last2Distance == lastDistance || lastDistance == distance)
@@ -156,38 +154,18 @@ void Orbit::calcTrajectory(int &pathSteps)
    
         last2Distance = lastDistance;
         lastDistance = distance;
-        int offset = 1; //starting at 1 now
         for (auto i=1; i < sys2.size(); i++) {
             auto j = ids[i];
-#if 0
-            paths[j].push_back(sys2[i+offset].sn.pos.x
-                               - sys2[0].sn.pos.x
-                               + initPos[0]);
-            paths[j].push_back(sys2[i+offset].sn.pos.y
-                               - sys2[0].sn.pos.y
-                               + initPos[1]);
-            paths[j].push_back(sys2[i+offset].sn.pos.z
-                               - sys2[0].sn.pos.z
-                               + initPos[2]);
-
-            paths[j].push_back(sys2[i+offset].sn.pos.x
-                               - sys2[0].sn.pos.x
-                               + initPos[0]);
-            paths[j].push_back(sys2[i+offset].sn.pos.y
-                               - sys2[0].sn.pos.y
-                               + initPos[1]);
-            paths[j].push_back(sys2[i+offset].sn.pos.z
-                               - sys2[0].sn.pos.z
-                               + initPos[2]);
-#else
-            paths[j].push_back(sys2[j+offset].sn.pos.x);
-            paths[j].push_back(sys2[j+offset].sn.pos.y);
-            paths[j].push_back(sys2[j+offset].sn.pos.z);
-
-            paths[j].push_back(sys2[j+offset].sn.pos.x);
-            paths[j].push_back(sys2[j+offset].sn.pos.y);
-            paths[j].push_back(sys2[j+offset].sn.pos.z);
-#endif
+            
+            int offset = 0;
+            auto tmp = sys2[i+offset].sn.pos - sys2[0].sn.pos + initPos;
+            paths[j].push_back(tmp.x);
+            paths[j].push_back(tmp.y);
+            paths[j].push_back(tmp.z);
+            
+            paths[j].push_back(tmp.x);
+            paths[j].push_back(tmp.y);
+            paths[j].push_back(tmp.z);
         }
     }
     

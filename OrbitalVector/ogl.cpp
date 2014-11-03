@@ -308,7 +308,7 @@ void OGL::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model, GLuin
 void OGL::draw(glm::mat4 &mvp)
 {
     
-    GLint uTransform = glGetUniformLocation(shaderProgram, "transform");
+    GLint uTransform = glGetUniformLocation(shaderProgram, "model");
     //    glm::mat4 mvp = camera * world * position * size * orientation;
     glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(mvp));
     check_gl_error();

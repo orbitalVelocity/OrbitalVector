@@ -155,35 +155,58 @@ void Scene::init(int width, int height)
 //    assert(true == TestLoadObj("suzanne.obj"));
 //    assert(true == TestLoadObj("olympus_1mesh.obj"));
 //    assert(true == TestLoadObj("terran_corvette.obj"));
+//    assert(true == TestLoadObj("square_bracket2.obj"));
 
     char fileName[] = "terran_corvette";
+    char fileName2[] = "square_bracket2";
 //    char fileName[] = "olympus";
-    if (0) writeBinObject(fileName);
+//    if (1) writeBinObject(fileName);
     if (1) readBinObject(fileName);
+    if (1) readBinObject(fileName2);
     
     /* loading shaders and render targets */
     //ship.id = shipIdx;
-    ship.loadShaders("shipVertex.glsl", "shipFragment.glsl");
-    ship.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
-    check_gl_error();
-    ship.loadAttrib("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
-    glBindVertexArray(ship.vao);
-    check_gl_error();
-    glGenBuffers(1, &ship.elementBuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship.elementBuffer);
-    check_gl_error();
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                 shapes[shipIdx].mesh.indices.size() * sizeof(GLuint),
-                 shapes[shipIdx].mesh.indices.data(),
-                 GL_STATIC_DRAW
-                 );
-    ship.drawCount = (int)shapes[shipIdx].mesh.indices.size();
-
+    {
+        ship.loadShaders("shipVertex.glsl", "shipFragment.glsl");
+        ship.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
+        check_gl_error();
+        ship.loadAttrib("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
+        glBindVertexArray(ship.vao);
+        check_gl_error();
+        glGenBuffers(1, &ship.elementBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship.elementBuffer);
+        check_gl_error();
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                     shapes[shipIdx].mesh.indices.size() * sizeof(GLuint),
+                     shapes[shipIdx].mesh.indices.data(),
+                     GL_STATIC_DRAW
+                     );
+        ship.drawCount = (int)shapes[shipIdx].mesh.indices.size();
+    }
     
+    
+    {
+        auto shipIdx = 1;
+        sprite.loadShaders("planetVertex.glsl", "planetFragment.glsl", true);
+        sprite.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
+        check_gl_error();
+        sprite.loadAttrib("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
+        glBindVertexArray(sprite.vao);
+        check_gl_error();
+        glGenBuffers(1, &sprite.elementBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite.elementBuffer);
+        check_gl_error();
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                     shapes[shipIdx].mesh.indices.size() * sizeof(GLuint),
+                     shapes[shipIdx].mesh.indices.data(),
+                     GL_STATIC_DRAW
+                     );
+        sprite.drawCount = (int)shapes[shipIdx].mesh.indices.size();
+    }
     
     // Create and compile our GLSL program from the shaders
-    hdr.loadShaders("passthrough.vs", "bloom.fs", true);
     vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
+    hdr.loadShaders("passthrough.vs", "bloom.fs", true);
     hdr.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
     composite.loadShaders("passthrough.vs", "composite.fs", true);
     composite.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
@@ -319,15 +342,15 @@ void Scene::linePick(vector<float> &shortestDist, int &closestObj)
     glfwGetCursorPos(window, &mouseX, &mouseY);
     glfwGetWindowSize(window, &screenWidth, &screenHeight);
     mouseY = screenHeight - mouseY; //for some reason, mouseY is flipped from tutorial
+    auto mouseX_NDC = ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f;
+    auto mouseY_NDC = ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f;
     glm::vec4 lRayStart_NDC(
-                            ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f,
-                            ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f,
+                            mouseX_NDC, mouseY_NDC,
                             -1.0, // The near plane maps to Z=-1 in Normalized Device Coordinates
                             1.0f
                             );
     glm::vec4 lRayEnd_NDC(
-                          ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f,
-                          ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f,
+                          mouseX_NDC, mouseY_NDC,
                           0.0,
                           1.0f
                           );
@@ -341,11 +364,11 @@ void Scene::linePick(vector<float> &shortestDist, int &closestObj)
 	lRayDir_world = glm::normalize(lRayDir_world);
     
     //iterate over all objects and find min distance
-//    shortestDist.resize(sys.size(), FLT_MAX);
     shortestDist.clear();
     auto objIdx = 0;
-//    const auto &b = sys[0];
-    for (auto &b : sys)
+    const auto &b = sys[0];
+//    for (auto &b : sys)
+    if (false)
     {
         auto p = glm::vec3(world * glm::vec4(b.sn.pos, 1.0));
         auto a = glm::vec3(lRayStart_world);
@@ -359,6 +382,17 @@ void Scene::linePick(vector<float> &shortestDist, int &closestObj)
 //            shortestDist = dist;
 //            closestObj = objIdx;
 //        }
+    }
+    for (const auto &b : sys)
+    {
+        auto posNDC = camera.matrix() * world * glm::vec4(b.sn.pos, 1.0);
+        posNDC /= posNDC.w;
+//        auto screenPosNDC = glm::vec2(posNDC.x, posNDC.y);
+//        auto mouseNDC = glm::vec2(mouseX_NDC, mouseY_NDC);
+//        auto dist = glm::length(mouseNDC - screenPosNDC);
+        auto mouseNDC = glm::vec2(mouseX_NDC * screenWidth, mouseY_NDC * screenHeight);
+        auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
+        auto dist = glm::length(mouseNDC - screenPosNDC);
         shortestDist.push_back(dist);
         
         objIdx++;
@@ -664,13 +698,13 @@ void Scene::forwardRender()
     }
     
     //ship
-        //add shadow related uniforms
-        glm::mat4 biasMatrix(
-                             0.5, 0.0, 0.0, 0.0,
-                             0.0, 0.5, 0.0, 0.0,
-                             0.0, 0.0, 0.5, 0.0,
-                             0.5, 0.5, 0.5, 1.0
-                             );
+    //add shadow related uniforms
+    glm::mat4 biasMatrix(
+                         0.5, 0.0, 0.0, 0.0,
+                         0.0, 0.5, 0.0, 0.0,
+                         0.0, 0.0, 0.5, 0.0,
+                         0.5, 0.5, 0.5, 1.0
+                         );
     
     glUseProgram(ship.shaderProgram);
     int shipOffset = 1;
@@ -693,6 +727,18 @@ void Scene::forwardRender()
         //break;
     }
     
+    glUseProgram(sprite.shaderProgram);
+    for (int i=0; i < gameLogic.sShip.size(); i++) {
+        gameLogic.sShip[i].move(sys[i+shipOffset].sn.pos);
+        auto size = glm::scale(glm::mat4(), glm::vec3(.1));
+        auto mvp = _camera
+                * world
+        * glm::translate(glm::mat4(), sys[i+shipOffset].sn.pos);
+//        * gameLogic.sShip[i].orientation;
+//                * size;
+        sprite.drawIndexed(world, camera, mvp, shapes[shipIdx].mesh.indices.data());
+    }
+    
     glUseProgram(globe.shaderProgram);
     for (auto &s : gameLogic.sGlobe) {
         auto mvp = _camera * world * s.transform();
@@ -702,7 +748,7 @@ void Scene::forwardRender()
     auto mvp = _camera * world;
     globe.draw(mvp, planetColor);
     
-    auto projectileOffset = 1 + gameLogic.sShip.size();
+    int projectileOffset = 1 + (int)gameLogic.sShip.size();
     for (int i=projectileOffset; i < sys.size(); i++)
     {
         auto mvp = _camera

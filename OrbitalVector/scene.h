@@ -54,6 +54,7 @@ public:
           globe(GL_TRIANGLES),
           grid(GL_LINEAR_ATTENUATION),
           ship(GL_TRIANGLES),
+          sprite(GL_TRIANGLES),
           hdr(GL_TRIANGLES),
           highPass(GL_TRIANGLES),
           composite(GL_TRIANGLES),
@@ -80,7 +81,7 @@ public:
     GLFWwindow *window;
 //    vector<OGL> renderables;
     Orbit orbit;
-    OGL globe, grid, ship;
+    OGL globe, grid, ship, sprite;
     glm::vec3 lightPos;
     Camera camera;
     friend class GameLogic;

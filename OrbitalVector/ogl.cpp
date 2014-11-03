@@ -305,6 +305,24 @@ void OGL::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model, GLuin
     
 }
 
+void OGL::drawIndexed(glm::mat4 &model, glm::vec3 &color, GLuint *indices)
+{
+    auto uniformID = glGetUniformLocation(shaderProgram, "model");
+    glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(model));
+
+    GLint uColor = glGetUniformLocation(shaderProgram, "color");
+    check_gl_error();
+    glUniform3fv(uColor, 1, glm::value_ptr(color));
+    check_gl_error();
+    
+    glBindVertexArray(vao);
+    check_gl_error();
+    
+    glDrawElements(drawType, drawCount, GL_UNSIGNED_INT, (void*)0);
+    check_gl_error();
+    
+}
+
 void OGL::draw(glm::mat4 &mvp)
 {
     

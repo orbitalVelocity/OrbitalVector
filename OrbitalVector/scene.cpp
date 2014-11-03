@@ -187,7 +187,7 @@ void Scene::init(int width, int height)
     
     {
         auto shipIdx = 1;
-        sprite.loadShaders("planetVertex.glsl", "planetFragment.glsl", true);
+        sprite.loadShaders("spriteVertex.glsl", "spriteFragment.glsl", true);
         sprite.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
         check_gl_error();
         sprite.loadAttrib("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
@@ -736,7 +736,10 @@ void Scene::forwardRender()
         * glm::translate(glm::mat4(), sys[i+shipOffset].sn.pos);
 //        * gameLogic.sShip[i].orientation;
 //                * size;
-        sprite.drawIndexed(world, camera, mvp, shapes[shipIdx].mesh.indices.data());
+        auto centralPos = glm::vec3(world * glm::vec4(sys[i+shipOffset].sn.pos, 1.0));
+        auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
+        glUniform3fv(loc, 1, glm::value_ptr(centralPos));
+        sprite.drawIndexed(_camera, shipOrbitColor, shapes[shipIdx].mesh.indices.data());
     }
     
     glUseProgram(globe.shaderProgram);

@@ -39,6 +39,9 @@ public:
     void loadAttrib(string name, vector<float> &input,
                     GLuint hint, GLuint type=GL_ARRAY_BUFFER);
     void update();
+    void drawIndexed(glm::mat4 &model,
+                     glm::vec3 &color,
+                     GLuint* indices);
     void drawIndexed(glm::mat4 &world,
                      Camera &camera,
                      glm::mat4 &mvp,

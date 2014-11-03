@@ -70,7 +70,7 @@ public:
     void init(int, int);
     void render();
     void forwardRender();
-    void linePick(float &dist, int &obj);
+    void linePick(vector<float> &dist, int &obj);
     void update();
     void postFrame();
     void setActiveShip(int s) { shipIdx = s; }

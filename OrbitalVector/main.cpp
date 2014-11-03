@@ -232,11 +232,14 @@ int main(int argc, const char * argv[])
         glfwGetCursorPos(window, &mx, &my);
         textOut << "mouse: x " << mx << " y " << my;
         textObj.pushBackDebug(textOut);
-        float dist = FLT_MAX;
+        vector<float> dist;
         int obj = -1;
         scene.linePick(dist, obj);
-        textOut << "nearest obj: " << obj << " dist: " << dist;
-        textObj.pushBackDebug(textOut);
+        for (int i=0; i < dist.size(); i++)
+        {
+            textOut << "obj: " << i << " dist: " << dist[i];
+            textObj.pushBackDebug(textOut);
+        }
         textOut << "ray start: " << std::fixed
                 << std::setprecision(2)
                 << printVec3(scene.rayStart);

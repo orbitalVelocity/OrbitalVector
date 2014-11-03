@@ -309,13 +309,16 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
 
 }
 
-void Scene::linePick(float &shortestDist, int &closestObj)
+void Scene::linePick(vector<float> &shortestDist, int &closestObj)
 {
     //line pick
+    //code taken from
+    //http://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-custom-ray-obb-function/
     double mouseX, mouseY;
+    int screenWidth, screenHeight;
     glfwGetCursorPos(window, &mouseX, &mouseY);
-    int screenWidth = fbWidth;
-    int screenHeight = fbHeight;
+    glfwGetWindowSize(window, &screenWidth, &screenHeight);
+    mouseY = screenHeight - mouseY; //for some reason, mouseY is flipped from tutorial
     glm::vec4 lRayStart_NDC(
                             ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f,
                             ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f,
@@ -338,7 +341,8 @@ void Scene::linePick(float &shortestDist, int &closestObj)
 	lRayDir_world = glm::normalize(lRayDir_world);
     
     //iterate over all objects and find min distance
-    shortestDist = FLT_MAX;
+//    shortestDist.resize(sys.size(), FLT_MAX);
+    shortestDist.clear();
     auto objIdx = 0;
 //    const auto &b = sys[0];
     for (auto &b : sys)
@@ -351,10 +355,11 @@ void Scene::linePick(float &shortestDist, int &closestObj)
         // http://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
         auto closestPoint = (a - p) - glm::dot((a - p), n) * n;
         auto dist = glm::length(closestPoint);
-        if (shortestDist > dist) {
-            shortestDist = dist;
-            closestObj = objIdx;
-        }
+//        if (shortestDist > dist) {
+//            shortestDist = dist;
+//            closestObj = objIdx;
+//        }
+        shortestDist.push_back(dist);
         
         objIdx++;
     }

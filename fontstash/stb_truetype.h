@@ -858,7 +858,7 @@ int stbtt_FindGlyphIndex(const stbtt_fontinfo *info, int unicode_codepoint)
    } else if (format == 12 || format == 13) {
       stbtt_uint32 ngroups = ttULONG(data+index_map+12);
       stbtt_int32 low,high;
-      stbtt_uint16 g = 0;
+//      stbtt_uint16 g = 0;
       low = 0; high = (stbtt_int32)ngroups;
       // Binary search the right group.
       while (low < high) {
@@ -966,7 +966,7 @@ int stbtt_GetGlyphShape(const stbtt_fontinfo *info, int glyph_index, stbtt_verte
 
    if (numberOfContours > 0) {
       stbtt_uint8 flags=0,flagcount;
-      stbtt_int32 ins, i,j=0,m,n, next_move, was_off=0, off, start_off=0, curve_end=0;
+       stbtt_int32 ins, i,j=0,m,n, next_move, was_off=0, off, start_off=0;//, curve_end=0;
       stbtt_int32 x,y,cx,cy,sx,sy, scx,scy;
 	  scx=0;
 	  scy=0;
@@ -1919,7 +1919,7 @@ static int stbtt__matchpair(stbtt_uint8 *fc, stbtt_uint32 nm, stbtt_uint8 *name,
 
 static int stbtt__matches(stbtt_uint8 *fc, stbtt_uint32 offset, stbtt_uint8 *name, stbtt_int32 flags)
 {
-   stbtt_int32 nlen = STBTT_strlen((char *) name);
+   stbtt_int32 nlen = (int)STBTT_strlen((char *) name);
    stbtt_uint32 nm,hd;
    if (!stbtt__isfont(fc+offset)) return 0;
 

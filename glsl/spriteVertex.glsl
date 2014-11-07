@@ -10,4 +10,5 @@ void main() {
     gl_Position = model * vec4(centralPos, 1.0);
     gl_Position /= gl_Position.w;
     gl_Position.xy += position.xy * vec2(.1, .1);
+    gl_Position.z = 0;
 }

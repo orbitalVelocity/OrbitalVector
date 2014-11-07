@@ -23,8 +23,8 @@ const int stage7  = 0x0040;     //FXAA
 const int stage8  = 0x0080;
 const int stage9  = 0x0010;
 const int stage10 = 0x0200;
-const int stage11 = 0x0400;
-const int stage12 = 0x0800;
+//const int stage11 = 0x0400;
+//const int stage12 = 0x0800;
 string get_file_contents(string filename)
 {
     std::ifstream in(filename, std::ios::in | std::ios::binary);

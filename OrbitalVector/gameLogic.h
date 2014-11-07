@@ -14,6 +14,8 @@
 #include "input.h"
 #include "spatial.h"
 #include "rk547m.h"
+#include "scene.h"
+#include "input.h"
 
 using namespace std;
 
@@ -23,10 +25,16 @@ public:
     float timeWarp;
     int activeShip;
     vector<Spatial> sGlobe, sOrbit, sShip;
+    GLFWwindow *window;
+    Scene &scene;
+    UserInput &userInput;
+    //UI related
+    int selected, mouseHover; //shipIDx
 public:
-    GameLogic();
+    GameLogic(GLFWwindow*, Scene &s, UserInput &i) ;
     void update(float dt);
     void processActionList(vector<ActionType> &actionList);
     void addSatellite(body &);
+    void linePick(vector<float> &, int &);
 };
 #endif /* defined(__GLFW3_test__gameLogic__) */

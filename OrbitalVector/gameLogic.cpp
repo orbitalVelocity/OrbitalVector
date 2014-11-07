@@ -9,8 +9,10 @@
 #include "gameLogic.h"
 
 using namespace std;
+using namespace glm;
 
-GameLogic::GameLogic()
+GameLogic::GameLogic(GLFWwindow *w, Scene &s, UserInput &i)
+           : window(w), scene(s), userInput(i)
 {
     activeShip = 0;
     deltaMove = 2;
@@ -24,6 +26,59 @@ GameLogic::GameLogic()
     sOrbit.push_back(Spatial());
     sShip.push_back(Spatial());
     sShip[0].scale(glm::vec3(.001));
+}
+
+void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
+{
+    //line pick
+    //code taken from
+    //http://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-custom-ray-obb-function/
+    double mouseX, mouseY;
+    int screenWidth, screenHeight;
+    glfwGetCursorPos(window, &mouseX, &mouseY);
+    glfwGetWindowSize(window, &screenWidth, &screenHeight);
+    mouseY = screenHeight - mouseY; //for some reason, mouseY is flipped from tutorial
+    auto mouseX_NDC = ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f;
+    auto mouseY_NDC = ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f;
+    vec4 lRayStart_NDC(
+                       mouseX_NDC, mouseY_NDC,
+                       -1.0, // The near plane maps to Z=-1 in Normalized Device Coordinates
+                       1.0f
+                       );
+    vec4 lRayEnd_NDC(
+                     mouseX_NDC, mouseY_NDC,
+                     0.0,
+                     1.0f
+                     );
+    mat4 M = inverse(scene.camera.matrix());
+    vec4 lRayStart_world  = M * lRayStart_NDC;
+    lRayStart_world /= lRayStart_world.w;
+    vec4 lRayEnd_world    = M * lRayEnd_NDC  ;
+    lRayEnd_world   /= lRayEnd_world.w  ;
+	vec3 lRayDir_world(lRayEnd_world - lRayStart_world);
+	lRayDir_world = normalize(lRayDir_world);
+    
+    shortestDist.clear();
+    auto objIdx = 0;
+    mouseHover = -1;
+    for (const auto &b : sys)   //todo: optimize w/ octree
+    {
+        auto posNDC = scene.camera.matrix() * world * vec4(b.sn.pos, 1.0);
+        posNDC /= posNDC.w;
+        auto mouseNDC = vec2(mouseX_NDC * screenWidth, mouseY_NDC * screenHeight);
+        auto screenPosNDC = vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
+        auto dist = length(mouseNDC - screenPosNDC);
+        shortestDist.push_back(dist);
+        
+        if (dist < 40) {
+            if (userInput.lmbPressed)
+                selected = objIdx;
+            else
+                mouseHover = objIdx;
+        }
+        
+        objIdx++;
+    }
 }
 
 void GameLogic::update(float dt)

@@ -51,6 +51,8 @@
 		F1EAC3451A07E8FC006B29CB /* square_bracket2.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1EAC3441A07E8F1006B29CB /* square_bracket2.obj */; };
 		F1EAC3481A081347006B29CB /* spriteVertex.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1EAC3461A0811BD006B29CB /* spriteVertex.glsl */; };
 		F1EAC3491A081347006B29CB /* spriteFragment.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1EAC3471A0811D1006B29CB /* spriteFragment.glsl */; };
+		F1EAC34C1A0B1DDB006B29CB /* user.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1EAC34A1A0B1DDB006B29CB /* user.cpp */; };
+		F1EAC34F1A0BDE42006B29CB /* renderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1EAC34D1A0BDE42006B29CB /* renderer.cpp */; };
 		F1F5236319E9D36D00B860DC /* highpass.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1F5236219E9D11D00B860DC /* highpass.fs */; };
 		F1F5236519EA2F8D00B860DC /* depth.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1F5236419EA2F2E00B860DC /* depth.fs */; };
 		F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */; };
@@ -158,6 +160,10 @@
 		F1EAC3441A07E8F1006B29CB /* square_bracket2.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = square_bracket2.obj; sourceTree = "<group>"; };
 		F1EAC3461A0811BD006B29CB /* spriteVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = spriteVertex.glsl; path = glsl/spriteVertex.glsl; sourceTree = "<group>"; };
 		F1EAC3471A0811D1006B29CB /* spriteFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = spriteFragment.glsl; path = glsl/spriteFragment.glsl; sourceTree = "<group>"; };
+		F1EAC34A1A0B1DDB006B29CB /* user.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = user.cpp; sourceTree = "<group>"; };
+		F1EAC34B1A0B1DDB006B29CB /* user.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = user.h; sourceTree = "<group>"; };
+		F1EAC34D1A0BDE42006B29CB /* renderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = renderer.cpp; sourceTree = "<group>"; };
+		F1EAC34E1A0BDE42006B29CB /* renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = renderer.h; sourceTree = "<group>"; };
 		F1F5236219E9D11D00B860DC /* highpass.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = highpass.fs; path = glsl/highpass.fs; sourceTree = "<group>"; };
 		F1F5236419EA2F2E00B860DC /* depth.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = depth.fs; path = glsl/depth.fs; sourceTree = "<group>"; };
 		F1FDDCF819BE68D4009CFEB0 /* GLError.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLError.cpp; sourceTree = "<group>"; };
@@ -261,8 +267,12 @@
 				F1B3C67318D935EC00971791 /* main.cpp */,
 				F1011C6519C68C6700602446 /* scene.cpp */,
 				F1011C6619C68C6700602446 /* scene.h */,
+				F1EAC34D1A0BDE42006B29CB /* renderer.cpp */,
+				F1EAC34E1A0BDE42006B29CB /* renderer.h */,
 				F151168A19DE1FE50018635B /* gameLogic.cpp */,
 				F151168B19DE1FE50018635B /* gameLogic.h */,
+				F1EAC34A1A0B1DDB006B29CB /* user.cpp */,
+				F1EAC34B1A0B1DDB006B29CB /* user.h */,
 				F111F26C19D9E94200DD4439 /* input.cpp */,
 				F111F26D19D9E94200DD4439 /* input.h */,
 				F111F26919D48F8C00DD4439 /* text.cpp */,
@@ -366,7 +376,9 @@
 				F1011C7519C7F0C700602446 /* orbit.cpp in Sources */,
 				F111F26B19D48F8C00DD4439 /* text.cpp in Sources */,
 				F15E8EA619BD4696003E566C /* LoadShader.cpp in Sources */,
+				F1EAC34F1A0BDE42006B29CB /* renderer.cpp in Sources */,
 				F111F26E19D9E94200DD4439 /* input.cpp in Sources */,
+				F1EAC34C1A0B1DDB006B29CB /* user.cpp in Sources */,
 				F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */,
 				F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */,
 				F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */,

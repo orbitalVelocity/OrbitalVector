@@ -221,12 +221,12 @@ int main(int argc, const char * argv[])
         textObj.pushBackDebug(textOut);
         textOut << "projectiles: " << sys.size() - 2;
         textObj.pushBackDebug(textOut);
-        textOut << "paths: " << renderer.orbit.paths.size() << " | ";
-        for ( auto & path : renderer.orbit.paths) {
+        textOut << "paths: " << scene.orbit.paths.size() << " | ";
+        for ( auto & path : scene.orbit.paths) {
             textOut << path.size()/3 << " ";
         }
         textObj.pushBackDebug(textOut);
-        textOut << "path size: " << renderer.orbit.drawCount;
+        textOut << "path size: " << scene.orbit.drawCount;
         textObj.pushBackDebug(textOut);
 
         //mouse debug
@@ -276,8 +276,8 @@ int main(int argc, const char * argv[])
     
     //init GUI text
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
-    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(renderer.orbit.apo)));
-    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(renderer.orbit.peri)));
+    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.apo)));
+    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.peri)));
     prevt = glfwGetTime();
     
     
@@ -322,11 +322,11 @@ int main(int argc, const char * argv[])
         //GUI setup
         auto vp = scene.camera.matrix() * world;
         textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
-        textObj.guiText[1].pos = getVec2(vp, renderer.orbit.apoPos);
-        textObj.guiText[2].pos = getVec2(vp, renderer.orbit.periPos);
+        textObj.guiText[1].pos = getVec2(vp, scene.orbit.apoPos);
+        textObj.guiText[2].pos = getVec2(vp, scene.orbit.periPos);
 
-        textObj.guiText[1].text = to_string(renderer.orbit.apo);
-        textObj.guiText[2].text = to_string(renderer.orbit.peri);
+        textObj.guiText[1].text = to_string(scene.orbit.apo);
+        textObj.guiText[2].text = to_string(scene.orbit.peri);
        
         /* render everything else */
 		glEnable(GL_DEPTH_TEST);

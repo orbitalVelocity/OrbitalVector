@@ -58,13 +58,15 @@ void initCamera(Camera & camera, int width, int height) {
 
 void writeBinObject(string _fileName)
 {
+    int shipIdx = (int)shapes.size()-1; //last obj read
     auto fileName = _fileName + ".obj";
     assert(true == TestLoadObj(fileName.c_str()));
+
     //write to binary
     vector<int> vecSizes(3);
-    int shipIdx = 0;
     fileName = _fileName + ".bin";
     FILE* pFile = fopen(fileName.c_str(), "wb");
+    
     //write size of each vector
     vecSizes[0] = (float)shapes[shipIdx].mesh.positions.size();
     vecSizes[1] = (float)shapes[shipIdx].mesh.normals.size();
@@ -75,6 +77,7 @@ void writeBinObject(string _fileName)
     << "indices:   " << vecSizes[2] << endl;
     fwrite(vecSizes.data(), sizeof(float), 3, pFile);
     
+    //write the actual arrays
     auto &array = shapes[shipIdx].mesh.positions;
     fwrite(array.data(), 1, array.size()*sizeof(float), pFile);
     auto &array2 = shapes[shipIdx].mesh.normals;
@@ -98,10 +101,7 @@ void readBinObject(string _fileName)
     << "normals:   " << vecSizes[1] << endl
     << "indices:   " << vecSizes[2] << endl;
     
-    vector<float> fArray1, fArray2;
-    vector<unsigned int> iArray1;
     {
-        
         auto &fArray = shapes[shipIdx].mesh.positions;
         fArray.resize(vecSizes[0]);
         fread((void *)fArray.data(), sizeof(float), vecSizes[0], pFile);
@@ -111,22 +111,20 @@ void readBinObject(string _fileName)
         fArray.resize(vecSizes[1]);
         fread((void *)fArray.data(), sizeof(float), vecSizes[1], pFile);
     }
-    auto &iArray = shapes[shipIdx].mesh.indices;
-    iArray.resize(vecSizes[2]);
-    fread((void *)iArray.data(), sizeof(int), vecSizes[2], pFile);
+    {
+        auto &iArray = shapes[shipIdx].mesh.indices;
+        iArray.resize(vecSizes[2]);
+        fread((void *)iArray.data(), sizeof(int), vecSizes[2], pFile);
+    }
 }
 
 
 void Scene::init(int width, int height)
 {
-    fbWidth = width;
-    fbHeight = height;
     initCamera(camera, width, height);
     
     lightPos = vec3(0, 0, -1000);
-    
 
-    
     /* mesh loading */
 //    assert(true == TestLoadObj("cornell_box.obj"));
 //    assert(true == TestLoadObj("suzanne.obj"));

@@ -95,6 +95,54 @@ void GameLogic::update(float dt)
     sGlobe[1].move(sys[1].sn.pos+progradeOffset);
     //retrograde
     sGlobe[2].move(sys[1].sn.pos-progradeOffset);
+   
+#if 1
+    double mx, my;
+    static double prevMX = 0, prevMY = 0;
+    glfwGetCursorPos(window, &mx, &my);
+    double _x = mx - prevMX;
+    double _y = my - prevMY;
+    prevMX = mx;
+    prevMY = my;
+    double mouseScale = .1;
+    
+    if (userInput.rmbPressed) {
+        scene.camera.rotate(_y*mouseScale, _x*mouseScale);
+    } else if (userInput.lmbPressed) {
+        sShip[0].rotate(-_x*mouseScale, _y*mouseScale, 0.0f);
+    }
+    
+    //scroll behavior
+    scene.camera.offsetPos(vec3(0,0, -userInput.yScroll));
+    userInput.yScroll = 0;
+    
+    //calculate trajectories
+    static int orbitCount = 0;
+    if (orbitCount++ % 30 == 0) {
+        scene.orbit.update();
+    }
+    
+    //remove elements
+    if (true)
+    {
+        //mark elements that needs to be removed
+        vector<bool> markedForRemoval(sys.size(), false);
+        markForDeletion(sys, markedForRemoval);
+        
+        //remove all marked elements
+        //FIXME: only works because first element never designed to be removed
+        auto it = sys.end() - 1;
+        for (int i = (int)sys.size()-1; i >= 0; --i, --it)
+        {
+            if (markedForRemoval[i]) {      
+                sys.erase(it);
+            }
+        }
+    }
+    
+    
+    world = translate(mat4(), -sys[1].sn.pos);
+#endif
 }
 
 void GameLogic::processActionList(vector<ActionType> &actionList)

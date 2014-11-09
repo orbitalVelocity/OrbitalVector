@@ -48,6 +48,7 @@ void markForDeletion(vector<body> &sys, vector<bool> &markedForRemoval)
             }
             if (glm::length(sys[i].sn.pos - sys[j].sn.pos) <= 10) {
                 markedForRemoval[j] = true;
+                markedForRemoval[i] = true;
             }
         }
         if (not markedForRemoval[i] && glm::length(sys[i].sn.pos - sys[0].sn.pos) > 400)

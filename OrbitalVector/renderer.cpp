@@ -46,7 +46,7 @@ void Renderer::init(int width, int height)
     
     globe.init();
     check_gl_error();
-    orbit.init();
+    scene.orbit.init();
     check_gl_error();
     grid.init();
     check_gl_error();
@@ -248,54 +248,7 @@ mat4 depthMVP;
 
 void Renderer::update()
 {
-    double mx, my;
-    static double prevMX = 0, prevMY = 0;
-    glfwGetCursorPos(gameLogic.window, &mx, &my);
-    double _x = mx - prevMX;
-    double _y = my - prevMY;
-    prevMX = mx;
-    prevMY = my;
-    double mouseScale = .1;
-    
-    if (userInput.rmbPressed) {
-        camera.rotate(_y*mouseScale, _x*mouseScale);
-    } else if (userInput.lmbPressed) {
-        gameLogic.sShip[0].rotate(-_x*mouseScale, _y*mouseScale, 0.0f);
-    }
-    
-    //scroll behavior
-    camera.offsetPos(vec3(0,0, -userInput.yScroll));
-    userInput.yScroll = 0;
-    
-    
-    
-    //calculate trajectories -- FIXME: should go in gamelogic
-    static int orbitCount = 0;
-    if (orbitCount++ % 30 == 0) {
-        orbit.update();
-    }
-    
-    //remove elements
-    if (true)
-    {
-        //mark elements that needs to be removed
-        //TODO: due to collision, too far/escape velocity
-        vector<bool> markedForRemoval(sys.size(), false);
-        markForDeletion(sys, markedForRemoval);
-        
-        //remove all marked elements
-        //FIXME: only works because first element never designed to be removed
-        auto it = sys.end() - 1;
-        for (int i = (int)sys.size()-1; i >= 0; --i, --it)
-        {
-            if (markedForRemoval[i]) {      //TODO: wrap sys and ids into 1 object
-                sys.erase(it);
-            }
-        }
-    }
-    
-    
-    world = translate(mat4(), -sys[1].sn.pos);
+    //maybe this will be useful someday
 }
 
 void Renderer::render()
@@ -318,7 +271,7 @@ void Renderer::render()
             depthMVP = depthProjectionMatrix * depthViewMatrix *
             gameLogic.sShip[shipIdx].orientation
             * gameLogic.sShip[shipIdx].size;
-            shadowMap.drawIndexed(world, camera, depthMVP, shapes[shipIdx].mesh.indices.data());
+            shadowMap.drawIndexed(world, scene.camera, depthMVP, shapes[shipIdx].mesh.indices.data());
         }
         //TODO: fix glViewPort toggle in stages too!
         if (renderStage & stage2)  //regular forward rendering
@@ -498,7 +451,7 @@ void Renderer::forwardRender()
     auto shipIdx = gameLogic.activeShip;
     
     /* render meshes */
-    auto _camera = camera.matrix();
+    auto _camera = scene.camera.matrix();
     
     vec3 planetColor   (0.4, 0.0, 0.0);
     vec3 shipColor     (0.9, 0.9, 0.9);
@@ -511,8 +464,8 @@ void Renderer::forwardRender()
         glUseProgram(grid.shaderProgram);
         grid.draw(mvp, gridColor);
         check_gl_error();
-        glUseProgram(orbit.shaderProgram);
-        orbit.draw(mvp, shipOrbitColor);
+        glUseProgram(scene.orbit.shaderProgram);
+        scene.orbit.draw(mvp, shipOrbitColor);
         check_gl_error();
     }
     
@@ -541,7 +494,7 @@ void Renderer::forwardRender()
         
 		mat4 depthBiasMVP = biasMatrix * depthMVP;
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
-        ship.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
+        ship.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
         check_gl_error();
         //break;
     }
@@ -581,14 +534,14 @@ void Renderer::forwardRender()
         * scale(mat4(), vec3(0.001f));
         //        globe.draw(mvp, planetColor);
 #if 1
-        shadowMap.drawIndexed(world, camera, mvp, shapes[shipIdx].mesh.indices.data());
+        shadowMap.drawIndexed(world, scene.camera, mvp, shapes[shipIdx].mesh.indices.data());
 #else
         auto loc = glGetUniformLocation(ship.shaderProgram, "shadowMap");
         glUniform1i(loc, 0);
         loc = glGetUniformLocation(ship.shaderProgram, "depthBiasMVP");
 		mat4 depthBiasMVP = biasMatrix * depthMVP;
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
-        ship.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
+        ship.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
 #endif
         check_gl_error();
     }

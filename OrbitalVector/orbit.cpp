@@ -66,7 +66,6 @@ void Orbit::calcTrajectory(int &pathSteps)
     auto &ks2 = ks;
     auto sys2 = sys;
     
-    
     float dt = 2.0;
     glm::vec3 initPos = sys2[0].sn.pos;
 
@@ -101,7 +100,6 @@ void Orbit::calcTrajectory(int &pathSteps)
         return (!apoFound or !periFound) and paths[0].size() < 1000;
     };
     
-    
     while (loopCond())
     {
         orbitDelta(dt, ks2, sys2, true);
@@ -132,23 +130,18 @@ void Orbit::calcTrajectory(int &pathSteps)
         }
         
         //collision detection
-        if (true)
+        vector<bool> markedForRemoval(sys2.size(), false);
+        markForDeletion(sys2, markedForRemoval);
+        
+        //remove all marked elements
+        //FIXME: only works because first element never designed to be removed
+        auto it = --sys2.end();
+        auto itt = --ids.end();
+        for (int i = (int)sys2.size()-1; i >= 0; --i, --it, --itt)
         {
-            //mark elements that needs to be removed
-            //TODO: due to collision, too far/escape velocity
-            vector<bool> markedForRemoval(sys2.size(), false);
-            markForDeletion(sys2, markedForRemoval);
-
-            //remove all marked elements
-            //FIXME: only works because first element never designed to be removed
-            auto it = --sys2.end();
-            auto itt = --ids.end();
-            for (int i = (int)sys2.size()-1; i >= 0; --i, --it, --itt)
-            {
-                if (markedForRemoval[i]) {      //TODO: wrap sys2 and ids into 1 object
-                    sys2.erase(it);
-                    ids.erase(itt);
-                }
+            if (markedForRemoval[i]) {      //TODO: wrap sys2 and ids into 1 object
+                sys2.erase(it);
+                ids.erase(itt);
             }
         }
    

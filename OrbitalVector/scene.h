@@ -26,13 +26,15 @@ extern std::vector<tinyobj::material_t> materials;
 //invokes game logic
 class Scene {
 public:
-    Scene()
+    Scene() :
+    orbit(GL_LINES)
         {
         };
     void init(int, int);
     void update();
     
 public:
+    Orbit orbit;
     
     glm::vec3 lightPos;
     Camera camera;
@@ -40,8 +42,6 @@ public:
     friend class GameLogic;
     friend class UserInput;
     friend class Renderer;
-    
-    int fbWidth, fbHeight;
     
     bool debug;
     glm::vec3 rayStart, rayEnd;

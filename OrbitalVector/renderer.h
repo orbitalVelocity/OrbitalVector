@@ -53,7 +53,6 @@ public:
     Renderer(Scene &s, GameLogic &g, UserInput &i)
     : scene(s), gameLogic(g),
     userInput(i),
-    orbit(GL_LINES),
     globe(GL_TRIANGLES),
     grid(GL_LINEAR_ATTENUATION),
     ship(GL_TRIANGLES),
@@ -79,10 +78,8 @@ public:
     
 public:
     //    vector<OGL> renderables;
-    Orbit orbit;
     OGL globe, grid, ship, sprite;
     glm::vec3 lightPos;
-    Camera camera;
     friend class GameLogic;
     friend class UserInput;
     GameLogic &gameLogic;

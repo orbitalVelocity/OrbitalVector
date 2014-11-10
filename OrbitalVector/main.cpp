@@ -234,6 +234,7 @@ int main(int argc, const char * argv[])
         glfwGetCursorPos(window, &mx, &my);
         textOut << "mouse: x " << mx << " y " << my;
         textObj.pushBackDebug(textOut);
+        
         vector<float> dist;
         int obj = -1;
         gameLogic.linePick(dist, obj);
@@ -242,18 +243,22 @@ int main(int argc, const char * argv[])
             textOut << "obj: " << i << " dist: " << dist[i];
             textObj.pushBackDebug(textOut);
         }
-        textOut << "ray start: " << std::fixed
-                << std::setprecision(2)
-                << printVec3(scene.rayStart);
+        textOut << "selected: " << gameLogic.selected;
         textObj.pushBackDebug(textOut);
-        textOut << "ray end: " <<std::fixed
-                << std::setprecision(2)
-                <<printVec3(scene.rayEnd);
+        textOut << "mouseOver: " << gameLogic.mouseHover;
         textObj.pushBackDebug(textOut);
-        textOut << "planet camera coord: " << std::fixed
-                << std::setprecision(2)
-                << printVec3(scene.obj);
-        textObj.pushBackDebug(textOut);
+//        textOut << "ray start: " << std::fixed
+//                << std::setprecision(2)
+//                << printVec3(scene.rayStart);
+//        textObj.pushBackDebug(textOut);
+//        textOut << "ray end: " <<std::fixed
+//                << std::setprecision(2)
+//                <<printVec3(scene.rayEnd);
+//        textObj.pushBackDebug(textOut);
+//        textOut << "planet camera coord: " << std::fixed
+//                << std::setprecision(2)
+//                << printVec3(scene.obj);
+//        textObj.pushBackDebug(textOut);
         
         
         

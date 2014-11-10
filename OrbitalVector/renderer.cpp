@@ -514,8 +514,8 @@ void Renderer::forwardRender()
         sprite.drawIndexed(_camera, color, shapes[shipIdx].mesh.indices.data());
     };
     
-    drawSelector(selected-1, shipOrbitColor);
-    drawSelector(mouseHover-1, gridColor);
+    drawSelector(gameLogic.selected-1, shipOrbitColor);
+    drawSelector(gameLogic.mouseHover-1, gridColor);
     
     glUseProgram(globe.shaderProgram);
     for (auto &s : gameLogic.sGlobe) {

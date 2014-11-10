@@ -482,6 +482,7 @@ void Renderer::forwardRender()
     int shipOffset = 1;
     for (int i=0; i < gameLogic.sShip.size(); i++) {
         gameLogic.sShip[i].move(sys[i+shipOffset].sn.pos);
+//        gameLogic.sShip[i].move(getBody(i, BodyType::SHIP).sn.pos);
         auto mvp =
         world *
         translate(mat4(), sys[i+shipOffset].sn.pos) *

@@ -134,7 +134,7 @@ void GameLogic::update(float dt)
         auto it = sys.end() - 1;
         for (int i = (int)sys.size()-1; i >= 0; --i, --it)
         {
-            if (markedForRemoval[i]) {      
+            if (markedForRemoval[i]) {
                 sys.erase(it);
             }
         }
@@ -201,7 +201,7 @@ void GameLogic::processActionList(vector<ActionType> &actionList)
             auto vel = sys[1].sn.vel
             + glm::normalize(shipVector)
             * 3.0f;
-            body bullet(state(pos, vel), 10, gm, nullptr, objType::SHIP);
+            body bullet(state(pos, vel), 10, gm, nullptr, BodyType::SHIP);
             addSatellite(bullet);
         }
 

@@ -95,7 +95,7 @@ void initPhysics()
                        gm,
                        10,
                        nullptr,
-                       objType::PLANET
+                       BodyType::GRAV
                        )
                   );
     glm::vec3 rad(110, 0, 0);
@@ -106,7 +106,7 @@ void initPhysics()
                        gm,
                        1,
                        nullptr,
-                       objType::SHIP
+                       BodyType::SHIP
                        )
                   );
 

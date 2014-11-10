@@ -17,6 +17,9 @@ vector<body> sys;
 vector<float> orbits;
 glm::mat4 world;
 
+BodyType numBodyPerType[MAX_BODY_TYPE];
+int sysIndexOffset[MAX_BODY_TYPE];
+
 void printks(vector<vector<state>> &ks)
 {
     
@@ -34,6 +37,37 @@ void printsys(vector<body> &sys)
         cout << "p: " << printVec3(body.sn.pos) << " v: " << printVec3(body.sn.vel) << "\n";
     }
 }
+
+void removeFromSys(int del, int type)
+{
+    assert(type != BodyType::GRAV && "grav wells are indistructable at this time");
+    auto offset = sysIndexOffset[type] + del;
+    sys.erase(sys.begin()+offset);
+    updateSysIndexOffset();
+}
+
+void InsertBodyToSys(body &body, int type)
+{
+    auto offset = sysIndexOffset[type+1];
+    sys.insert(sys.begin() + offset, body);
+    updateSysIndexOffset();
+}
+void updateSysIndexOffset()
+{
+    auto total = 0;
+    for (int i = 0; i < MAX_BODY_TYPE; i++)
+    {
+        sysIndexOffset[i] = total;
+        total += numBodyPerType[i];
+    }
+}
+
+body& getBody(int bodyNum, int type)
+{
+    return sys[sysIndexOffset[type] + bodyNum];
+}
+
+
 
 void markForDeletion(vector<body> &sys, vector<bool> &markedForRemoval)
 {

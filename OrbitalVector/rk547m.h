@@ -49,12 +49,18 @@ public:
     glm::vec3 pos, vel;
 };
 
-enum objType { PLANET, ORB, SHIP };
+enum BodyType {
+    GRAV,
+    SHIP,
+    MISSILE,
+    PROJECTILE,
+    MAX_BODY_TYPE
+};
 
 class body {         // State of a planetary body
 public:
     body() {};
-    body(state s, float _mu, float r, body* p, objType t) :
+    body(state s, float _mu, float r, body* p, BodyType t) :
     sn(s), mu(_mu), radius(r), parent(p), type(t), deltaV(0) {
         if (nullptr == parent) {
             soi = INFINITY;
@@ -114,7 +120,7 @@ public:
     float soi;
     float deltaV;
     GLfloat deltaVCapacity;
-    objType type;
+    BodyType type;
 };
 
 void printsys(vector<body> &sys);
@@ -135,4 +141,17 @@ extern vector<body> sys;                    //sys[planetID].sn is pos
 extern vector<float> orbits;   //orbits[planetID] is path
                                             //of planets'/satellites'
                                             //trajectory
+
+
+extern BodyType numBodyPerType[MAX_BODY_TYPE];
+extern int sysIndexOffset[MAX_BODY_TYPE];
+
+void removeFromSys(int del, int type);
+void InsertBodyToSys(body &body, int type);
+void updateSysIndexOffset();
+
+body& getBody(int shipNum, int type);
+
+
+
 #endif /* defined(__SpaceSimulator__rk547m__) */

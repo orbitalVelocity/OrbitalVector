@@ -97,8 +97,6 @@ public:
     
     bool debug;
     float downSizeFactor;
-    glm::vec3 rayStart, rayEnd;
-    glm::vec3 obj;
     int selected, mouseHover;
 };
 

@@ -36,7 +36,7 @@ Spatial::Spatial(float r) : x(0), y(90) {
                        gm,
                        1,
                        nullptr,
-                       objType::SHIP
+                       BodyType::SHIP
                        )
                   );
     

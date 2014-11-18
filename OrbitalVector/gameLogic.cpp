@@ -93,7 +93,7 @@ void GameLogic::missileLogic(float dt)
         //find vector to target
         vec3 targetVector = normalize(sys[selected].sn.pos - sys[i].sn.pos);
         //add a bit of velocity in that direction?
-        float scale = 0.01;
+        float scale = 0.1;
         sys[i].sn.vel += targetVector * scale;
         cout << "update projectile: " << i << endl;
     }

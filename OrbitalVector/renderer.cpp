@@ -500,10 +500,10 @@ void Renderer::forwardRender()
                     );
     
     glUseProgram(ship.shaderProgram);
-    int shipOffset = 1;
-    for (int i=0; i < gameLogic.sShip.size(); i++) {
-        gameLogic.sShip[i].move(sys[i+shipOffset].sn.pos);
-//        gameLogic.sShip[i].move(getBody(i, BodyType::SHIP).sn.pos);
+    int shipOffset = sysIndexOffset[BodyType::SHIP];
+    int shipNum = numBodyPerType[BodyType::SHIP];
+    //int shipNum = gameLogic.sShip.size();
+    for (int i=0; i < shipNum; i++) {
         auto mvp =
         world *
         translate(mat4(), sys[i+shipOffset].sn.pos) *
@@ -526,7 +526,6 @@ void Renderer::forwardRender()
         if (i < 1) {
             return;
         }
-        gameLogic.sShip[i].move(sys[i].sn.pos);
         auto centralPos = vec3(world * vec4(sys[i].sn.pos, 1.0));
         auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
         glUniform3fv(loc, 1, value_ptr(centralPos));
@@ -553,9 +552,10 @@ void Renderer::forwardRender()
     {
     glUseProgram(missile.shaderProgram);
         auto mvp =
-        world *
-        translate(mat4(), sys[i].sn.pos) *
-        gameLogic.sShip[shipIdx].orientation;
+        world
+//        * lookAt(sys[i].sn.vel, vec3(0), vec3(0,1,0))
+        * translate(mat4(), sys[i].sn.pos);
+        
         missile.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
 
         check_gl_error();

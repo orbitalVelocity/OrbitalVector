@@ -143,11 +143,12 @@ extern vector<float> orbits;   //orbits[planetID] is path
                                             //trajectory
 
 
-extern BodyType numBodyPerType[MAX_BODY_TYPE];
+extern int numBodyPerType[MAX_BODY_TYPE];
 extern int sysIndexOffset[MAX_BODY_TYPE];
 
 void removeFromSys(int del, int type);
-void InsertBodyToSys(body &body, int type);
+void removeFromSys(vector<body>::iterator it);
+void InsertToSys(body &body, int type);
 void updateSysIndexOffset();
 
 body& getBody(int shipNum, int type);

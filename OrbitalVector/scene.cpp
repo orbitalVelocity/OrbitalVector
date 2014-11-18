@@ -129,15 +129,19 @@ void Scene::init(int width, int height)
 //    assert(true == TestLoadObj("cornell_box.obj"));
 //    assert(true == TestLoadObj("suzanne.obj"));
 //    assert(true == TestLoadObj("olympus_1mesh.obj"));
-//    assert(true == TestLoadObj("terran_corvette.obj"));
+//    assert(true == TestLoadObj("terran_corvette_small.obj"));
 //    assert(true == TestLoadObj("square_bracket2.obj"));
 
-    char fileName[] = "terran_corvette";
+//    assert(true == TestLoadObj("missile1.obj"));
+//    if (1) writeBinObject("terran_corvette_small");
+//    return;
+    char fileName[] = "terran_corvette_small";
     char fileName2[] = "square_bracket2";
+    char fileName3[] = "missile1";
 //    char fileName[] = "olympus";
-//    if (1) writeBinObject(fileName);
     if (1) readBinObject(fileName);
     if (1) readBinObject(fileName2);
+    if (1) readBinObject(fileName3);
   
 }
 

@@ -54,6 +54,7 @@ void Renderer::init(int width, int height)
     /* loading shaders and render targets */
     //ship.id = shipIdx;
     {
+        shipIdx = 0;
         ship.loadShaders("shipVertex.glsl", "shipFragment.glsl");
         ship.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
         check_gl_error();
@@ -89,6 +90,27 @@ void Renderer::init(int width, int height)
                      GL_STATIC_DRAW
                      );
         sprite.drawCount = (int)shapes[shipIdx].mesh.indices.size();
+    }
+    
+    if (1)
+    {
+        shipIdx = 2;
+        missile.loadShaders("shipVertex.glsl", "shipFragment.glsl");
+        missile.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
+        check_gl_error();
+        missile.loadAttrib("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
+        glBindVertexArray(missile.vao);
+        check_gl_error();
+        glGenBuffers(1, &missile.elementBuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, missile.elementBuffer);
+        check_gl_error();
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+                     shapes[shipIdx].mesh.indices.size() * sizeof(GLuint),
+                     shapes[shipIdx].mesh.indices.data(),
+                     GL_STATIC_DRAW
+                     );
+        missile.drawCount = (int)shapes[shipIdx].mesh.indices.size();
+        shipIdx = 0;
     }
     
     // Create and compile our GLSL program from the shaders
@@ -450,7 +472,6 @@ void Renderer::forwardRender()
 {
     auto shipIdx = gameLogic.activeShip;
     
-    /* render meshes */
     auto _camera = scene.camera.matrix();
     
     vec3 planetColor   (0.4, 0.0, 0.0);
@@ -499,23 +520,23 @@ void Renderer::forwardRender()
         check_gl_error();
         //break;
     }
-    
     glUseProgram(sprite.shaderProgram);
-    //    for (int i=0; i < gameLogic.sShip.size(); i++)
     auto drawSelector = [&](int i, vec3 &color)
     {
-        if (i < 0) {
+        if (i < 1) {
             return;
         }
-        gameLogic.sShip[i].move(sys[i+shipOffset].sn.pos);
-        auto centralPos = vec3(world * vec4(sys[i+shipOffset].sn.pos, 1.0));
+        gameLogic.sShip[i].move(sys[i].sn.pos);
+        auto centralPos = vec3(world * vec4(sys[i].sn.pos, 1.0));
         auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
         glUniform3fv(loc, 1, value_ptr(centralPos));
-        sprite.drawIndexed(_camera, color, shapes[shipIdx].mesh.indices.data());
+        sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
     };
     
-    drawSelector(gameLogic.selected-1, shipOrbitColor);
+    drawSelector(gameLogic.selected, shipOrbitColor);
+#if 0
     drawSelector(gameLogic.mouseHover-1, gridColor);
+#endif
     
     glUseProgram(globe.shaderProgram);
     for (auto &s : gameLogic.sGlobe) {
@@ -526,24 +547,17 @@ void Renderer::forwardRender()
     auto mvp = _camera * world;
     globe.draw(mvp, planetColor);
     
-    int projectileOffset = 1 + (int)gameLogic.sShip.size();
+    //draw projectile
+    int projectileOffset = sysIndexOffset[BodyType::PROJECTILE];
     for (int i=projectileOffset; i < sys.size(); i++)
     {
-        auto mvp = _camera
-        * world
-        * translate(mat4(), sys[i].sn.pos)
-        * scale(mat4(), vec3(0.001f));
-        //        globe.draw(mvp, planetColor);
-#if 1
-        shadowMap.drawIndexed(world, scene.camera, mvp, shapes[shipIdx].mesh.indices.data());
-#else
-        auto loc = glGetUniformLocation(ship.shaderProgram, "shadowMap");
-        glUniform1i(loc, 0);
-        loc = glGetUniformLocation(ship.shaderProgram, "depthBiasMVP");
-		mat4 depthBiasMVP = biasMatrix * depthMVP;
-		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
-        ship.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
-#endif
+    glUseProgram(missile.shaderProgram);
+        auto mvp =
+        world *
+        translate(mat4(), sys[i].sn.pos) *
+        gameLogic.sShip[shipIdx].orientation;
+        missile.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
+
         check_gl_error();
     }
     

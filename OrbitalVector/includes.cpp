@@ -25,6 +25,13 @@ const int stage9  = 0x0010;
 const int stage10 = 0x0200;
 //const int stage11 = 0x0400;
 //const int stage12 = 0x0800;
+
+void _debug_cout(string msg, const char *file, int line)
+{
+    cerr <<file<<":"<<line << " " << msg << endl;
+    
+}
+
 string get_file_contents(string filename)
 {
     std::ifstream in(filename, std::ios::in | std::ios::binary);

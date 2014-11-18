@@ -32,18 +32,22 @@ Spatial::Spatial(float r) : x(0), y(90) {
     cout << "new ship: r: " << r << ", v: " << v << endl;
     m = 1e1;
     gm = m * G;
-    sys.push_back(body(state(rad, vel),
-                       gm,
-                       1,
-                       nullptr,
-                       BodyType::SHIP
-                       )
-                  );
+    auto tmp = body(state(rad, vel),
+                    gm,
+                    1,
+                    nullptr,
+                    BodyType::SHIP
+                    );
+#if 0
+    sys.push_back(tmp);
     
     const int numTerms = 8;
     ks.resize(numTerms);
     for (auto &k : ks)
         k.resize(sys.size());
+#else
+    InsertToSys(tmp, BodyType::SHIP);
+#endif
 }
 
 void Spatial::scale(const glm::vec3 s)

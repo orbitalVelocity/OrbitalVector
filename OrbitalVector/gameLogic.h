@@ -31,12 +31,13 @@ public:
     Scene &scene;
     UserInput &userInput;
     //UI related
-    int selected, mouseHover; //shipIDx
+    int selected, mouseHover; //sysIdx
 public:
     GameLogic(GLFWwindow*, Scene &s, UserInput &i) ;
     void update(float dt);
     void processActionList(vector<ActionType> &actionList);
     void addSatellite(body &);
     void linePick(vector<float> &, int &);
+    void missileLogic(float dt);
 };
 #endif /* defined(__GLFW3_test__gameLogic__) */

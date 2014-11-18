@@ -25,7 +25,7 @@ GameLogic::GameLogic(GLFWwindow *w, Scene &s, UserInput &i)
     sGlobe[2].scale(glm::vec3(.05));
     sOrbit.push_back(Spatial());
     sShip.push_back(Spatial());
-    sShip[0].scale(glm::vec3(.001));
+    sShip[0].scale(glm::vec3(1));
 }
 
 void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
@@ -73,11 +73,29 @@ void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
         if (dist < 40) {
             if (userInput.lmbPressed)
                 selected = objIdx;
-            else
+            else {
                 mouseHover = objIdx;
+                cout << "mouse hover is: " << mouseHover << endl;
+            }
         }
         
         objIdx++;
+    }
+}
+
+void GameLogic::missileLogic(float dt)
+{
+    //for each missile, aim at selected target and fire
+    auto start = sysIndexOffset[BodyType::PROJECTILE];
+    auto stop = start + numBodyPerType[BodyType::PROJECTILE];
+    for (int i = start; i < stop; i++)
+    {
+        //find vector to target
+        vec3 targetVector = normalize(sys[selected].sn.pos - sys[i].sn.pos);
+        //add a bit of velocity in that direction?
+        float scale = 0.01;
+        sys[i].sn.vel += targetVector * scale;
+        cout << "update projectile: " << i << endl;
     }
 }
 
@@ -86,6 +104,8 @@ void GameLogic::update(float dt)
     //calculate new position/velocity
     float gameDT = dt * timeWarp;
     orbitDelta(gameDT, ks, sys, false);
+    
+    missileLogic(gameDT);
     
     //central planet
     sGlobe[0].move(sys[0].sn.pos);
@@ -135,7 +155,8 @@ void GameLogic::update(float dt)
         for (int i = (int)sys.size()-1; i >= 0; --i, --it)
         {
             if (markedForRemoval[i]) {
-                sys.erase(it);
+//                sys.erase(it);
+                removeFromSys(it);
             }
         }
     }
@@ -185,8 +206,8 @@ void GameLogic::processActionList(vector<ActionType> &actionList)
         
         if (action == ActionType::newShip)
         {
-            sShip.push_back(Spatial(200.0));
-            sShip.back().scale(glm::vec3(.002));
+            sShip.push_back(Spatial(200.0));    //Spatial constructor inserts body into sys already!
+            sShip.back().scale(glm::vec3(1));
         }
         if (action == ActionType::fireGun)
         {
@@ -202,7 +223,8 @@ void GameLogic::processActionList(vector<ActionType> &actionList)
             + glm::normalize(shipVector)
             * 3.0f;
             body bullet(state(pos, vel), 10, gm, nullptr, BodyType::SHIP);
-            addSatellite(bullet);
+//            addSatellite(bullet);
+            InsertToSys(bullet, BodyType::PROJECTILE);
         }
 
     }

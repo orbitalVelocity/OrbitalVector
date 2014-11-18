@@ -27,9 +27,11 @@
 #include "glm/ext.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include "GLError.h"
-
-
 using namespace std;
+
+void _debug_cout(string msg, const char *file, int line);
+
+#define debug_cout(x) _debug_cout(x,__FILE__,__LINE__)
 
 //FIXME: globals for prototyping ONLY
 extern bool globalReload;

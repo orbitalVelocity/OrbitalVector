@@ -91,6 +91,8 @@ void initPhysics()
     double m = 7e12;
     double G = 6.673e-11;
     double gm = m * G;
+#define oldway 0
+#if oldway
     sys.push_back(body(state(glm::vec3(), glm::vec3(0, 0, -.1)),
                        gm,
                        10,
@@ -98,10 +100,21 @@ void initPhysics()
                        BodyType::GRAV
                        )
                   );
+#else
+    auto planet = body(state(glm::vec3(), glm::vec3(0, 0, -.1)),
+                       gm,
+                       10,
+                       nullptr,
+                       BodyType::GRAV
+                       );
+    InsertToSys(planet, BodyType::GRAV);
+#endif
     glm::vec3 rad(110, 0, 0);
     glm::vec3 vel(0, 0, 2.3);
     m = 1e5;
     gm = m * G;
+
+#if oldway
     sys.push_back(body(state(rad, vel),
                        gm,
                        1,
@@ -109,7 +122,15 @@ void initPhysics()
                        BodyType::SHIP
                        )
                   );
-
+#else
+    auto ship = body(state(rad, vel),
+                       gm,
+                       1,
+                       nullptr,
+                       BodyType::SHIP
+                     );
+    InsertToSys(ship, BodyType::SHIP);
+#endif
     const int numTerms = 8;
     ks.resize(numTerms);
     for (auto &k : ks)
@@ -227,6 +248,18 @@ int main(int argc, const char * argv[])
         }
         textObj.pushBackDebug(textOut);
         textOut << "path size: " << scene.orbit.drawCount;
+        textObj.pushBackDebug(textOut);
+        textOut << "grav offset: " << sysIndexOffset[BodyType::GRAV]
+        << " size: " << numBodyPerType[BodyType::GRAV];
+        textObj.pushBackDebug(textOut);
+        textOut << "ship offset: " << sysIndexOffset[BodyType::SHIP]
+        << " size: " << numBodyPerType[BodyType::SHIP];
+        textObj.pushBackDebug(textOut);
+        textOut << "miss offset: " << sysIndexOffset[BodyType::MISSILE]
+        << " size: " << numBodyPerType[BodyType::MISSILE];
+        textObj.pushBackDebug(textOut);
+        textOut << "proj offset: " << sysIndexOffset[BodyType::PROJECTILE]
+        << " size: " << numBodyPerType[BodyType::PROJECTILE];
         textObj.pushBackDebug(textOut);
 
         //mouse debug

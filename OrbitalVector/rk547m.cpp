@@ -17,7 +17,7 @@ vector<body> sys;
 vector<float> orbits;
 glm::mat4 world;
 
-BodyType numBodyPerType[MAX_BODY_TYPE];
+int numBodyPerType[MAX_BODY_TYPE];
 int sysIndexOffset[MAX_BODY_TYPE];
 
 void printks(vector<vector<state>> &ks)
@@ -38,20 +38,46 @@ void printsys(vector<body> &sys)
     }
 }
 
+//remove the del'th item of type in sys
 void removeFromSys(int del, int type)
 {
     assert(type != BodyType::GRAV && "grav wells are indistructable at this time");
     auto offset = sysIndexOffset[type] + del;
+    debug_cout("erasing body from sys: " + to_string(offset));
     sys.erase(sys.begin()+offset);
+    numBodyPerType[type] = (BodyType)(numBodyPerType[type] - 1);
     updateSysIndexOffset();
 }
 
-void InsertBodyToSys(body &body, int type)
+//remove the item directly
+void removeFromSys(vector<body>::iterator it)
 {
-    auto offset = sysIndexOffset[type+1];
-    sys.insert(sys.begin() + offset, body);
+    //find type from it
+    int type;
+    for (int i=0; i < BodyType::MAX_BODY_TYPE; i++) {
+        if (sysIndexOffset[i] + numBodyPerType[i] > it - sys.begin()) {
+            type = i;
+            break;
+        }
+    }
+    
+    debug_cout("erasing body of type from sys: " + to_string(type));
+    sys.erase(it);
+    numBodyPerType[type] = (BodyType)(numBodyPerType[type] - 1);
     updateSysIndexOffset();
 }
+
+void InsertToSys(body &body, int type)
+{
+    auto offset = sysIndexOffset[type] + numBodyPerType[type];
+    assert(sys.size() >= offset && "trying to insert past vector size");
+    debug_cout("inserting to sys: " + to_string(offset));
+    sys.insert(sys.begin() + offset, body);
+    numBodyPerType[type] += (BodyType)(1);
+    updateSysIndexOffset();
+    cout << "inserted to offset: " << offset << endl;
+}
+
 void updateSysIndexOffset()
 {
     auto total = 0;
@@ -60,6 +86,12 @@ void updateSysIndexOffset()
         sysIndexOffset[i] = total;
         total += numBodyPerType[i];
     }
+    
+    for (auto &k : ks)
+    {
+        k.clear();
+        k.resize(sys.size());
+    }
 }
 
 body& getBody(int bodyNum, int type)
@@ -67,6 +99,10 @@ body& getBody(int bodyNum, int type)
     return sys[sysIndexOffset[type] + bodyNum];
 }
 
+body& getShipBody(int bodyNum)
+{
+    return sys[sysIndexOffset[BodyType::SHIP] + bodyNum];
+}
 
 
 void markForDeletion(vector<body> &sys, vector<bool> &markedForRemoval)
@@ -76,18 +112,29 @@ void markForDeletion(vector<body> &sys, vector<bool> &markedForRemoval)
     markedForRemoval.resize(sys.size(), false);
     
     for (int i=0; i < sys.size(); i++) {
+        auto collided = false;
         for (int j = i+1; j < sys.size(); j++) { //skip element 0 - planet
             if (i == j ) {
                 continue;
             }
-            if (glm::length(sys[i].sn.pos - sys[j].sn.pos) <= 10) {
+            auto dist = glm::length(sys[i].sn.pos - sys[j].sn.pos);
+            auto minDist = sys[i].radius + sys[j].radius;
+            if (dist <= minDist) {
                 markedForRemoval[j] = true;
-                markedForRemoval[i] = true;
+                //only mark if not a grav well
+                if (i >= sysIndexOffset[BodyType::GRAV] + numBodyPerType[BodyType::GRAV]) {
+                    markedForRemoval[i] = true;
+                }
+                collided = true;
             }
+        }
+        if (collided) {
+            debug_cout("collision is happening!");
         }
         if (not markedForRemoval[i] && glm::length(sys[i].sn.pos - sys[0].sn.pos) > 400)
         {
             markedForRemoval[i] = true;
+            cout << "body " << i << " has left the building\n";
         }
     }
 }

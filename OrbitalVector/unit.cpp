@@ -1,17 +1,17 @@
 //
-//  user.cpp
+//  unit.cpp
 //  OrbitalVector
 //
 //  Created by Si Li on 11/5/14.
 //  Copyright (c) 2014 Si Li. All rights reserved.
 //
 
-#include "user.h"
+#include "unit.h"
 #include <math.h>
 
-User::User(bool test)
+Unit::Unit(bool test)
 {
-    isUser = test;
+    isUnit = test;
     bulletCount = 0;
     bulletMass = 0;
     missileCount = 4;
@@ -30,7 +30,7 @@ User::User(bool test)
     target = -1;
 }
 
-float User::getDeltaV()
+float Unit::getDeltaV()
 {
     float dv;
     auto fullMass = dryMass + mainFuel * fuelMass

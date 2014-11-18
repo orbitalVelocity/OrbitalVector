@@ -57,6 +57,7 @@ public:
     grid(GL_LINEAR_ATTENUATION),
     ship(GL_TRIANGLES),
     sprite(GL_TRIANGLES),
+    missile(GL_TRIANGLES),
     hdr(GL_TRIANGLES),
     highPass(GL_TRIANGLES),
     composite(GL_TRIANGLES),
@@ -78,7 +79,7 @@ public:
     
 public:
     //    vector<OGL> renderables;
-    OGL globe, grid, ship, sprite;
+    OGL globe, grid, ship, sprite, missile;
     glm::vec3 lightPos;
     friend class GameLogic;
     friend class UserInput;

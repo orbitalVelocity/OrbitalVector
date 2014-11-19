@@ -90,6 +90,9 @@ void GameLogic::missileLogic(float dt)
     auto stop = start + numBodyPerType[BodyType::PROJECTILE];
     for (int i = start; i < stop; i++)
     {
+        if (selected == i) {
+            continue;
+        }
         //find vector to target
         vec3 targetVector = normalize(sys[selected].sn.pos - sys[i].sn.pos);
         //add a bit of velocity in that direction?

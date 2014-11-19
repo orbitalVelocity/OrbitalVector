@@ -523,7 +523,7 @@ void Renderer::forwardRender()
     glUseProgram(sprite.shaderProgram);
     auto drawSelector = [&](int i, vec3 &color)
     {
-        if (i < 1) {
+        if (i < 1 || i >= sys.size()) {
             return;
         }
         auto centralPos = vec3(world * vec4(sys[i].sn.pos, 1.0));
@@ -532,9 +532,9 @@ void Renderer::forwardRender()
         sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
     };
     
+#if 1
     drawSelector(gameLogic.selected, shipOrbitColor);
-#if 0
-    drawSelector(gameLogic.mouseHover-1, gridColor);
+    drawSelector(gameLogic.mouseHover, gridColor);
 #endif
     
     glUseProgram(globe.shaderProgram);

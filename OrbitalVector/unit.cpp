@@ -30,26 +30,13 @@ Unit::Unit(bool test)
     target = -1;
 }
 
-float Unit::getDeltaV()
-{
-    float dv;
-    auto fullMass = dryMass + mainFuel * fuelMass
-                  + rcsFuel * rcsMass
-                  + bulletCount * bulletMass
-                  + missileCount * missileMass;
-    dv = mainISP * log(fullMass/dryMass);
-    return dv;
-}
-
-void update(vector<ActionType> &actionList)
-{
-    for (const auto& action : actionList)
-    {
-        //big switch statement
-    }
-}
-
-void update(UserInput &input)
-{
-    //read mouse input
-}
+//float Unit::getDeltaV() //should be scripted, or at least go in gameLogic
+//{
+//    float dv;
+//    auto fullMass = dryMass + mainFuel * fuelMass
+//                  + rcsFuel * rcsMass
+//                  + bulletCount * bulletMass
+//                  + missileCount * missileMass;
+//    dv = mainISP * log(fullMass/dryMass);
+//    return dv;
+//}

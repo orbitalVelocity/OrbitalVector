@@ -35,21 +35,32 @@ public:
     //ammo
     int bulletCount;
     int missileCount;
+    
     float bulletMass;
     float missileMass;
+    
     //fuel
     float mainFuel;
     float rcsFuel;
+    
     float fuelMass;
     float rcsMass;
+    
     float mainISP;
     float rcsISP;
+    
     //hit point
     float hp;
+    
     //weight
     float dryMass;
-    //tracking
+    
+    //user controlled states
     int target; //shipID
+    float throttle;
+    
+    //animation related?
+    
     
 };
 

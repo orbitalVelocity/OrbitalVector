@@ -16,6 +16,7 @@
 #include "rk547m.h"
 #include "scene.h"
 #include "input.h"
+#include "EntityManager.h"
 
 
 using namespace std;
@@ -26,7 +27,7 @@ public:
     float deltaMove, deltaRotate;
     float timeWarp;
     int activeShip;
-    vector<Spatial> sGlobe, sOrbit, sShip;
+    EntityManager entityManager;
     GLFWwindow *window;
     Scene &scene;
     UserInput &userInput;

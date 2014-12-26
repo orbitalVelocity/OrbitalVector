@@ -275,6 +275,8 @@ void Renderer::update()
 
 void Renderer::render()
 {
+    auto compManager = gameLogic.entityManager.getComponentManager(Family::SHIP);
+    auto sShip = compManager.getSpatialComponents();
     if (0 == renderStage) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -291,8 +293,8 @@ void Renderer::render()
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glUseProgram(shadowMap.shaderProgram);
             depthMVP = depthProjectionMatrix * depthViewMatrix *
-            gameLogic.sShip[shipIdx].orientation
-            * gameLogic.sShip[shipIdx].size;
+            sShip[shipIdx].orientation
+            * sShip[shipIdx].size;
             shadowMap.drawIndexed(world, scene.camera, depthMVP, shapes[shipIdx].mesh.indices.data());
         }
         //TODO: fix glViewPort toggle in stages too!
@@ -470,6 +472,9 @@ void Renderer::render()
 
 void Renderer::forwardRender()
 {
+    auto compManager = gameLogic.entityManager.getComponentManager(Family::SHIP);
+    auto sys = compManager.getSysComponents();
+    auto sShip = compManager.getSpatialComponents();
     auto shipIdx = gameLogic.activeShip;
     
     auto _camera = scene.camera.matrix();
@@ -500,15 +505,16 @@ void Renderer::forwardRender()
                     );
     
     glUseProgram(ship.shaderProgram);
+#if OLDWAY
     int shipOffset = sysIndexOffset[BodyType::SHIP];
     int shipNum = numBodyPerType[BodyType::SHIP];
-    //int shipNum = gameLogic.sShip.size();
-    for (int i=0; i < shipNum; i++) {
+#endif
+    for (int i=0; i < sys.size(); i++) {
         auto mvp =
         world *
-        translate(mat4(), sys[i+shipOffset].sn.pos) *
-        gameLogic.sShip[i].orientation
-        * gameLogic.sShip[i].size;
+        translate(mat4(), sys[i].sn.pos) *
+        sShip[i].orientation
+        * sShip[i].size;
         
         auto loc = glGetUniformLocation(ship.shaderProgram, "shadowMap");
         glUniform1i(loc, 0);
@@ -537,29 +543,34 @@ void Renderer::forwardRender()
     drawSelector(gameLogic.mouseHover, gridColor);
 #endif
     
+    auto globeManager = gameLogic.entityManager.getComponentManager(Family::GRAV);
+    auto sGlobe = globeManager.getSpatialComponents();
     glUseProgram(globe.shaderProgram);
-    for (auto &s : gameLogic.sGlobe) {
+    for (auto &s : sGlobe) {
         auto mvp = _camera * world * s.transform();
         globe.draw(mvp, planetColor);
         check_gl_error();
     }
     auto mvp = _camera * world;
-    globe.draw(mvp, planetColor);
+    globe.draw(mvp, planetColor); //origin marker
     
     //draw projectile
-    int projectileOffset = sysIndexOffset[BodyType::PROJECTILE];
-    for (int i=projectileOffset; i < sys.size(); i++)
     {
-    glUseProgram(missile.shaderProgram);
-        auto mvp =
-        world
-//        * lookAt(sys[i].sn.vel, vec3(0), vec3(0,1,0))
-        * translate(mat4(), sys[i].sn.pos);
+        glUseProgram(missile.shaderProgram);
+        auto projectileManager = gameLogic.entityManager.getComponentManager(Family::PROJECTILE);
+        auto sys = projectileManager.getSysComponents();
+        for (int i=0; i < sys.size(); i++)
+        {
+            auto mvp =
+            world
+            //        * lookAt(sys[i].sn.vel, vec3(0), vec3(0,1,0))
+            * translate(mat4(), sys[i].sn.pos);
+            
+            missile.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
+            
+            check_gl_error();
+        }
         
-        missile.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
-
-        check_gl_error();
     }
-    
     
 }

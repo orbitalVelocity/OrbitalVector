@@ -10,6 +10,7 @@
 #include "rk547m.h"
 #include "stdlib.h"
 #include "time.h"
+#include "EntityManager.h"
 
 Spatial::Spatial(float r) : x(0), y(90) {
     yAxis = glm::vec3(1.0f, 0, 0);
@@ -26,17 +27,14 @@ Spatial::Spatial(float r) : x(0), y(90) {
     if (r < 50) {
         r = 50;
     }
-    float v = sqrt(gm/r);
+    float v = std::sqrt(gm/r);
     glm::vec3 rad(r, 0, 0);
     glm::vec3 vel(0, 0, v);
     cout << "new ship: r: " << r << ", v: " << v << endl;
     m = 1e1;
     gm = m * G;
     auto tmp = body(state(rad, vel),
-                    gm,
-                    1,
-                    nullptr,
-                    BodyType::SHIP
+                    gm, 3
                     );
 #if 0
     sys.push_back(tmp);
@@ -46,7 +44,7 @@ Spatial::Spatial(float r) : x(0), y(90) {
     for (auto &k : ks)
         k.resize(sys.size());
 #else
-    InsertToSys(tmp, BodyType::SHIP);
+    //InsertToSys(tmp, Family::SHIP);
 #endif
 }
 

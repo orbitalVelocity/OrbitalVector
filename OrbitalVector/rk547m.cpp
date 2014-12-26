@@ -10,6 +10,7 @@
 #include <vector>
 using namespace std;
 
+#define OLDWAY 0
 #define MIN_DT .1
 
 vector<vector<state> > ks;
@@ -17,8 +18,10 @@ vector<body> sys;
 vector<float> orbits;
 glm::mat4 world;
 
+#if OLDWAY
 int numBodyPerType[MAX_BODY_TYPE];
 int sysIndexOffset[MAX_BODY_TYPE];
+#endif
 
 void printks(vector<vector<state>> &ks)
 {
@@ -38,6 +41,7 @@ void printsys(vector<body> &sys)
     }
 }
 
+#if OLDWAY
 //remove the del'th item of type in sys
 void removeFromSys(int del, int type)
 {
@@ -103,7 +107,7 @@ body& getShipBody(int bodyNum)
 {
     return sys[sysIndexOffset[BodyType::SHIP] + bodyNum];
 }
-
+#endif
 
 void markForDeletion(vector<body> &sys, vector<bool> &markedForRemoval)
 {
@@ -122,9 +126,7 @@ void markForDeletion(vector<body> &sys, vector<bool> &markedForRemoval)
             if (dist <= minDist) {
                 markedForRemoval[j] = true;
                 //only mark if not a grav well
-                if (i >= sysIndexOffset[BodyType::GRAV] + numBodyPerType[BodyType::GRAV]) {
-                    markedForRemoval[i] = true;
-                }
+                markedForRemoval[i] = true;
                 collided = true;
             }
         }

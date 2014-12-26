@@ -23,6 +23,7 @@
 #include "text.h"
 #include "gameLogic.h"
 #include "renderer.h"
+#include "EntityManager.h"
 #include "GPUTimer.h"
 #define CUSTOM_VSYNC 2
 #define VSYNC 1
@@ -85,57 +86,7 @@ GLFWwindow* initGraphics(int width, int height)
     return window;
 }
 
-void initPhysics()
-{
-    //hardcoded, need to go into object creation code
-    double m = 7e12;
-    double G = 6.673e-11;
-    double gm = m * G;
-#define oldway 0
-#if oldway
-    sys.push_back(body(state(glm::vec3(), glm::vec3(0, 0, -.1)),
-                       gm,
-                       10,
-                       nullptr,
-                       BodyType::GRAV
-                       )
-                  );
-#else
-    auto planet = body(state(glm::vec3(), glm::vec3(0, 0, -.1)),
-                       gm,
-                       10,
-                       nullptr,
-                       BodyType::GRAV
-                       );
-    InsertToSys(planet, BodyType::GRAV);
-#endif
-    glm::vec3 rad(110, 0, 0);
-    glm::vec3 vel(0, 0, 2.3);
-    m = 1e5;
-    gm = m * G;
 
-#if oldway
-    sys.push_back(body(state(rad, vel),
-                       gm,
-                       1,
-                       nullptr,
-                       BodyType::SHIP
-                       )
-                  );
-#else
-    auto ship = body(state(rad, vel),
-                       gm,
-                       1,
-                       nullptr,
-                       BodyType::SHIP
-                     );
-    InsertToSys(ship, BodyType::SHIP);
-#endif
-    const int numTerms = 8;
-    ks.resize(numTerms);
-    for (auto &k : ks)
-        k.resize(sys.size());
-}
 
 static void PrintInfo(const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials)
 {
@@ -190,7 +141,6 @@ int main(int argc, const char * argv[])
     glViewport(0, 0, fbWidth, fbHeight);
     
     initFontStash();
-    initPhysics();
     UserInput inputObject;
     Scene scene;
     GameLogic gameLogic(window, scene, inputObject);
@@ -249,19 +199,20 @@ int main(int argc, const char * argv[])
         textObj.pushBackDebug(textOut);
         textOut << "path size: " << scene.orbit.drawCount;
         textObj.pushBackDebug(textOut);
-        textOut << "grav offset: " << sysIndexOffset[BodyType::GRAV]
-        << " size: " << numBodyPerType[BodyType::GRAV];
+#if OLDWAY
+        textOut << "grav offset: " << sysIndexOffset[Family::GRAV]
+        << " size: " << numBodyPerType[Family::GRAV];
         textObj.pushBackDebug(textOut);
-        textOut << "ship offset: " << sysIndexOffset[BodyType::SHIP]
-        << " size: " << numBodyPerType[BodyType::SHIP];
+        textOut << "ship offset: " << sysIndexOffset[Family::SHIP]
+        << " size: " << numBodyPerType[Family::SHIP];
         textObj.pushBackDebug(textOut);
-        textOut << "miss offset: " << sysIndexOffset[BodyType::MISSILE]
-        << " size: " << numBodyPerType[BodyType::MISSILE];
+        textOut << "miss offset: " << sysIndexOffset[Family::MISSILE]
+        << " size: " << numBodyPerType[Family::MISSILE];
         textObj.pushBackDebug(textOut);
-        textOut << "proj offset: " << sysIndexOffset[BodyType::PROJECTILE]
-        << " size: " << numBodyPerType[BodyType::PROJECTILE];
+        textOut << "proj offset: " << sysIndexOffset[Family::PROJECTILE]
+        << " size: " << numBodyPerType[Family::PROJECTILE];
         textObj.pushBackDebug(textOut);
-
+#endif
         //mouse debug
         double mx, my;
         glfwGetCursorPos(window, &mx, &my);
@@ -314,8 +265,8 @@ int main(int argc, const char * argv[])
     
     //init GUI text
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
-    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.apo)));
-    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.peri)));
+    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, std::to_string((float)scene.orbit.apo)));
+    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, std::to_string((float)scene.orbit.peri)));
     prevt = glfwGetTime();
     
     
@@ -363,8 +314,8 @@ int main(int argc, const char * argv[])
         textObj.guiText[1].pos = getVec2(vp, scene.orbit.apoPos);
         textObj.guiText[2].pos = getVec2(vp, scene.orbit.periPos);
 
-        textObj.guiText[1].text = to_string(scene.orbit.apo);
-        textObj.guiText[2].text = to_string(scene.orbit.peri);
+        textObj.guiText[1].text = std::to_string(scene.orbit.apo);
+        textObj.guiText[2].text = std::to_string(scene.orbit.peri);
        
         /* render everything else */
 		glEnable(GL_DEPTH_TEST);

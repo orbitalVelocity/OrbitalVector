@@ -32,14 +32,15 @@ public:
     vector<T>& data()         { return array;         }
     T& operator[](int index)
                             { return array.at(index);  }
-//    void erase(int index)   { array.erase(array.begin() + index); }
-    void erase(int index)
-    {
-        auto begin = array.begin()+index;
-        auto last = array.end()-1;
-        std::swap(begin, last);
-        array.resize(array.size()-1);
-    }
+    void erase(int index)   { array.erase(array.begin() + index); }
+    //must test this first before using it
+//    void erase(int index)
+//    {
+//        auto begin = array.begin()+index;
+//        auto last = array.end()-1;
+//        std::swap(begin, last);
+//        array.resize(array.size()-1);
+//    }
 private:
     vector<T> array;
 };

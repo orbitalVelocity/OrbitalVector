@@ -27,6 +27,8 @@
 #include "glm/ext.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include "GLError.h"
+
+
 using namespace std;
 
 void _debug_cout(string msg, const char *file, int line);

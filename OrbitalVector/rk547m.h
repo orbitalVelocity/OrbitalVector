@@ -49,28 +49,19 @@ public:
     glm::vec3 pos, vel;
 };
 
-enum BodyType {
-    GRAV,
-    SHIP,
-    MISSILE,
-    PROJECTILE,
-    MAX_BODY_TYPE
-};
+//enum BodyType {
+//    GRAV,
+//    SHIP,
+//    MISSILE,
+//    PROJECTILE,
+//    MAX_BODY_TYPE
+//};
 
 class body {         // State of a planetary body
 public:
     body() {};
-    body(state s, float _mu, float r, body* p, BodyType t) :
-    sn(s), mu(_mu), radius(r), parent(p), type(t), deltaV(0) {
-        if (nullptr == parent) {
-            soi = INFINITY;
-        } else {
-            //                soi = r * pow(mu/parent->mu, 2.0f/5.0f);
-            soi = 66000000;
-        }
-        soi = 66000000;
-        //cout << "soi: " << soi << "\n";
-        deltaVCapacity = 5000;
+    body(state s, float _mu, float r) :
+    sn(s), mu(_mu), radius(r) {
     }
     
     void setParent(body* p) {
@@ -82,13 +73,11 @@ public:
     void incPrograde(GLfloat dv) {
         GLfloat h = glm::length(sn.vel);// .mag();
         sn.vel += sn.vel * dv/h;
-        deltaV += fabs(dv);
     }
     void incRadial(GLfloat dv) {
         glm::vec3 inward = getRadial();
         GLfloat h = glm::length(inward);
         sn.vel += inward * dv/h;
-        deltaV += fabs(dv);
     }
     glm::vec3 cross(glm::vec3 u, glm::vec3 v) {
         return glm::vec3(u.y*v.z-u.z*v.y,
@@ -99,7 +88,6 @@ public:
         glm::vec3 normal = getNormal();
         GLfloat h = glm::length(normal);
         sn.vel += normal * dv/h;
-        deltaV += fabs(dv);
     }
     inline glm::vec3 getRadial() {
         return parent->sn.pos- sn.pos;
@@ -117,10 +105,6 @@ public:
     state RHS, stmp;    // RHS for the body and temporary state
     float mu;          // Gravitational constant of the body
     float radius;
-    float soi;
-    float deltaV;
-    GLfloat deltaVCapacity;
-    BodyType type;
 };
 
 void printsys(vector<body> &sys);
@@ -143,8 +127,8 @@ extern vector<float> orbits;   //orbits[planetID] is path
                                             //trajectory
 
 
-extern int numBodyPerType[MAX_BODY_TYPE];
-extern int sysIndexOffset[MAX_BODY_TYPE];
+//extern int numBodyPerType[MAX_BODY_TYPE];
+//extern int sysIndexOffset[MAX_BODY_TYPE];
 
 void removeFromSys(int del, int type);
 void removeFromSys(vector<body>::iterator it);

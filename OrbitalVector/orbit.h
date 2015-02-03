@@ -10,6 +10,7 @@
 #define __GLFW3_test__orbit__
 
 #include "includes.h"
+#include "EntityManager.h"
 #include "rk547m.h"
 #include <iostream>
 #include <set>
@@ -51,5 +52,9 @@ public:
     int drawCount;
     float apo, peri;
     glm::vec3 apoPos, periPos;
+    
+    vector<vector<state> > ks;
+    vector<body> *sys;
+    EntityManager *entityManager;
 };
 #endif /* defined(__GLFW3_test__orbit__) */

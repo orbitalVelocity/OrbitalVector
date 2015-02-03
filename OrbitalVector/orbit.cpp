@@ -13,7 +13,7 @@
 using namespace std;
 
 
-Orbit::Orbit(GLenum _drawType) : drawType(_drawType), x(0), y(90) {
+Orbit::Orbit(GLenum _drawType) : drawType(_drawType), x(0), y(90), entityManager(nullptr)  {
 }
 
 void Orbit::init()
@@ -63,8 +63,42 @@ void Orbit::newProgram(map<GLuint, string> &shaders)
 
 void Orbit::calcTrajectory(int &pathSteps)
 {
+    //get pos/vel vectors from desired collection
+    auto gravCM = entityManager->getComponentManager(Family::GRAV);
+    auto shipCM = entityManager->getComponentManager(Family::SHIP);
+    
+    auto gravPosVector = gravCM.getPosComponents();
+    auto shipPosVector = shipCM.getPosComponents();
+    auto posVector = appendVector(gravPosVector, shipPosVector);
+    
+    
+    auto gravVelVector = gravCM.getVelComponents();
+    auto shipVelVector = shipCM.getVelComponents();
+    auto velVector = appendVector(gravVelVector, shipVelVector);
+    
+    auto gravRadiusVector = gravCM.getRadiusComponents();
+    auto shipRadiusVector = shipCM.getRadiusComponents();
+    auto radiusVector = appendVector(gravRadiusVector, shipRadiusVector);
+
+    auto gravGMVector = gravCM.getGMComponents();
+    auto shipGMVector = shipCM.getGMComponents();
+    auto GMVector = appendVector(gravGMVector, shipGMVector);
+
+    assert(posVector.size() == velVector.size());
+    
+    //convert pos/vel vectors to sys vector
+    vector<body> sys2;
+    sys2.reserve(posVector.size());
+    for (int i = 0; i < posVector.size(); i++) {
+        sys2.emplace_back(body(state(posVector[i], velVector[i]),
+                            GMVector[i],
+                            radiusVector[i]
+                            )
+                       );
+    }
+    
     auto &ks2 = ks;
-    auto sys2 = sys;
+    //auto sys2 = *sys;
     
     float dt = 2.0;
     glm::vec3 initPos = sys2[0].sn.pos;
@@ -77,7 +111,7 @@ void Orbit::calcTrajectory(int &pathSteps)
     for (auto &p : paths)
         p.clear();
     paths.clear();
-    paths.resize(sys.size()-1);//# of grav wells, maybe not even that!
+    paths.resize(sys2.size()-1);//# of grav wells, maybe not even that!
     paths[0].reserve(pathSteps);
     int count = 0;
     for (auto &path : paths)
@@ -172,6 +206,11 @@ void Orbit::calcTrajectory(int &pathSteps)
 
 void Orbit::loadPath()
 {
+    
+    if (entityManager == nullptr) {
+        cout << "orbit.entityManager not initialized\n";
+        return;
+    }
     //load shaders
     string vertFilename = "lineVertex.glsl";
     string fragFilename = "lineFragment.glsl";

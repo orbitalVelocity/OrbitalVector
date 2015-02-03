@@ -77,6 +77,8 @@ GameLogic::GameLogic(GLFWwindow *w, Scene &s, UserInput &i)
     sShip[0].scale(glm::vec3(1));
 #endif
     initSys(entityManager);
+    
+    scene.orbit.entityManager = &entityManager;
 }
 
 void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
@@ -169,10 +171,53 @@ void GameLogic::missileLogic(float dt)
 
 void GameLogic::update(float dt)
 {
+    //get pos/vel vectors from desired collection
+    auto gravCM = entityManager.getComponentManager(Family::GRAV);
+    auto shipCM = entityManager.getComponentManager(Family::SHIP);
+    
+    auto gravPosVector = gravCM.getPosComponents();
+    auto shipPosVector = shipCM.getPosComponents();
+    auto posVector = appendVector(gravPosVector, shipPosVector);
+    
+    
+    auto gravVelVector = gravCM.getVelComponents();
+    auto shipVelVector = shipCM.getVelComponents();
+    auto velVector = appendVector(gravVelVector, shipVelVector);
+    
+    auto gravRadiusVector = gravCM.getRadiusComponents();
+    auto shipRadiusVector = shipCM.getRadiusComponents();
+    auto radiusVector = appendVector(gravRadiusVector, shipRadiusVector);
+    
+    auto gravGMVector = gravCM.getGMComponents();
+    auto shipGMVector = shipCM.getGMComponents();
+    auto GMVector = appendVector(gravGMVector, shipGMVector);
+    
+    assert(posVector.size() == velVector.size());
+    
+    //convert pos/vel vectors to sys vector
+    vector<body> sys2;
+    //TODO: Check if sys2 is suppose to have grav + ships in vector
+    sys2.reserve(posVector.size());
+    for (int i = 0; i < posVector.size(); i++) {
+        sys2.emplace_back(body(state(posVector[i], velVector[i]),
+                               GMVector[i],
+                               radiusVector[i]
+                               )
+                          );
+    }
+    
     //calculate new position/velocity
     float gameDT = dt * timeWarp;
     orbitDelta(gameDT, ks, sys, false);
     
+    //convert sys back to pos/vel vectors
+    for (int i = 0; i < shipPosVector.size(); i++) {
+        shipPosVector[i] = sys2[i+gravPosVector.size()].sn.pos;
+        shipVelVector[i] = sys2[i+gravPosVector.size()].sn.vel;
+    }
+    //check if actual components are updated
+    //TODO: check if shipCM is a copy of entityManager.shipCM??
+    assert(shipPosVector[0] == shipCM.getPos(0));
     missileLogic(gameDT);
 
    

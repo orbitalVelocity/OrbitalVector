@@ -88,4 +88,20 @@ public:
     vector<T> data;
 };
 
+
+template <typename T>
+vector<T> appendVector(vector<T> &vectorA, vector<T> &vectorB)
+{
+    vector<T> finalVector;
+    finalVector.resize(vectorA.size() + vectorB.size());
+    auto i = 0;
+    for (auto &a : vectorA)
+        finalVector[i++] = a;
+    for (auto &b : vectorB)
+        finalVector[i++] = b;
+    assert(finalVector.size() == i);
+    assert(i != 0);
+    return finalVector;
+}
+
 #endif

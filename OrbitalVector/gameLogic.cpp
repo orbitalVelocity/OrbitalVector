@@ -59,8 +59,8 @@ void initSys(EntityManager &em)
 #endif
 }
 
-GameLogic::GameLogic(GLFWwindow *w, Scene &s, UserInput &i)
-           : window(w), scene(s), userInput(i)
+GameLogic::GameLogic(GLFWwindow *w, Scene *s, UserInput *i)
+           : window(w), _scene(s), _userInput(i)
 {
     activeShip = 0;
     deltaMove = 2;
@@ -78,11 +78,15 @@ GameLogic::GameLogic(GLFWwindow *w, Scene &s, UserInput &i)
 #endif
     initSys(entityManager);
     
+    auto &scene = *_scene;
     scene.orbit.entityManager = &entityManager;
 }
 
 void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
 {
+    auto &scene = *_scene;
+    auto &userInput = *_userInput;
+    
     //line pick
     //code taken from
     //http://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-custom-ray-obb-function/
@@ -171,6 +175,9 @@ void GameLogic::missileLogic(float dt)
 
 void GameLogic::update(float dt)
 {
+    auto &scene = *_scene;
+    auto &userInput = *_userInput;
+    
     //get pos/vel vectors from desired collection
     auto gravCM = entityManager.getComponentManager(Family::GRAV);
     auto shipCM = entityManager.getComponentManager(Family::SHIP);

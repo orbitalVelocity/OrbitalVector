@@ -39,6 +39,9 @@ static const GLfloat quad[] = {
 
 void Renderer::init(int width, int height)
 {
+    auto &gameLogic = *_gameLogic;
+    auto &scene = *_scene;
+
     fbWidth = width;
     fbHeight = height;
     auto shipIdx = gameLogic.activeShip;
@@ -275,6 +278,8 @@ void Renderer::update()
 
 void Renderer::render()
 {
+    auto &gameLogic = *_gameLogic;
+    auto &scene = *_scene;
     auto compManager = gameLogic.entityManager.getComponentManager(Family::SHIP);
     auto sShip = compManager.getSpatialComponents();
     if (0 == renderStage) {
@@ -472,6 +477,9 @@ void Renderer::render()
 
 void Renderer::forwardRender()
 {
+    auto &gameLogic = *_gameLogic;
+    auto &scene = *_scene;
+
     auto compManager = gameLogic.entityManager.getComponentManager(Family::SHIP);
     auto sys = compManager.getSysComponents();
     auto sShip = compManager.getSpatialComponents();

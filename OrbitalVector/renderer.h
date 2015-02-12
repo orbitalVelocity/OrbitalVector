@@ -50,9 +50,9 @@ public:
 //invokes game logic
 class Renderer {
 public:
-    Renderer(Scene &s, GameLogic &g, UserInput &i)
-    : scene(s), gameLogic(g),
-    userInput(i),
+    Renderer(Scene *s, GameLogic *g, UserInput *i)
+    : _scene(s), _gameLogic(g),
+    _userInput(i),
     globe(GL_TRIANGLES),
     grid(GL_LINEAR_ATTENUATION),
     ship(GL_TRIANGLES),
@@ -83,9 +83,9 @@ public:
     glm::vec3 lightPos;
     friend class GameLogic;
     friend class UserInput;
-    GameLogic &gameLogic;
-    UserInput &userInput;
-    Scene &scene;
+    GameLogic *_gameLogic;
+    UserInput *_userInput;
+    Scene *_scene;
     
     //    RenderTarget rt, rtBloom, rtBloomV, rtShadowMap;
     vector<RenderTarget> rt;

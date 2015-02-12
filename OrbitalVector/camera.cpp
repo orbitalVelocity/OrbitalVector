@@ -51,7 +51,8 @@ float Camera::getFOV() const
 
 void Camera::setFOV(float f)
 {
-    assert(fov > 0.0f && fov < 180.0f);
+    assert(f > 0.0f && f < 180.0f);
+//    assert(fov > 0.0f && fov < 180.0f);
     fov = f;
 }
 

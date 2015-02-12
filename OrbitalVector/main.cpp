@@ -143,9 +143,9 @@ int main(int argc, const char * argv[])
     initFontStash();
     UserInput inputObject;
     Scene scene;
-    GameLogic gameLogic(window, scene, inputObject);
-    scene.init(fbWidth, fbHeight);
-    Renderer renderer(scene, gameLogic, inputObject);
+    scene.init(fbWidth, fbHeight);  //THIS THRASHES scene.orbit.entityManager!!
+    GameLogic gameLogic(window, &scene, &inputObject);
+    Renderer renderer(&scene, &gameLogic, &inputObject);
     renderer.init(fbWidth, fbHeight);
         check_gl_error();
     
@@ -161,7 +161,7 @@ int main(int argc, const char * argv[])
     // Calculate pixel ratio for hi-dpi devices.
     auto pxRatio = (float)fbWidth / (float)width;
     
-    // creating vector of string
+    // creating vector of string for printing to screen
     TextRenderer textObj(pxRatio, fbWidth, fbHeight);
     auto getText = [&]()
     {

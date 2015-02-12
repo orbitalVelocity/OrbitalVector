@@ -29,12 +29,12 @@ public:
     int activeShip;
     EntityManager entityManager;
     GLFWwindow *window;
-    Scene &scene;
-    UserInput &userInput;
+    Scene *_scene;
+    UserInput *_userInput;
     //UI related
     int selected, mouseHover; //sysIdx
 public:
-    GameLogic(GLFWwindow*, Scene &s, UserInput &i) ;
+    GameLogic(GLFWwindow*, Scene *_s, UserInput *_i) ;
     void update(float dt);
     void processActionList(vector<ActionType> &actionList);
     void addSatellite(body &);

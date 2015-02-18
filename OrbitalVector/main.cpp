@@ -305,7 +305,7 @@ int main(int argc, const char * argv[])
         gameLogic.update(dt);
         renderer.update();
 
-        /* render text  */
+        /* setup text  */
         getText();
         
         //GUI setup

@@ -80,6 +80,16 @@ GameLogic::GameLogic(GLFWwindow *w, Scene *s, UserInput *i)
     
     auto &scene = *_scene;
     scene.orbit.entityManager = &entityManager;
+    
+    //load scene
+//    double m = 0.0;
+//    double G = 6.673e-11;
+//    double gm = m * G;
+//    entityManager.addEntity(Family::GRAV, glm::vec3(), glm::vec3(), gm, 10e3, Spatial(), Unit());
+//    
+//    //add player ship
+//    
+//    entityManager.addEntity(Family::SHIP, glm::vec3(), glm::vec3(), gm, 10e3, Spatial(), Unit());
 }
 
 void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)

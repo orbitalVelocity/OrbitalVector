@@ -1,4 +1,4 @@
-//
+
 //  main.cpp
 //  GLFW3_test
 //
@@ -184,14 +184,14 @@ int main(int argc, const char * argv[])
         textOut << "win " << winWidth << " x " << winHeight
                 << " fb size " << fbWidth << " x " << fbHeight;
         textObj.pushBackDebug(textOut);
-        textOut << "planet (" << printVec3(sys[0].sn.pos) << ")";
-        textObj.pushBackDebug(textOut);
-        textOut << "planet v: " << glm::length(sys[0].sn.vel);
-        textObj.pushBackDebug(textOut);
-        textOut << "ship vel: " << glm::length(sys[1].sn.vel);
-        textObj.pushBackDebug(textOut);
-        textOut << "projectiles: " << sys.size() - 2;
-        textObj.pushBackDebug(textOut);
+//        textOut << "planet (" << printVec3(sys[0].sn.pos) << ")";
+//        textObj.pushBackDebug(textOut);
+//        textOut << "planet v: " << glm::length(sys[0].sn.vel);
+//        textObj.pushBackDebug(textOut);
+//        textOut << "ship vel: " << glm::length(sys[1].sn.vel);
+//        textObj.pushBackDebug(textOut);
+//        textOut << "projectiles: " << sys.size() - 2;
+//        textObj.pushBackDebug(textOut);
         textOut << "paths: " << scene.orbit.paths.size() << " | ";
         for ( auto & path : scene.orbit.paths) {
             textOut << path.size()/3 << " ";
@@ -300,6 +300,14 @@ int main(int argc, const char * argv[])
         
         /* physics, handle user input, ai, game states, 
          * it's a lot here 
+         * Refactor Goal: 
+         *      receive user input
+         *      update states as a result of physics
+         *      generate actions
+         *          from user, from AI, from entities
+         *      process actions via gameLogic.processActionList()
+         *      update states
+         *      render
          */
         gameLogic.processActionList(inputObject.actionList);
         gameLogic.update(dt);
@@ -310,7 +318,9 @@ int main(int argc, const char * argv[])
         
         //GUI setup
         auto vp = scene.camera.matrix() * world;
-        textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
+//        textObj.guiText[0].pos = vec2();
+//        textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
+        textObj.guiText[0].pos = getVec2(vp, scene.orbit.apoPos);
         textObj.guiText[1].pos = getVec2(vp, scene.orbit.apoPos);
         textObj.guiText[2].pos = getVec2(vp, scene.orbit.periPos);
 

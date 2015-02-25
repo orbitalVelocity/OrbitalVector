@@ -13,8 +13,8 @@ using namespace glm;
 
 void initSys(EntityManager &em)
 {
-    auto planetCM = em.getComponentManager(Family::GRAV);
-    auto shipCM   = em.getComponentManager(Family::SHIP);
+    auto &planetCM = em.getComponentManager(Family::GRAV);
+    auto &shipCM   = em.getComponentManager(Family::SHIP);
     //hardcoded, need to go into object creation code
     double m = 7e12;
     double G = 6.673e-11;
@@ -32,7 +32,6 @@ void initSys(EntityManager &em)
     auto planet = body(state(glm::vec3(), glm::vec3(0, 0, -.1) ),
                        gm, 40
                        );
-//    InsertToSys(planet, Family::GRAV);
     planetCM.addEntry(planet);
 #endif
     
@@ -54,7 +53,6 @@ void initSys(EntityManager &em)
     auto ship = body(state(rad, vel),
                      gm, 3
                      );
-//    InsertToSys(ship, Family::SHIP);
     shipCM.addEntry(ship);
 #endif
 }
@@ -128,9 +126,13 @@ void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
     shortestDist.clear();
     auto objIdx = 0;
     mouseHover = -1;
-    for (const auto &b : sys)   //todo: optimize w/ octree
+    
+    //convert from sys to ECS
+    auto &shipCM = entityManager.getComponentManager(Family::SHIP);
+    auto &shipPosVector = shipCM.getPosComponents();
+    for (const auto &b : shipPosVector)   //todo: optimize w/ octree
     {
-        auto posNDC = scene.camera.matrix() * world * vec4(b.sn.pos, 1.0);
+        auto posNDC = scene.camera.matrix() * world * vec4(b, 1.0);
         posNDC /= posNDC.w;
         auto mouseNDC = vec2(mouseX_NDC * screenWidth, mouseY_NDC * screenHeight);
         auto screenPosNDC = vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
@@ -152,31 +154,19 @@ void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
 
 void GameLogic::missileLogic(float dt)
 {
-    //for each missile, aim at selected target and fire
-#if OLDWAY
-    auto start = sysIndexOffset[BodyType::PROJECTILE];
-    auto stop = start + numBodyPerType[BodyType::PROJECTILE];
-    for (int i = start; i < stop; i++)
+    //for each missile, steer towards target
+#if 0
+    auto &shipCM = entityManager.getComponentManager(Family::SHIP);
+    auto &missileCM = entityManager.getComponentManager(Family::PROJECTILE);
+    
+    auto &shipPosVector = shipCM.getPosComponents();
+    auto &missilePosVector = missileCM.getPosComponents();
+    auto &missileVelVector = missileCM.getVelComponents();
+    for (int i = 0; i < missileCM.size(); i++)
     {
-        if (selected == i) {
-            continue;
-        }
-        //find vector to target
-        vec3 targetVector = normalize(sys[selected].sn.pos - sys[i].sn.pos);
-        //add a bit of velocity in that direction?
+        vec3 targetVector = normalize(shipPosVector[selected] - missilePosVector[i]);
         float scale = 0.1;
-        sys[i].sn.vel += targetVector * scale;
-        cout << "update projectile: " << i << endl;
-    }
-#else
-    auto componentManager = entityManager.getComponentManager(Family::SHIP);
-    auto sys = componentManager.getSysComponents();
-    for (int i = 0; i < componentManager.size(); i++)
-    {
-        vec3 targetVector = normalize(sys[selected].sn.pos - sys[i].sn.pos);
-        //add a bit of velocity in that direction?
-        float scale = 0.1;
-        sys[i].sn.vel += targetVector * scale;
+        missileVelVector[i] += targetVector * scale;
         cout << "update projectile: " << i << endl;
     }
 #endif
@@ -188,17 +178,21 @@ void GameLogic::update(float dt)
     auto &scene = *_scene;
     auto &userInput = *_userInput;
     
+// update orbit/pos/vel of units:
+// Refactor: should all go into orbit.update()
+    //pull pos/vel vector from ECS
     //get pos/vel vectors from desired collection
-    auto gravCM = entityManager.getComponentManager(Family::GRAV);
-    auto shipCM = entityManager.getComponentManager(Family::SHIP);
+    auto &gravCM = entityManager.getComponentManager(Family::GRAV);
+    auto &shipCM = entityManager.getComponentManager(Family::SHIP);
     
-    auto gravPosVector = gravCM.getPosComponents();
-    auto shipPosVector = shipCM.getPosComponents();
+    auto &gravPosVector = gravCM.getPosComponents();
+    auto &shipPosVector = shipCM.getPosComponents();
     auto posVector = appendVector(gravPosVector, shipPosVector);
     
+#if 1
     
-    auto gravVelVector = gravCM.getVelComponents();
-    auto shipVelVector = shipCM.getVelComponents();
+    auto &gravVelVector = gravCM.getVelComponents();
+    auto &shipVelVector = shipCM.getVelComponents();
     auto velVector = appendVector(gravVelVector, shipVelVector);
     
     auto gravRadiusVector = gravCM.getRadiusComponents();
@@ -225,7 +219,7 @@ void GameLogic::update(float dt)
     
     //calculate new position/velocity
     float gameDT = dt * timeWarp;
-    orbitDelta(gameDT, ks, sys, false);
+    orbitDelta(gameDT, ks, sys2, false);
     
     //convert sys back to pos/vel vectors
     for (int i = 0; i < shipPosVector.size(); i++) {
@@ -236,8 +230,8 @@ void GameLogic::update(float dt)
     //TODO: check if shipCM is a copy of entityManager.shipCM??
     assert(shipPosVector[0] == shipCM.getPos(0));
     missileLogic(gameDT);
-
-   
+#endif
+    //handle user input...
 #if 1
     double mx, my;
     static double prevMX = 0, prevMY = 0;
@@ -251,7 +245,7 @@ void GameLogic::update(float dt)
     if (userInput.rmbPressed) {
         scene.camera.rotate(_y*mouseScale, _x*mouseScale);
     } else if (userInput.lmbPressed) {
-        auto compManager = entityManager.getComponentManager(Family::SHIP);
+        auto &compManager = entityManager.getComponentManager(Family::SHIP);
         auto spatial = compManager.getSpatial(0);
         spatial.rotate(-_x*mouseScale, _y*mouseScale, 0.0f);
         compManager.setSpatial(0, spatial);
@@ -267,21 +261,22 @@ void GameLogic::update(float dt)
         scene.orbit.update();
     }
     
-    //remove elements
+    //find closest distance between all objects between 2 vectors
+    //separate vector for tagging objects for removal
     auto findCollisions = [&](ComponentManager &cm1, ComponentManager &cm2, vector<bool> &mark1ForRemoval, vector<bool> &mark2ForRemoval)
     {
         //get pos and radius
-        auto &sys1 = cm1.getSysComponents();
-        auto &sys2 = cm2.getSysComponents();
+        auto &pos1 = cm1.getPosComponents();
+        auto &pos2 = cm2.getPosComponents();
         auto &rad1 = cm1.getRadiusComponents();
         auto &rad2 = cm2.getRadiusComponents();
        
-        mark1ForRemoval.resize(sys1.size(), false);
-        mark2ForRemoval.resize(sys2.size(), false);
+        mark1ForRemoval.resize(pos1.size(), false);
+        mark2ForRemoval.resize(pos2.size(), false);
         //find all collisions
-        for (int i=0; i<sys1.size(); i++) {
-            for (int j=0; j<sys2.size(); j++) {
-                auto distance = glm::length(sys1[i].sn.pos - sys2[j].sn.pos);
+        for (int i=0; i<pos1.size(); i++) {
+            for (int j=0; j<pos2.size(); j++) {
+                auto distance = glm::length(pos1[i] - pos2[j]);
                 auto minDistance = rad1[i] + rad2[j];
                 if (distance <= minDistance) {
                     mark1ForRemoval[i] = true;
@@ -291,6 +286,8 @@ void GameLogic::update(float dt)
         }
     };
     //for (int i = Family::SHIP; i < Family::MAX_FAMILIES; i++)
+    //UNTESTED: may need to just rewrite from scratch
+    if (0)
     {
         //FIXME this doesn't work at all, need to reformulate algorithm for
         //comparing items of different families and remove them all...'
@@ -315,8 +312,6 @@ void GameLogic::update(float dt)
         //for each collection, perform removal
         //(optional) compare all missiles against projectiles
         //mark elements that needs to be removed
-//        vector<bool> markedForRemoval(sys.size(), false);
-//        markForDeletion(sys, markedForRemoval);
         
         //remove all marked elements
         //FIXME: only works because first element never designed to be removed
@@ -339,22 +334,24 @@ void GameLogic::update(float dt)
         }
     }
     
-    
-    world = translate(mat4(), -sys[1].sn.pos);
+    //focus on current player
+    world = translate(mat4(), -shipPosVector[0]);
 #endif
 }
 
 void GameLogic::processActionList(vector<ActionType> &actionList)
 {
     glm::vec3 forwardVector;
-    auto compManager = entityManager.getComponentManager(Family::SHIP);
-    auto sShip = compManager.getSpatialComponents();
+    auto &compManager = entityManager.getComponentManager(Family::SHIP);
+    auto &shipPosVector = compManager.getPosComponents();
+    auto &shipVelVector = compManager.getVelComponents();
+    auto &sShip = compManager.getSpatialComponents();
     for (auto &action : actionList )
     {
         switch (action) {
             case ActionType::transForward:
                 forwardVector = glm::vec3(sShip[activeShip].orientation * glm::vec4(0, 0, 1, 1));
-                sys[1].incCustom(.1, forwardVector);
+                shipVelVector[activeShip] += glm::normalize(forwardVector) * 0.1f;
                 break;
             case ActionType::yawLeft:
                 sShip[activeShip].rotate(deltaMove, 0, 0);
@@ -386,8 +383,9 @@ void GameLogic::processActionList(vector<ActionType> &actionList)
         
         if (action == ActionType::newShip)
         {
-            sShip.push_back(Spatial(3.0));    //Spatial constructor inserts body into sys already!
+            sShip.push_back(Spatial(3.0));
             sShip.back().scale(glm::vec3(1));
+        //TODO: insert to ECS
         }
         if (action == ActionType::fireGun)
         {
@@ -396,16 +394,14 @@ void GameLogic::processActionList(vector<ActionType> &actionList)
             double gm = m * G;
             auto shipVector = glm::vec3(sShip[activeShip].orientation * glm::vec4(0,0,1,1));
             cout << "ship orientation: " << printVec3(shipVector) << "\n";
-            auto pos = sys[1].sn.pos
-            + glm::normalize(shipVector)
-            * 10.0f;
-            auto vel = sys[1].sn.vel
-            + glm::normalize(shipVector)
-            * 3.0f;
+            auto pos = shipPosVector[activeShip]
+                + glm::normalize(shipVector)
+                * 10.0f;
+            auto vel = shipVelVector[activeShip]
+                + glm::normalize(shipVector)
+                * 3.0f;
             body bullet(state(pos, vel), 1, gm);
-//            addSatellite(bullet);
-//            InsertToSys(bullet, Family::PROJECTILE);
-            auto componentManager = entityManager.getComponentManager(Family::PROJECTILE);
+            auto &componentManager = entityManager.getComponentManager(Family::PROJECTILE);
             componentManager.addEntry(pos, vel, gm, 1, Spatial(), Unit());
         }
 
@@ -415,10 +411,10 @@ void GameLogic::processActionList(vector<ActionType> &actionList)
 
 void GameLogic::addSatellite(body &b)
 {
-    sys.push_back(b);
-    for (auto &k : ks)
-    {
-        k.clear();
-        k.resize(sys.size());
-    }
+//    sys.push_back(b);
+//    for (auto &k : ks)
+//    {
+//        k.clear();
+//        k.resize(sys.size());
+//    }
 }

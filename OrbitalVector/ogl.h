@@ -6,6 +6,27 @@
 //  Copyright (c) 2014 Si Li. All rights reserved.
 //
 
+/*
+ * OGL is a base class for packaging all the shader related
+ * components together
+ * It is meant to load, compile and link shaders along with drawing
+ * a class of objects
+ *
+ * Refactor goal: base class for a type of renderables
+ *      e.g. regular entities like missiles, ships, asteroids
+ *           UI, sfx sprites, etc
+ *           atmospheric scattering, other transparent effects
+ * States:
+ *      shaders: shaderID, vbo, vao, attributes,
+ *      assets: pointer to mesh/vertices
+ *      uniforms:   goes in derived class
+ *          (too messy to implement generically in base)
+ * Functions:
+ *      load shader
+ *      compile/link shader program
+ *      rendering: goes in derived class (for now)
+ */
+
 #ifndef __GLFW3_test__ogl__
 #define __GLFW3_test__ogl__
 

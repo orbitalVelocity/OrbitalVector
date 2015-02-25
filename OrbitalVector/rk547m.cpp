@@ -14,7 +14,7 @@ using namespace std;
 #define MIN_DT .1
 
 vector<vector<state> > ks;
-vector<body> sys;
+//vector<body> sys;
 vector<float> orbits;
 glm::mat4 world;
 
@@ -204,7 +204,7 @@ void calcRHS(float t, vector<body> &sys) {
 }
 
 void RK45Int(float &dt, float absTol, float relTol,
-             vector<vector<state> > &ks, vector<body> &sys,
+             vector<vector<state> > &ks2, vector<body> &sys,
              bool changeDT) {
     
     float t = 0;

@@ -63,6 +63,7 @@ void Orbit::newProgram(map<GLuint, string> &shaders)
 
 void Orbit::calcTrajectory(int &pathSteps)
 {
+    //duplicated code also in GameLogic::update()
     //get pos/vel vectors from desired collection
     auto gravCM = entityManager->getComponentManager(Family::GRAV);
     auto shipCM = entityManager->getComponentManager(Family::SHIP);
@@ -97,7 +98,7 @@ void Orbit::calcTrajectory(int &pathSteps)
                        );
     }
     
-    auto &ks2 = ks;
+//    auto &ks2 = ks;
     //auto sys2 = *sys;
     
     float dt = 2.0;
@@ -136,7 +137,7 @@ void Orbit::calcTrajectory(int &pathSteps)
     
     while (loopCond())
     {
-        orbitDelta(dt, ks2, sys2, true);
+        orbitDelta(dt, ks, sys2, true);
         
         //check if apoapsis and periapsis has been reached
         distance = glm::length(sys2[j].sn.pos - sys2[0].sn.pos);

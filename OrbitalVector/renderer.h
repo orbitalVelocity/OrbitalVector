@@ -6,6 +6,25 @@
 //  Copyright (c) 2014 Si Li. All rights reserved.
 //
 
+/*
+ * Current status: a hodgepodge of code for managing render passes
+ *      manual initialization of OGL objects
+ *      manual management of render targets
+ * Refactor goal
+ * Renderer manages render passes and render targets
+ *      view transformations
+ *      rendering OGL objects
+ *      reload shaders
+ * States:
+ *      List of OGL objects for rendering
+ *      set of passes, and what OGL goes in what passes...?
+ *      frame buffer dimensions
+ *      lights and camera states
+ * Functions:
+ *      renderPass
+ *      reloadShaders (in between frame)
+ *
+ */
 #ifndef __OrbitalVector__renderer__
 #define __OrbitalVector__renderer__
 

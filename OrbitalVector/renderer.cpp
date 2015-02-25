@@ -480,10 +480,14 @@ void Renderer::forwardRender()
     auto &gameLogic = *_gameLogic;
     auto &scene = *_scene;
 
-    auto compManager = gameLogic.entityManager.getComponentManager(Family::SHIP);
-    auto sys = compManager.getSysComponents();
-    auto sShip = compManager.getSpatialComponents();
-    auto shipIdx = gameLogic.activeShip;
+    auto &gravCM = gameLogic.entityManager.getComponentManager(Family::GRAV);
+    auto &shipCM = gameLogic.entityManager.getComponentManager(Family::SHIP);
+    auto &projCM = gameLogic.entityManager.getComponentManager(Family::PROJECTILE);
+    auto &gravPosVector = gravCM.getPosComponents();
+    auto &shipPosVector = shipCM.getPosComponents();
+    auto &projPosVector = projCM.getPosComponents();
+    auto &sShip = shipCM.getSpatialComponents();
+    auto &shipIdx = gameLogic.activeShip;
     
     auto _camera = scene.camera.matrix();
     
@@ -517,10 +521,12 @@ void Renderer::forwardRender()
     int shipOffset = sysIndexOffset[BodyType::SHIP];
     int shipNum = numBodyPerType[BodyType::SHIP];
 #endif
-    for (int i=0; i < sys.size(); i++) {
+
+    for (int i=0; i < shipPosVector.size(); i++) {
+//    for (int i=0; i < sys.size(); i++) {
         auto mvp =
         world *
-        translate(mat4(), sys[i].sn.pos) *
+        translate(mat4(), shipPosVector[i]) *
         sShip[i].orientation
         * sShip[i].size;
         
@@ -537,10 +543,10 @@ void Renderer::forwardRender()
     glUseProgram(sprite.shaderProgram);
     auto drawSelector = [&](int i, vec3 &color)
     {
-        if (i < 1 || i >= sys.size()) {
+        if (i < 1 || i >= shipPosVector.size()) {
             return;
         }
-        auto centralPos = vec3(world * vec4(sys[i].sn.pos, 1.0));
+        auto centralPos = vec3(world * vec4(shipPosVector[i], 1.0));
         auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
         glUniform3fv(loc, 1, value_ptr(centralPos));
         sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
@@ -566,13 +572,11 @@ void Renderer::forwardRender()
     {
         glUseProgram(missile.shaderProgram);
         auto projectileManager = gameLogic.entityManager.getComponentManager(Family::PROJECTILE);
-        auto sys = projectileManager.getSysComponents();
-        for (int i=0; i < sys.size(); i++)
+        for (int i=0; i < shipPosVector.size(); i++)
         {
             auto mvp =
-            world
-            //        * lookAt(sys[i].sn.vel, vec3(0), vec3(0,1,0))
-            * translate(mat4(), sys[i].sn.pos);
+                world
+                * translate(mat4(), shipPosVector[i]);
             
             missile.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
             

@@ -85,7 +85,7 @@ public:
         //update matched entity with index
     }
     
-    vector<body>& getSysComponents() { return sys.data(); }
+//    vector<body>& getSysComponents() { return sys.data(); }
     vector<vec3>& getPosComponents() { return pos.data(); }
     vector<vec3>& getVelComponents() { return vel.data(); }
     vector<float>& getGMComponents() { return GM.data(); }

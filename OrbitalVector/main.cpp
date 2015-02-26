@@ -34,7 +34,9 @@ using namespace std;
 
 
 GPUtimer gpuTimer;
-
+/*
+ * error call back function
+ */
 void errorcb(int error, const char* desc)
 {
 	printf("GLFW error %d: %s\n", error, desc);
@@ -85,6 +87,10 @@ GLFWwindow* initGraphics(int width, int height)
     return window;
 }
 
+/*
+ * initializes entities in the scene
+ * Refactor Goal: move to scene class, but data driven (from save file, preferably)
+ */
 void initPhysics()
 {
     //hardcoded, need to go into object creation code
@@ -137,6 +143,10 @@ void initPhysics()
         k.resize(sys.size());
 }
 
+/*
+ * prints to console all vertices, indices, and normals of a mesh
+ * @Refactor Goal   move to mesh class, or at least file
+ */
 static void PrintInfo(const std::vector<tinyobj::shape_t>& shapes, const std::vector<tinyobj::material_t>& materials)
 {
   std::cout << "# of shapes    : " << shapes.size() << std::endl;
@@ -174,6 +184,39 @@ static void PrintInfo(const std::vector<tinyobj::shape_t>& shapes, const std::ve
 
 }
 
+const int ftSize = 120;
+class PerfMon {
+public:
+    PerfMon() : fps(ftSize), renderTimes(ftSize),
+                gpuRenderTimes(ftSize), gpuTimes(3),
+                tPrevFrame(0), renderTime(0.0f), dt(0.0f)
+    {
+    }
+    void update(double thisTime)
+    {
+        tFrameStart = thisTime;
+        dt = tFrameStart - tPrevFrame;
+        tPrevFrame = tFrameStart;
+        fps.push(1.0f/dt);
+        renderTimes.push(renderTime*1000.0f);
+        startGPUTimer(&gpuTimer);
+    }
+    void frameEnd(double thisTime)
+    {
+        renderTime = thisTime - tFrameStart;
+        stopGPUTimer(&gpuTimer, gpuTimes.data(), 3);
+        gpuRenderTimes.push(gpuTimes[0]*1000.0);
+    }
+    
+public:
+    double tPrevFrame, tFrameStart;
+    float renderTime;
+    RingBuffer<float> fps, renderTimes, gpuRenderTimes;
+//    (120), renderTimes(120), gpuRenderTimes(120);
+    vector<float> gpuTimes;
+    float dt;
+};
+
 int main(int argc, const char * argv[])
 {
 //    int width = 1280, height = 720;
@@ -189,6 +232,9 @@ int main(int argc, const char * argv[])
     glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
     glViewport(0, 0, fbWidth, fbHeight);
     
+    // Calculate pixel ratio for hi-dpi devices.
+    auto pxRatio = (float)fbWidth / (float)width;
+    
     initFontStash();
     initPhysics();
     UserInput inputObject;
@@ -201,15 +247,7 @@ int main(int argc, const char * argv[])
     
     // performance measurement
     glfwSetTime(0);
-    auto prevt = glfwGetTime();
-    float renderTime = 0.0f;
-    auto size = 120;
-    RingBuffer<float> fps(size), renderTimes(size), gpuRenderTimes(size);
-    vector<float> gpuTimes;
-    gpuTimes.resize(3);
-    
-    // Calculate pixel ratio for hi-dpi devices.
-    auto pxRatio = (float)fbWidth / (float)width;
+    PerfMon perfMon;
     
     // creating vector of string
     TextRenderer textObj(pxRatio, fbWidth, fbHeight);
@@ -218,17 +256,17 @@ int main(int argc, const char * argv[])
         stringstream textOut;
         textObj.debugTexts.clear();
         textOut << "Frame: " << std::fixed << std::setprecision(1)
-                << 1000.0/fps.average()
-                << "ms max: " << 1000.0/fps.min()
-                << "ms min: " << 1000.0/fps.max() << "ms";
+                << 1000.0/perfMon.fps.average()
+                << "ms max: " << 1000.0/perfMon.fps.min()
+                << "ms min: " << 1000.0/perfMon.fps.max() << "ms";
         textObj.pushBackDebug(textOut);
         textOut << "cpu time: " << std::fixed << std::setprecision(2)
-                << renderTimes.average() << "ms max: " << renderTimes.max()
-                << "ms min: " << renderTimes.min();
+                << perfMon.renderTimes.average() << "ms max: " << perfMon.renderTimes.max()
+                << "ms min: " << perfMon.renderTimes.min();
         textObj.pushBackDebug(textOut);
         textOut << "gpu time: " << std::fixed << std::setprecision(2)
-                << gpuRenderTimes.average() << "ms max: " << gpuRenderTimes.max()
-                << "ms min: " << gpuRenderTimes.min();
+                << perfMon.gpuRenderTimes.average() << "ms max: " << perfMon.gpuRenderTimes.max()
+                << "ms min: " << perfMon.gpuRenderTimes.min();
 //        << std::accumulate(gpuTimes.begin(), gpuTimes.end(), 0) << "ms";
         textObj.pushBackDebug(textOut);
         textOut << "win " << winWidth << " x " << winHeight
@@ -316,18 +354,14 @@ int main(int argc, const char * argv[])
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.apo)));
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.peri)));
-    prevt = glfwGetTime();
+
     
-    
+    perfMon.tPrevFrame = glfwGetTime();
     while (!glfwWindowShouldClose(window))
     {
         /* performance measurement setup */
-        auto t = glfwGetTime();
-        float dt = t - prevt;
-        prevt = t;
-        fps.push(1.0f/dt);
-        renderTimes.push(renderTime*1000.0f);
-		startGPUTimer(&gpuTimer);
+        perfMon.update(glfwGetTime());
+        auto dt = perfMon.dt;
     
         /* get window size */
    		glfwGetWindowSize(window, &winWidth, &winHeight);
@@ -375,10 +409,8 @@ int main(int argc, const char * argv[])
 		glDisable(GL_DEPTH_TEST);
         textObj.render();
        
-//        glFinish(); //16ms w/o vsync, 32ms w/ vsync for some reason
-        renderTime = glfwGetTime() - t;
-		stopGPUTimer(&gpuTimer, gpuTimes.data(), 3);
-        gpuRenderTimes.push(gpuTimes[0]*1000.0);
+//        glFinish(); //16ms w/o vsync, 32ms w/ vsync for some reaso
+        perfMon.frameEnd(glfwGetTime());
 
         /* Swap front and back buffers */
         glfwSwapBuffers(window);

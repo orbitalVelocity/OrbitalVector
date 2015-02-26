@@ -35,6 +35,11 @@ public:
 public:
     GameLogic(GLFWwindow*, Scene &s, UserInput &i) ;
     void update(float dt);
+    
+    /**
+     processes list of actions
+     @param actionList &actionList      list of actions
+     */
     void processActionList(vector<ActionType> &actionList);
     void addSatellite(body &);
     void linePick(vector<float> &, int &);

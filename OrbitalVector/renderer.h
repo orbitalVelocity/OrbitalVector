@@ -75,6 +75,10 @@ public:
     void render();
     void forwardRender();
     void update();
+    /*
+     * perform actions between frames
+     * like reloading shaders
+     */
     void postFrame();
     
 public:

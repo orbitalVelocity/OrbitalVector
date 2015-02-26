@@ -275,6 +275,12 @@ void Renderer::update()
 
 void Renderer::render()
 {
+    /* Set up a blank screen */
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    check_gl_error();
+    
     if (0 == renderStage) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

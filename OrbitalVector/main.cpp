@@ -217,6 +217,134 @@ public:
     float dt;
 };
 
+/**
+ Convenience POD for holding GLFW window states
+ */
+struct WindowStates {
+    GLFWwindow* pWindow;
+    int fbWidth, fbHeight;
+    int winWidth, winHeight;
+};
+
+/**
+ get and change window/framebuffer dimension to support 
+ mouse dragging of window border
+ @param ws    a reference to a convenience struct for holding window related states
+ */
+void updateWindowSize(WindowStates &ws)
+{
+    glfwGetWindowSize(ws.pWindow, &ws.winWidth, &ws.winHeight);
+    glfwGetFramebufferSize(ws.pWindow, &ws.fbWidth, &ws.fbHeight);
+    glViewport(0, 0, ws.fbWidth, ws.fbHeight);
+}
+//auto getText = [&]()
+void getText(TextRenderer &textObj, PerfMon &perfMon, WindowStates &ws)
+{
+    auto fbWidth = ws.fbWidth;
+    auto fbHeight = ws.fbHeight;
+    auto winWidth = ws.winWidth;
+    auto winHeight = ws.winHeight;
+    
+    stringstream textOut;
+    textObj.debugTexts.clear();
+    textOut << "Frame: " << std::fixed << std::setprecision(1)
+    << 1000.0/perfMon.fps.average()
+    << "ms max: " << 1000.0/perfMon.fps.min()
+    << "ms min: " << 1000.0/perfMon.fps.max() << "ms";
+    textObj.pushBackDebug(textOut);
+    textOut << "cpu time: " << std::fixed << std::setprecision(2)
+    << perfMon.renderTimes.average() << "ms max: " << perfMon.renderTimes.max()
+    << "ms min: " << perfMon.renderTimes.min();
+    textObj.pushBackDebug(textOut);
+    textOut << "gpu time: " << std::fixed << std::setprecision(2)
+    << perfMon.gpuRenderTimes.average() << "ms max: " << perfMon.gpuRenderTimes.max()
+    << "ms min: " << perfMon.gpuRenderTimes.min();
+    //        << std::accumulate(gpuTimes.begin(), gpuTimes.end(), 0) << "ms";
+    textObj.pushBackDebug(textOut);
+    textOut << "win " << winWidth << " x " << winHeight
+    << " fb size " << fbWidth << " x " << fbHeight;
+    
+    
+    //the following code should go into UserInput and GameLogic, not out here
+//    textObj.pushBackDebug(textOut);
+//    textOut << "planet (" << printVec3(sys[0].sn.pos) << ")";
+//    textObj.pushBackDebug(textOut);
+//    textOut << "planet v: " << glm::length(sys[0].sn.vel);
+//    textObj.pushBackDebug(textOut);
+//    textOut << "ship vel: " << glm::length(sys[1].sn.vel);
+//    textObj.pushBackDebug(textOut);
+//    textOut << "projectiles: " << sys.size() - 2;
+//    textObj.pushBackDebug(textOut);
+//    textOut << "paths: " << scene.orbit.paths.size() << " | ";
+//    for ( auto & path : scene.orbit.paths) {
+//        textOut << path.size()/3 << " ";
+//    }
+//    textObj.pushBackDebug(textOut);
+//    textOut << "path size: " << scene.orbit.drawCount;
+//    textObj.pushBackDebug(textOut);
+//    textOut << "grav offset: " << sysIndexOffset[BodyType::GRAV]
+//    << " size: " << numBodyPerType[BodyType::GRAV];
+//    textObj.pushBackDebug(textOut);
+//    textOut << "ship offset: " << sysIndexOffset[BodyType::SHIP]
+//    << " size: " << numBodyPerType[BodyType::SHIP];
+//    textObj.pushBackDebug(textOut);
+//    textOut << "miss offset: " << sysIndexOffset[BodyType::MISSILE]
+//    << " size: " << numBodyPerType[BodyType::MISSILE];
+//    textObj.pushBackDebug(textOut);
+//    textOut << "proj offset: " << sysIndexOffset[BodyType::PROJECTILE]
+//    << " size: " << numBodyPerType[BodyType::PROJECTILE];
+//    textObj.pushBackDebug(textOut);
+   
+//    //mouse debug
+//    double mx, my;
+//    glfwGetCursorPos(window, &mx, &my);
+//    textOut << "mouse: x " << mx << " y " << my;
+//    textObj.pushBackDebug(textOut);
+//    
+//    vector<float> dist;
+//    int obj = -1;
+//    gameLogic.linePick(dist, obj);
+//    for (int i=0; i < dist.size(); i++)
+//    {
+//        textOut << "obj: " << i << " dist: " << dist[i];
+//        textObj.pushBackDebug(textOut);
+//    }
+//    textOut << "selected: " << gameLogic.selected;
+//    textObj.pushBackDebug(textOut);
+//    textOut << "mouseOver: " << gameLogic.mouseHover;
+//    textObj.pushBackDebug(textOut);
+    //        textOut << "ray start: " << std::fixed
+    //                << std::setprecision(2)
+    //                << printVec3(scene.rayStart);
+    //        textObj.pushBackDebug(textOut);
+    //        textOut << "ray end: " <<std::fixed
+    //                << std::setprecision(2)
+    //                <<printVec3(scene.rayEnd);
+    //        textObj.pushBackDebug(textOut);
+    //        textOut << "planet camera coord: " << std::fixed
+    //                << std::setprecision(2)
+    //                << printVec3(scene.obj);
+    //        textObj.pushBackDebug(textOut);
+    
+    
+    
+    return;
+    textOut << "shadow pass: 1   " << ((renderStage & stage1) ? "On" : " ");
+    textObj.pushBackDebug(textOut);
+    textOut << "forward pass: 2  " << ((renderStage & stage2) ? "On" : " ");
+    textObj.pushBackDebug(textOut);
+    textOut << "highpass: 3           " << ((renderStage & stage3) ? "On" : " ");
+    textObj.pushBackDebug(textOut);
+    textOut << "blur1 pass: 4         " << ((renderStage & stage4) ? "On" : " ");
+    textObj.pushBackDebug(textOut);
+    textOut << "blur2 pass: 5         " << ((renderStage & stage5) ? "On" : " ");
+    textObj.pushBackDebug(textOut);
+    textOut << "composite pass: 6 " << ((renderStage & stage6) ? "On" : " ");
+    textObj.pushBackDebug(textOut);
+    textOut << "fxaa pass: 7            " << ((renderStage & stage7) ? "On" : " ");
+    textObj.pushBackDebug(textOut);
+}
+
 int main(int argc, const char * argv[])
 {
 //    int width = 1280, height = 720;
@@ -224,199 +352,80 @@ int main(int argc, const char * argv[])
 //    int width = 1440*2, height = 900*2;
 //    int width = 1440*1, height = 900*1;
 //    int width = 1920, height = 1080;
-    GLFWwindow* window = initGraphics(width, height);
-    int winWidth, winHeight;
-    int fbWidth, fbHeight;
+//    GLFWwindow* window = initGraphics(width, height);
     
-    glfwGetWindowSize(window, &winWidth, &winHeight);
-    glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-    glViewport(0, 0, fbWidth, fbHeight);
+    WindowStates ws;
+    ws.pWindow = initGraphics(width, height);
+    glfwGetWindowSize(ws.pWindow, &ws.winWidth, &ws.winHeight);
+    glfwGetFramebufferSize(ws.pWindow, &ws.fbWidth, &ws.fbHeight);
+    glViewport(0, 0, ws.fbWidth, ws.fbHeight);
     
     // Calculate pixel ratio for hi-dpi devices.
-    auto pxRatio = (float)fbWidth / (float)width;
+    auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
     
     initFontStash();
     initPhysics();
     UserInput inputObject;
     Scene scene;
-    GameLogic gameLogic(window, scene, inputObject);
-    scene.init(fbWidth, fbHeight);
+    GameLogic gameLogic(ws.pWindow, scene, inputObject);
+    scene.init(ws.fbWidth, ws.fbHeight);
     Renderer renderer(scene, gameLogic, inputObject);
-    renderer.init(fbWidth, fbHeight);
+    renderer.init(ws.fbWidth, ws.fbHeight);
         check_gl_error();
     
-    // performance measurement
-    glfwSetTime(0);
-    PerfMon perfMon;
-    
     // creating vector of string
-    TextRenderer textObj(pxRatio, fbWidth, fbHeight);
-    auto getText = [&]()
-    {
-        stringstream textOut;
-        textObj.debugTexts.clear();
-        textOut << "Frame: " << std::fixed << std::setprecision(1)
-                << 1000.0/perfMon.fps.average()
-                << "ms max: " << 1000.0/perfMon.fps.min()
-                << "ms min: " << 1000.0/perfMon.fps.max() << "ms";
-        textObj.pushBackDebug(textOut);
-        textOut << "cpu time: " << std::fixed << std::setprecision(2)
-                << perfMon.renderTimes.average() << "ms max: " << perfMon.renderTimes.max()
-                << "ms min: " << perfMon.renderTimes.min();
-        textObj.pushBackDebug(textOut);
-        textOut << "gpu time: " << std::fixed << std::setprecision(2)
-                << perfMon.gpuRenderTimes.average() << "ms max: " << perfMon.gpuRenderTimes.max()
-                << "ms min: " << perfMon.gpuRenderTimes.min();
-//        << std::accumulate(gpuTimes.begin(), gpuTimes.end(), 0) << "ms";
-        textObj.pushBackDebug(textOut);
-        textOut << "win " << winWidth << " x " << winHeight
-                << " fb size " << fbWidth << " x " << fbHeight;
-        textObj.pushBackDebug(textOut);
-        textOut << "planet (" << printVec3(sys[0].sn.pos) << ")";
-        textObj.pushBackDebug(textOut);
-        textOut << "planet v: " << glm::length(sys[0].sn.vel);
-        textObj.pushBackDebug(textOut);
-        textOut << "ship vel: " << glm::length(sys[1].sn.vel);
-        textObj.pushBackDebug(textOut);
-        textOut << "projectiles: " << sys.size() - 2;
-        textObj.pushBackDebug(textOut);
-        textOut << "paths: " << scene.orbit.paths.size() << " | ";
-        for ( auto & path : scene.orbit.paths) {
-            textOut << path.size()/3 << " ";
-        }
-        textObj.pushBackDebug(textOut);
-        textOut << "path size: " << scene.orbit.drawCount;
-        textObj.pushBackDebug(textOut);
-        textOut << "grav offset: " << sysIndexOffset[BodyType::GRAV]
-        << " size: " << numBodyPerType[BodyType::GRAV];
-        textObj.pushBackDebug(textOut);
-        textOut << "ship offset: " << sysIndexOffset[BodyType::SHIP]
-        << " size: " << numBodyPerType[BodyType::SHIP];
-        textObj.pushBackDebug(textOut);
-        textOut << "miss offset: " << sysIndexOffset[BodyType::MISSILE]
-        << " size: " << numBodyPerType[BodyType::MISSILE];
-        textObj.pushBackDebug(textOut);
-        textOut << "proj offset: " << sysIndexOffset[BodyType::PROJECTILE]
-        << " size: " << numBodyPerType[BodyType::PROJECTILE];
-        textObj.pushBackDebug(textOut);
-
-        //mouse debug
-        double mx, my;
-        glfwGetCursorPos(window, &mx, &my);
-        textOut << "mouse: x " << mx << " y " << my;
-        textObj.pushBackDebug(textOut);
-        
-        vector<float> dist;
-        int obj = -1;
-        gameLogic.linePick(dist, obj);
-        for (int i=0; i < dist.size(); i++)
-        {
-            textOut << "obj: " << i << " dist: " << dist[i];
-            textObj.pushBackDebug(textOut);
-        }
-        textOut << "selected: " << gameLogic.selected;
-        textObj.pushBackDebug(textOut);
-        textOut << "mouseOver: " << gameLogic.mouseHover;
-        textObj.pushBackDebug(textOut);
-//        textOut << "ray start: " << std::fixed
-//                << std::setprecision(2)
-//                << printVec3(scene.rayStart);
-//        textObj.pushBackDebug(textOut);
-//        textOut << "ray end: " <<std::fixed
-//                << std::setprecision(2)
-//                <<printVec3(scene.rayEnd);
-//        textObj.pushBackDebug(textOut);
-//        textOut << "planet camera coord: " << std::fixed
-//                << std::setprecision(2)
-//                << printVec3(scene.obj);
-//        textObj.pushBackDebug(textOut);
-        
-        
-        
-        return;
-        textOut << "shadow pass: 1   " << ((renderStage & stage1) ? "On" : " ");
-        textObj.pushBackDebug(textOut);
-        textOut << "forward pass: 2  " << ((renderStage & stage2) ? "On" : " ");
-        textObj.pushBackDebug(textOut);
-        textOut << "highpass: 3           " << ((renderStage & stage3) ? "On" : " ");
-        textObj.pushBackDebug(textOut);
-        textOut << "blur1 pass: 4         " << ((renderStage & stage4) ? "On" : " ");
-        textObj.pushBackDebug(textOut);
-        textOut << "blur2 pass: 5         " << ((renderStage & stage5) ? "On" : " ");
-        textObj.pushBackDebug(textOut);
-        textOut << "composite pass: 6 " << ((renderStage & stage6) ? "On" : " ");
-        textObj.pushBackDebug(textOut);
-        textOut << "fxaa pass: 7            " << ((renderStage & stage7) ? "On" : " ");
-        textObj.pushBackDebug(textOut);
-    };
-    
-    //init GUI text
+    TextRenderer textObj(pxRatio, ws.fbWidth, ws.fbHeight);
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.apo)));
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.peri)));
 
+    auto UITextSetup = [&](){
+        auto vp = scene.camera.matrix() * world;
+        textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
+        textObj.guiText[1].pos = getVec2(vp, scene.orbit.apoPos);
+        textObj.guiText[2].pos = getVec2(vp, scene.orbit.periPos);
+        
+        textObj.guiText[1].text = to_string(scene.orbit.apo);
+        textObj.guiText[2].text = to_string(scene.orbit.peri);
+    };
     
+    // performance measurement
+    glfwSetTime(0);
+    PerfMon perfMon;
     perfMon.tPrevFrame = glfwGetTime();
-    while (!glfwWindowShouldClose(window))
+    
+    while (!glfwWindowShouldClose(ws.pWindow))
     {
         /* performance measurement setup */
         perfMon.update(glfwGetTime());
         auto dt = perfMon.dt;
     
-        /* get window size */
-   		glfwGetWindowSize(window, &winWidth, &winHeight);
-		glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
-        
-		glViewport(0, 0, fbWidth, fbHeight);
+        updateWindowSize(ws);
         
         // Calculate pixel ratio for hi-dpi devices.
-        auto pxRatio = (float)fbWidth / (float)winWidth;
-        textObj.updateSettings(pxRatio, fbWidth, fbHeight);
+        auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
+        textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
 		
-        /* Set up a blank screen */
-//        glClearColor(0.0,0.0,0.0,1);
-//        glClearColor(0.5,0.5,0.5,1);
-//        glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        check_gl_error();
-        
-        /* physics, handle user input, ai, game states, 
+        /* physics, handle user input, ai, game states,
          * it's a lot here 
          */
         gameLogic.processActionList(inputObject.actionList);
         gameLogic.update(dt);
         renderer.update();
 
-        /* render text  */
-        getText();
-        
-        //GUI setup
-        auto vp = scene.camera.matrix() * world;
-        textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
-        textObj.guiText[1].pos = getVec2(vp, scene.orbit.apoPos);
-        textObj.guiText[2].pos = getVec2(vp, scene.orbit.periPos);
-
-        textObj.guiText[1].text = to_string(scene.orbit.apo);
-        textObj.guiText[2].text = to_string(scene.orbit.peri);
+        getText(textObj, perfMon, ws);
+        UITextSetup();
        
-        /* render everything else */
-		glEnable(GL_DEPTH_TEST);
-        check_gl_error();
-
+        /* render */
         renderer.render();
-        
-		glDisable(GL_DEPTH_TEST);
         textObj.render();
        
-//        glFinish(); //16ms w/o vsync, 32ms w/ vsync for some reaso
         perfMon.frameEnd(glfwGetTime());
 
-        /* Swap front and back buffers */
-        glfwSwapBuffers(window);
+        glfwSwapBuffers(ws.pWindow);
         renderer.postFrame();
         
-        /* Poll for and process events */
+        /* Poll for events (kb, mouse, joystick) and process them via glfw callbacks*/
         glfwPollEvents();
     }
     

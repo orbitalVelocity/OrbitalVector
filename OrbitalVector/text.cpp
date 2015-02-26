@@ -238,6 +238,7 @@ void TextRenderer::pushBackDebug(stringstream &ss)
 //void printText(vector<string> texts, int pxRatio, int fbWidth, int fbHeight)
 void TextRenderer::render()
 {
+    glDisable(GL_DEPTH_TEST);
 	float sx,sy,dx,dy;
    
     sth_begin_draw(stash);

@@ -123,6 +123,10 @@ public:
     BodyType type;
 };
 
+/**
+ Dumps pos/vel data of entire system
+ @param sys    all bodies in system
+ */
 void printsys(vector<body> &sys);
 void printks(vector<vector<state>> &ks);
 void orbitDelta(GLfloat &delta,

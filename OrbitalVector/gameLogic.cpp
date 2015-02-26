@@ -78,16 +78,6 @@ GameLogic::GameLogic(GLFWwindow *w, Scene *s, UserInput *i)
     
     auto &scene = *_scene;
     scene.orbit.entityManager = &entityManager;
-    
-    //load scene
-//    double m = 0.0;
-//    double G = 6.673e-11;
-//    double gm = m * G;
-//    entityManager.addEntity(Family::GRAV, glm::vec3(), glm::vec3(), gm, 10e3, Spatial(), Unit());
-//    
-//    //add player ship
-//    
-//    entityManager.addEntity(Family::SHIP, glm::vec3(), glm::vec3(), gm, 10e3, Spatial(), Unit());
 }
 
 void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
@@ -222,6 +212,7 @@ void GameLogic::update(float dt)
     orbitDelta(gameDT, ks, sys2, false);
     
     //convert sys back to pos/vel vectors
+    assert(sys2.size() == gravPosVector.size() + shipPosVector.size());
     for (int i = 0; i < shipPosVector.size(); i++) {
         shipPosVector[i] = sys2[i+gravPosVector.size()].sn.pos;
         shipVelVector[i] = sys2[i+gravPosVector.size()].sn.vel;

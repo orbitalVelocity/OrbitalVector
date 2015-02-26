@@ -312,7 +312,13 @@ int main(int argc, const char * argv[])
         gameLogic.processActionList(inputObject.actionList);
         gameLogic.update(dt);
         renderer.update();
+       
+        /* render everything else */
+		glEnable(GL_DEPTH_TEST);
+        check_gl_error();
 
+        renderer.render();
+        
         /* setup text  */
         getText();
         
@@ -326,13 +332,7 @@ int main(int argc, const char * argv[])
 
         textObj.guiText[1].text = std::to_string(scene.orbit.apo);
         textObj.guiText[2].text = std::to_string(scene.orbit.peri);
-       
-        /* render everything else */
-		glEnable(GL_DEPTH_TEST);
-        check_gl_error();
 
-        renderer.render();
-        
 		glDisable(GL_DEPTH_TEST);
         textObj.render();
        

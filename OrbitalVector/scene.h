@@ -34,18 +34,18 @@ public:
     void update();
     
 public:
-    Orbit orbit;
-    
-    glm::vec3 lightPos;
-    Camera camera;
-    
     friend class GameLogic;
     friend class UserInput;
     friend class Renderer;
     
+    Camera camera;
+    glm::vec3 lightPos;
+    
     bool debug;
     glm::vec3 rayStart, rayEnd;
     glm::vec3 obj;
+    
+    Orbit orbit;
 };
 
 

@@ -139,6 +139,7 @@ void Orbit::calcTrajectory(int &pathSteps)
     {
         orbitDelta(dt, ks, sys2, true);
         
+        printsys(sys2);
         //check if apoapsis and periapsis has been reached
         distance = glm::length(sys2[j].sn.pos - sys2[0].sn.pos);
         if ((last2Distance > lastDistance && lastDistance < distance)
@@ -156,13 +157,14 @@ void Orbit::calcTrajectory(int &pathSteps)
             apo      = distance;
             apoPos   = sys2[j].sn.pos - sys2[0].sn.pos + initPos;
         }
-        
-        if ((last2Distance == lastDistance || lastDistance == distance)
-            && last2Distance != 0.0f && lastDistance != 0.0f)
-        {
-            cout << "same radius across 2 time points! gotta solve this\n";
-            break;
-        }
+       
+//        not actually a bad thing... consider a circle
+//        if ((last2Distance == lastDistance || lastDistance == distance)
+//            && last2Distance != 0.0f && lastDistance != 0.0f)
+//        {
+//            cout << "same radius across 2 time points! gotta solve this\n";
+//            break;
+//        }
         
         //collision detection
         vector<bool> markedForRemoval(sys2.size(), false);
@@ -185,7 +187,7 @@ void Orbit::calcTrajectory(int &pathSteps)
         for (auto i=1; i < sys2.size(); i++) {
             auto j = ids[i];
             
-            int offset = 0;
+            int offset = 1;
             auto tmp = sys2[i+offset].sn.pos - sys2[0].sn.pos + initPos;
             paths[j].push_back(tmp.x);
             paths[j].push_back(tmp.y);

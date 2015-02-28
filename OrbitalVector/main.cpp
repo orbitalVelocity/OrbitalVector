@@ -87,7 +87,7 @@ GLFWwindow* initGraphics(int width, int height)
     return window;
 }
 
-/*
+/**
  * initializes entities in the scene
  * Refactor Goal: move to scene class, but data driven (from save file, preferably)
  */

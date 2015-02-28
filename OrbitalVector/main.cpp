@@ -301,18 +301,7 @@ void getText(TextRenderer &textObj, PerfMon &perfMon, WindowStates &ws)
 //    textOut << "mouse: x " << mx << " y " << my;
 //    textObj.pushBackDebug(textOut);
 //    
-//    vector<float> dist;
-//    int obj = -1;
-//    gameLogic.linePick(dist, obj);
-//    for (int i=0; i < dist.size(); i++)
-//    {
-//        textOut << "obj: " << i << " dist: " << dist[i];
-//        textObj.pushBackDebug(textOut);
-//    }
-//    textOut << "selected: " << gameLogic.selected;
-//    textObj.pushBackDebug(textOut);
-//    textOut << "mouseOver: " << gameLogic.mouseHover;
-//    textObj.pushBackDebug(textOut);
+
     //        textOut << "ray start: " << std::fixed
     //                << std::setprecision(2)
     //                << printVec3(scene.rayStart);
@@ -342,6 +331,20 @@ void getText(TextRenderer &textObj, PerfMon &perfMon, WindowStates &ws)
     textOut << "composite pass: 6 " << ((renderStage & stage6) ? "On" : " ");
     textObj.pushBackDebug(textOut);
     textOut << "fxaa pass: 7            " << ((renderStage & stage7) ? "On" : " ");
+    textObj.pushBackDebug(textOut);
+}
+
+void getLinePick(TextRenderer &textObj, GameLogic &gameLogic)
+{
+    stringstream textOut;
+    for (int i=0; i < gameLogic.shortestDist.size(); i++)
+    {
+        textOut << "obj: " << i << " dist: " << gameLogic.shortestDist[i];
+        textObj.pushBackDebug(textOut);
+    }
+    textOut << "selected: " << gameLogic.selected;
+    textObj.pushBackDebug(textOut);
+    textOut << "mouseOver: " << gameLogic.mouseHover;
     textObj.pushBackDebug(textOut);
 }
 
@@ -414,6 +417,7 @@ int main(int argc, const char * argv[])
         renderer.update();
 
         getText(textObj, perfMon, ws);
+        getLinePick(textObj, gameLogic);
         UITextSetup();
        
         /* render */

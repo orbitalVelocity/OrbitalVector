@@ -28,7 +28,8 @@ GameLogic::GameLogic(GLFWwindow *w, Scene &s, UserInput &i)
     sShip[0].scale(glm::vec3(1));
 }
 
-void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
+//void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
+void GameLogic::linePick()
 {
     //line pick
     //code taken from
@@ -70,7 +71,8 @@ void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
         auto dist = length(mouseNDC - screenPosNDC);
         shortestDist.push_back(dist);
         
-        if (dist < 40) {
+        const int thresholdInPixels = 40;
+        if (dist < thresholdInPixels) {
             if (userInput.lmbPressed)
                 selected = objIdx;
             else {
@@ -82,6 +84,9 @@ void GameLogic::linePick(vector<float> &shortestDist, int &closestObj)
         objIdx++;
     }
 }
+
+//have gamelogic.update() call linePick
+//have main reach in and display distance and debug stats
 
 void GameLogic::missileLogic(float dt)
 {
@@ -104,6 +109,8 @@ void GameLogic::missileLogic(float dt)
 
 void GameLogic::update(float dt)
 {
+    linePick();
+    
     //calculate new position/velocity
     float gameDT = dt * timeWarp;
     orbitDelta(gameDT, ks, sys, false);

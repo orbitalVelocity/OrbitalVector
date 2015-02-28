@@ -32,6 +32,8 @@ public:
     UserInput &userInput;
     //UI related
     int selected, mouseHover; //sysIdx
+    //debug related
+    vector<float> shortestDist;
 public:
     GameLogic(GLFWwindow*, Scene &s, UserInput &i) ;
     void update(float dt);
@@ -42,7 +44,7 @@ public:
      */
     void processActionList(vector<ActionType> &actionList);
     void addSatellite(body &);
-    void linePick(vector<float> &, int &);
+    void linePick();//vector<float> &, int &);
     void missileLogic(float dt);
 };
 #endif /* defined(__GLFW3_test__gameLogic__) */

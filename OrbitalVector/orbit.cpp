@@ -102,7 +102,7 @@ void Orbit::calcTrajectory(int &pathSteps)
     
     while (loopCond())
     {
-        orbitDelta(dt, ks2, sys2, true);
+        orbitPhysicsUpdate(dt, ks2, sys2, true);
         
         //check if apoapsis and periapsis has been reached
         distance = glm::length(sys2[j].sn.pos - sys2[0].sn.pos);

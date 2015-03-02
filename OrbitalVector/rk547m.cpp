@@ -139,7 +139,7 @@ void markForDeletion(vector<body> &sys, vector<bool> &markedForRemoval)
     }
 }
 
-void orbitDelta(GLfloat &delta,
+void orbitPhysicsUpdate(GLfloat &delta,
                 vector<vector<state> > &ks, vector<body> &sys,
                 bool changeDT)
 {

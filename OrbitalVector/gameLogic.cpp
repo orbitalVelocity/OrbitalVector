@@ -38,6 +38,8 @@ void GameLogic::linePick()
     int screenWidth, screenHeight;
     glfwGetCursorPos(window, &mouseX, &mouseY);
     glfwGetWindowSize(window, &screenWidth, &screenHeight);
+    
+    //get ray casted under cursor
     mouseY = screenHeight - mouseY; //for some reason, mouseY is flipped from tutorial
     auto mouseX_NDC = ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f;
     auto mouseY_NDC = ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f;
@@ -59,6 +61,7 @@ void GameLogic::linePick()
 	vec3 lRayDir_world(lRayEnd_world - lRayStart_world);
 	lRayDir_world = normalize(lRayDir_world);
     
+    //iterate over all objects and find shortest distance
     shortestDist.clear();
     auto objIdx = 0;
     mouseHover = -1;
@@ -107,29 +110,13 @@ void GameLogic::missileLogic(float dt)
     }
 }
 
-void GameLogic::update(float dt)
+void GameLogic::userInteraction()
 {
     linePick();
     
-    //calculate new position/velocity
-    float gameDT = dt * timeWarp;
-    orbitDelta(gameDT, ks, sys, false);
-    
-    missileLogic(gameDT);
-    
-    //central planet
-    sGlobe[0].move(sys[0].sn.pos);
-    //UI
-    //prograde
-    auto progradeOffset = glm::normalize(sys[1].sn.vel);
-    sGlobe[1].move(sys[1].sn.pos+progradeOffset);
-    //retrograde
-    sGlobe[2].move(sys[1].sn.pos-progradeOffset);
-   
-#if 1
     double mx, my;
     static double prevMX = 0, prevMY = 0;
-    glfwGetCursorPos(window, &mx, &my);
+    glfwGetCursorPos(window, &mx, &my);     //consider consolidating this line w/ the one in linePick();
     double _x = mx - prevMX;
     double _y = my - prevMY;
     prevMX = mx;
@@ -145,18 +132,16 @@ void GameLogic::update(float dt)
     //scroll behavior
     scene.camera.offsetPos(vec3(0,0, -userInput.yScroll));
     userInput.yScroll = 0;
-    
-    //calculate trajectories
-    static int orbitCount = 0;
-    if (orbitCount++ % 30 == 0) {
-        scene.orbit.update();
-    }
-    
-    //remove elements
+}
+
+void GameLogic::handleCollision()
+{
     if (true)
     {
-        //mark elements that needs to be removed
+        //contains elements to be removed
         vector<bool> markedForRemoval(sys.size(), false);
+        
+        //find collisions and mark candidates for deletion
         markForDeletion(sys, markedForRemoval);
         
         //remove all marked elements
@@ -165,15 +150,44 @@ void GameLogic::update(float dt)
         for (int i = (int)sys.size()-1; i >= 0; --i, --it)
         {
             if (markedForRemoval[i]) {
-//                sys.erase(it);
                 removeFromSys(it);
             }
         }
     }
+ 
+}
+
+void GameLogic::update(float dt)
+{
+    userInteraction();
+
+    float gameDT = dt * timeWarp;
+
+    missileLogic(gameDT);
     
+    //calculate new position/velocity
+    orbitPhysicsUpdate(gameDT, ks, sys, false);
     
+    //calculate trajectories every 30 frames
+    static int orbitCount = 0;
+    if (orbitCount++ % 30 == 0) {
+        scene.orbit.update();
+    }
+    
+    handleCollision();
+
+    //update positions
+    //central planet
+    sGlobe[0].move(sys[0].sn.pos);
+    //UI
+    //prograde
+    auto progradeOffset = glm::normalize(sys[1].sn.vel);
+    sGlobe[1].move(sys[1].sn.pos+progradeOffset);
+    //retrograde
+    sGlobe[2].move(sys[1].sn.pos-progradeOffset);
+  
+    //center the world around player ship
     world = translate(mat4(), -sys[1].sn.pos);
-#endif
 }
 
 void GameLogic::processActionList(vector<ActionType> &actionList)

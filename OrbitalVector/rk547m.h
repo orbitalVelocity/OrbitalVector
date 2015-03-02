@@ -129,7 +129,7 @@ public:
  */
 void printsys(vector<body> &sys);
 void printks(vector<vector<state>> &ks);
-void orbitDelta(GLfloat &delta,
+void orbitPhysicsUpdate(GLfloat &delta,
                 vector<vector<state> > &ks, vector<body> &sys,
                 bool variableDT);
 

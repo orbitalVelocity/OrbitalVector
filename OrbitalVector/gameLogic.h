@@ -44,7 +44,9 @@ public:
      */
     void processActionList(vector<ActionType> &actionList);
     void addSatellite(body &);
+    void userInteraction();
     void linePick();//vector<float> &, int &);
     void missileLogic(float dt);
+    void handleCollision();
 };
 #endif /* defined(__GLFW3_test__gameLogic__) */

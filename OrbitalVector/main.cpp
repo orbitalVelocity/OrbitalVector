@@ -185,6 +185,15 @@ static void PrintInfo(const std::vector<tinyobj::shape_t>& shapes, const std::ve
 }
 
 const int ftSize = 120;
+
+/**
+ Measures frame rate, frame latency, GPU and CPU timing
+ 
+ Includes debugging functionality such as
+ @code
+    - frame rate limiting for breakpoint while debugging
+    - other debugging functionalities?
+ */
 class PerfMon {
 public:
     PerfMon() : fps(ftSize), renderTimes(ftSize),
@@ -199,7 +208,20 @@ public:
         tPrevFrame = tFrameStart;
         fps.push(1.0f/dt);
         renderTimes.push(renderTime*1000.0f);
+        
+        frameRateLimitForDebugging();
+        
         startGPUTimer(&gpuTimer);
+    }
+    /**
+     Prevents artificially large frame time when paused at
+     break point during debugging
+     */
+    void frameRateLimitForDebugging()
+    {
+        //for debugging: framelock to 1/30 second
+        const auto frameTimeLimit = 1.0f/30.0f;
+        dt = (dt > frameTimeLimit) ? frameTimeLimit : dt;
     }
     void frameEnd(double thisTime)
     {

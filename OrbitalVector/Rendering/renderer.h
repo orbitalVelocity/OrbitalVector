@@ -12,7 +12,7 @@
 
 #include <iostream>
 #include "includes.h"
-#include "ogl.h"
+#include "renderableType.h"
 #include "orbit.h"
 #include "camera.h"
 #include "gameLogic.h"
@@ -82,8 +82,8 @@ public:
     void postFrame();
     
 public:
-    //    vector<OGL> renderables;
-    OGL globe, grid, ship, sprite, missile;
+    //    vector<RenderableType> renderables;
+    RenderableType globe, grid, ship, sprite, missile;
     glm::vec3 lightPos;
     friend class GameLogic;
     friend class UserInput;
@@ -93,7 +93,7 @@ public:
     
     //    RenderTarget rt, rtBloom, rtBloomV, rtShadowMap;
     vector<RenderTarget> rt;
-    OGL hdr, highPass, shadowMap,
+    RenderableType hdr, highPass, shadowMap,
     blit, composite, fxaa;
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;

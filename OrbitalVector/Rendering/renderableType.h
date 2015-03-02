@@ -1,13 +1,13 @@
 //
-//  ogl.h
+//  renderableType.h
 //  GLFW3_test
 //
 //  Created by Si Li on 9/7/14.
 //  Copyright (c) 2014 Si Li. All rights reserved.
 //
 
-#ifndef __GLFW3_test__ogl__
-#define __GLFW3_test__ogl__
+#ifndef __GLFW3_test__renderableType__
+#define __GLFW3_test__renderableType__
 
 #include "includes.h"
 #include "rk547m.h"
@@ -15,11 +15,11 @@
 #include <iostream>
 using namespace std;
 
-class OGL
+class RenderableType
 {
 public:
-    OGL(GLenum _drawType);
-    ~OGL()
+    RenderableType(GLenum _drawType);
+    ~RenderableType()
     {
         glDeleteProgram(shaderProgram);
         for (auto &shaderID : shaderIDs)
@@ -73,4 +73,4 @@ public:
 #endif
 };
 
-#endif /* defined(__GLFW3_test__ogl__) */
+#endif /* defined(__GLFW3_test__renderableType__) */

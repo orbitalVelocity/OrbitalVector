@@ -28,7 +28,7 @@
 		F156D0921A1BA86400C26739 /* terran_corvette_small.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F156D0911A1BA85500C26739 /* terran_corvette_small.obj */; };
 		F159FF4D18DA86650003FF56 /* libglfw3.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67C18D9396300971791 /* libglfw3.a */; };
 		F15D70DE19CFD303008F6573 /* spatial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15D70DC19CFD303008F6573 /* spatial.cpp */; };
-		F15E8E9C19BD406B003E566C /* ogl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8E9A19BD406B003E566C /* ogl.cpp */; };
+		F15E8E9C19BD406B003E566C /* renderableType.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8E9A19BD406B003E566C /* renderableType.cpp */; };
 		F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EA019BD4696003E566C /* GLPrimitiveRenderer.cpp */; };
 		F15E8EA619BD4696003E566C /* LoadShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EA219BD4696003E566C /* LoadShader.cpp */; };
 		F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB319BD47C9003E566C /* fontstash.cpp */; };
@@ -128,8 +128,8 @@
 		F156D0911A1BA85500C26739 /* terran_corvette_small.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = terran_corvette_small.obj; sourceTree = "<group>"; };
 		F15D70DC19CFD303008F6573 /* spatial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = spatial.cpp; sourceTree = "<group>"; };
 		F15D70DD19CFD303008F6573 /* spatial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = spatial.h; sourceTree = "<group>"; };
-		F15E8E9A19BD406B003E566C /* ogl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ogl.cpp; sourceTree = "<group>"; };
-		F15E8E9B19BD406B003E566C /* ogl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ogl.h; sourceTree = "<group>"; };
+		F15E8E9A19BD406B003E566C /* renderableType.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = renderableType.cpp; sourceTree = "<group>"; };
+		F15E8E9B19BD406B003E566C /* renderableType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = renderableType.h; sourceTree = "<group>"; };
 		F15E8E9D19BD40C2003E566C /* includes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = includes.h; sourceTree = "<group>"; };
 		F15E8E9F19BD4696003E566C /* GLPrimInternalData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLPrimInternalData.h; sourceTree = "<group>"; };
 		F15E8EA019BD4696003E566C /* GLPrimitiveRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GLPrimitiveRenderer.cpp; sourceTree = "<group>"; };
@@ -276,8 +276,7 @@
 				F1B3C67318D935EC00971791 /* main.cpp */,
 				F1011C6519C68C6700602446 /* scene.cpp */,
 				F1011C6619C68C6700602446 /* scene.h */,
-				F1EAC34D1A0BDE42006B29CB /* renderer.cpp */,
-				F1EAC34E1A0BDE42006B29CB /* renderer.h */,
+				F1D4680A1AA50BFA00869C62 /* Rendering */,
 				F151168A19DE1FE50018635B /* gameLogic.cpp */,
 				F151168B19DE1FE50018635B /* gameLogic.h */,
 				F156D08C1A16D9AD00C26739 /* unitManager.cpp */,
@@ -296,10 +295,6 @@
 				F1BB301119C1DB9200E349FE /* rk547m.h */,
 				F1011C6219C5F45A00602446 /* camera.cpp */,
 				F1011C6319C5F45A00602446 /* camera.h */,
-				F1011C7319C7F0C700602446 /* orbit.cpp */,
-				F1011C7419C7F0C700602446 /* orbit.h */,
-				F15E8E9A19BD406B003E566C /* ogl.cpp */,
-				F15E8E9B19BD406B003E566C /* ogl.h */,
 				F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */,
 				F1DBBA1119F6758F0022F107 /* GPUTimer.h */,
 				F1011C7619C7F17200602446 /* includes.cpp */,
@@ -324,6 +319,19 @@
 				F1C8EFBA19CD2C86008CCC90 /* jet.obj */,
 			);
 			path = assets;
+			sourceTree = "<group>";
+		};
+		F1D4680A1AA50BFA00869C62 /* Rendering */ = {
+			isa = PBXGroup;
+			children = (
+				F1EAC34D1A0BDE42006B29CB /* renderer.cpp */,
+				F1EAC34E1A0BDE42006B29CB /* renderer.h */,
+				F1011C7319C7F0C700602446 /* orbit.cpp */,
+				F1011C7419C7F0C700602446 /* orbit.h */,
+				F15E8E9A19BD406B003E566C /* renderableType.cpp */,
+				F15E8E9B19BD406B003E566C /* renderableType.h */,
+			);
+			path = Rendering;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -379,7 +387,7 @@
 			files = (
 				F151168C19DE1FE50018635B /* gameLogic.cpp in Sources */,
 				F1011C6719C68C6700602446 /* scene.cpp in Sources */,
-				F15E8E9C19BD406B003E566C /* ogl.cpp in Sources */,
+				F15E8E9C19BD406B003E566C /* renderableType.cpp in Sources */,
 				F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */,
 				F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */,
 				F1011C7719C7F17200602446 /* includes.cpp in Sources */,

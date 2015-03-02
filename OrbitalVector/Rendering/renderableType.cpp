@@ -1,24 +1,24 @@
 //
-//  ogl.cpp
+//  renderableType.cpp
 //  GLFW3_test
 //
 //  Created by Si Li on 9/7/14.
 //  Copyright (c) 2014 Si Li. All rights reserved.
 //
 
-#include "ogl.h"
+#include "renderableType.h"
 
 using namespace std;
 
 
-OGL::OGL(GLenum _drawType) : drawType(_drawType),
+RenderableType::RenderableType(GLenum _drawType) : drawType(_drawType),
                              vboIdx(0),
                              depthTexture(false)
 {
     glGenVertexArrays(1, &vao);
 }
 
-void OGL::init()
+void RenderableType::init()
 {
     if (drawType == GL_TRIANGLES)
         loadIco();
@@ -26,7 +26,7 @@ void OGL::init()
         loadGrid();
 }
 
-void OGL::newProgram(map<GLuint, string> &shaders, bool useProg)
+void RenderableType::newProgram(map<GLuint, string> &shaders, bool useProg)
 {
     GLint Result = GL_FALSE;
     int InfoLogLength;
@@ -145,7 +145,7 @@ void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, vector<G
     }
 }
 
-void OGL::loadShaders(string vs, string fs, bool useProg)
+void RenderableType::loadShaders(string vs, string fs, bool useProg)
 {
     map<GLuint, string> shaders;
     auto vShader = get_file_contents(vs);
@@ -157,7 +157,7 @@ void OGL::loadShaders(string vs, string fs, bool useProg)
     newProgram(shaders, useProg);
 }
 
-void OGL::loadIco() {
+void RenderableType::loadIco() {
     //load shaders
     string vertFilename = "planetVertex.glsl";
     string fragFilename = "planetFragment.glsl";
@@ -198,7 +198,7 @@ void OGL::loadIco() {
 }
 
 
-void OGL::loadGrid()
+void RenderableType::loadGrid()
 {
     //load shaders
     string vertFilename = "lineVertex.glsl";
@@ -234,7 +234,7 @@ void OGL::loadGrid()
 }
 
 //single data type per attrib
-void OGL::loadAttrib(string attribName, vector<float> &path, GLuint drawHint, GLuint bufferType)
+void RenderableType::loadAttrib(string attribName, vector<float> &path, GLuint drawHint, GLuint bufferType)
 {
     //transfer position data
     vbo.resize(vboIdx+1);           //vbo only used in this funciton
@@ -259,13 +259,13 @@ void OGL::loadAttrib(string attribName, vector<float> &path, GLuint drawHint, GL
 }
 
 
-void OGL::update()
+void RenderableType::update()
 {
 //call back function?
 }
 
 
-void OGL::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
+void RenderableType::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
                       glm::vec3 color, GLuint *indices)
 {
     GLint uniformID;
@@ -285,7 +285,7 @@ void OGL::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPos, glm
     
 }
 
-void OGL::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model, GLuint *indices)
+void RenderableType::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model, GLuint *indices)
 {
     auto uniformID = glGetUniformLocation(shaderProgram, "camera");
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(_camera.matrix()));
@@ -305,7 +305,7 @@ void OGL::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model, GLuin
     
 }
 
-void OGL::drawIndexed(glm::mat4 &model, glm::vec3 &color, GLuint *indices)
+void RenderableType::drawIndexed(glm::mat4 &model, glm::vec3 &color, GLuint *indices)
 {
     auto uniformID = glGetUniformLocation(shaderProgram, "model");
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(model));
@@ -323,7 +323,7 @@ void OGL::drawIndexed(glm::mat4 &model, glm::vec3 &color, GLuint *indices)
     
 }
 
-void OGL::draw(glm::mat4 &mvp)
+void RenderableType::draw(glm::mat4 &mvp)
 {
     
     GLint uTransform = glGetUniformLocation(shaderProgram, "model");
@@ -336,7 +336,7 @@ void OGL::draw(glm::mat4 &mvp)
     check_gl_error();
     
 }
-void OGL::draw(glm::mat4 &mvp, glm::vec3 color)
+void RenderableType::draw(glm::mat4 &mvp, glm::vec3 color)
 {
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
     check_gl_error();

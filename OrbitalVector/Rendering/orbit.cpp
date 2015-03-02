@@ -7,7 +7,7 @@
 //
 
 #include "orbit.h"
-#include "ogl.h"
+#include "renderableType.h"
 #include "rk547m.h"
 
 using namespace std;

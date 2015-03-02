@@ -12,7 +12,7 @@
 //#include <OpenGL/glu.h>
 #include "includes.h" 
 #include "rk547m.h"
-#include "ogl.h"
+#include "renderableType.h"
 #include <GLFW/glfw3.h>
 
 #include "camera.h"

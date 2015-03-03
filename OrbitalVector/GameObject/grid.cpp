@@ -10,17 +10,16 @@
 
 void RenderableGrid::init()
 {
-    loadAsset();
-}
-
-void RenderableGrid::loadAsset()
-{
     //load shaders
     string vertFilename = "lineVertex.glsl";
     string fragFilename = "lineFragment.glsl";
     loadShaders(vertFilename, fragFilename);
     
-    
+    loadAsset();
+}
+
+void RenderableGrid::loadAsset()
+{
     //generate positions
     std::vector<float> path;
     int vecSize = 3;

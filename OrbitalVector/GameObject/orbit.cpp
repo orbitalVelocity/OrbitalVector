@@ -183,6 +183,8 @@ void Orbit::loadPath()
     shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
     newProgram(shaders);
     
+    
+    //replaces loadAttrib
     glGenBuffers(1, &vbo);
     glGenVertexArrays(1, &vao);
     

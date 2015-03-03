@@ -17,6 +17,8 @@
 #include "camera.h"
 #include "gameLogic.h"
 #include "scene.h"
+#include "grid.h"
+#include "globe.h"
 
 enum SN {
     shadowMap,
@@ -83,7 +85,9 @@ public:
     
 public:
     //    vector<RenderableType> renderables;
-    RenderableType globe, grid, ship, sprite, missile;
+    RenderableType ship, sprite, missile;
+    RenderableGrid grid;
+    RenderableGlobe globe;
     glm::vec3 lightPos;
     friend class GameLogic;
     friend class UserInput;

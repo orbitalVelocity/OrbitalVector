@@ -34,6 +34,7 @@
 		F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB319BD47C9003E566C /* fontstash.cpp */; };
 		F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB519BD47C9003E566C /* opengl_fontstashcallbacks.cpp */; };
 		F1764D8219ECDE2B0031443F /* simplePassThrough.vs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1764D8119ECDE250031443F /* simplePassThrough.vs */; };
+		F19330AC1AA552E3009B42B0 /* globe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330AA1AA552E3009B42B0 /* globe.cpp */; };
 		F1B3C67418D935EC00971791 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1B3C67318D935EC00971791 /* main.cpp */; };
 		F1B3C67618D935EC00971791 /* GLFW3_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1B3C67518D935EC00971791 /* GLFW3_test.1 */; };
 		F1B3C67F18D9397400971791 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67E18D9397400971791 /* IOKit.framework */; };
@@ -48,6 +49,7 @@
 		F1C8EFC019CE1B26008CCC90 /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = F1C8EFBE19CE1B26008CCC90 /* tiny_obj_loader.cc */; };
 		F1CFAEE819FAC5F3007CB974 /* fxaa.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1D04FBE19FAC2A100B3520F /* fxaa.fs */; };
 		F1CFAEE919FAC5F3007CB974 /* passthrough.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1D04FBD19FAC26B00B3520F /* passthrough.fs */; };
+		F1D4680E1AA511CB00869C62 /* grid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1D4680C1AA511CB00869C62 /* grid.cpp */; };
 		F1DBBA1219F6758F0022F107 /* GPUTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */; };
 		F1EAC3411A07E124006B29CB /* square.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1EAC3401A07E110006B29CB /* square.obj */; };
 		F1EAC3431A07E55B006B29CB /* square_bracket.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1EAC3421A07E547006B29CB /* square_bracket.obj */; };
@@ -144,6 +146,8 @@
 		F15E8EB719BD47C9003E566C /* stb_image_write.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		F15E8EB819BD47C9003E566C /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
 		F1764D8119ECDE250031443F /* simplePassThrough.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = simplePassThrough.vs; path = glsl/simplePassThrough.vs; sourceTree = "<group>"; };
+		F19330AA1AA552E3009B42B0 /* globe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = globe.cpp; path = GameObject/globe.cpp; sourceTree = "<group>"; };
+		F19330AB1AA552E3009B42B0 /* globe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = globe.h; path = GameObject/globe.h; sourceTree = "<group>"; };
 		F1B3C67018D935EC00971791 /* OrbitalVector */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OrbitalVector; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1B3C67318D935EC00971791 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F1B3C67518D935EC00971791 /* GLFW3_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GLFW3_test.1; sourceTree = "<group>"; };
@@ -162,6 +166,8 @@
 		F1C8EFBF19CE1B26008CCC90 /* tiny_obj_loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
 		F1D04FBD19FAC26B00B3520F /* passthrough.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = passthrough.fs; path = glsl/passthrough.fs; sourceTree = "<group>"; };
 		F1D04FBE19FAC2A100B3520F /* fxaa.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = fxaa.fs; sourceTree = "<group>"; };
+		F1D4680C1AA511CB00869C62 /* grid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grid.cpp; path = GameObject/grid.cpp; sourceTree = "<group>"; };
+		F1D4680D1AA511CB00869C62 /* grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grid.h; path = GameObject/grid.h; sourceTree = "<group>"; };
 		F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GPUTimer.cpp; sourceTree = "<group>"; };
 		F1DBBA1119F6758F0022F107 /* GPUTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUTimer.h; sourceTree = "<group>"; };
 		F1EAC3401A07E110006B29CB /* square.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = square.obj; sourceTree = "<group>"; };
@@ -276,6 +282,7 @@
 				F1B3C67318D935EC00971791 /* main.cpp */,
 				F1011C6519C68C6700602446 /* scene.cpp */,
 				F1011C6619C68C6700602446 /* scene.h */,
+				F1D4680B1AA5116C00869C62 /* GameObject */,
 				F1D4680A1AA50BFA00869C62 /* Rendering */,
 				F151168A19DE1FE50018635B /* gameLogic.cpp */,
 				F151168B19DE1FE50018635B /* gameLogic.h */,
@@ -334,6 +341,17 @@
 			path = Rendering;
 			sourceTree = "<group>";
 		};
+		F1D4680B1AA5116C00869C62 /* GameObject */ = {
+			isa = PBXGroup;
+			children = (
+				F1D4680C1AA511CB00869C62 /* grid.cpp */,
+				F1D4680D1AA511CB00869C62 /* grid.h */,
+				F19330AA1AA552E3009B42B0 /* globe.cpp */,
+				F19330AB1AA552E3009B42B0 /* globe.h */,
+			);
+			name = GameObject;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -388,6 +406,7 @@
 				F151168C19DE1FE50018635B /* gameLogic.cpp in Sources */,
 				F1011C6719C68C6700602446 /* scene.cpp in Sources */,
 				F15E8E9C19BD406B003E566C /* renderableType.cpp in Sources */,
+				F19330AC1AA552E3009B42B0 /* globe.cpp in Sources */,
 				F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */,
 				F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */,
 				F1011C7719C7F17200602446 /* includes.cpp in Sources */,
@@ -404,6 +423,7 @@
 				F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */,
 				F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */,
 				F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */,
+				F1D4680E1AA511CB00869C62 /* grid.cpp in Sources */,
 				F15D70DE19CFD303008F6573 /* spatial.cpp in Sources */,
 				F1C8EFC019CE1B26008CCC90 /* tiny_obj_loader.cc in Sources */,
 			);

@@ -19,23 +19,13 @@ class RenderableType
 {
 public:
     RenderableType(GLenum _drawType);
-    ~RenderableType()
-    {
-        glDeleteProgram(shaderProgram);
-        for (auto &shaderID : shaderIDs)
-            glDeleteShader(shaderID);
-        
-        for (auto &v : vbo)
-            glDeleteBuffers(1, &v);
-        glDeleteBuffers(1, &elementBuffer);
-        
-        glDeleteVertexArrays(1, &vao);
-    }
-    void init();
+    ~RenderableType();
+    
+    virtual void init(){}//FIXME: make full virtual
     void loadShaders(string vs, string fs, bool useProg=true);
     void newProgram(map<GLuint, string> &shaders, bool useProg=true);
-    void loadIco();
-    void loadGrid();
+    
+    virtual void loadAsset(){}//FIXME: make full virtual
     void loadAttrib(string name, vector<float> &input,
                     GLuint hint, GLuint type=GL_ARRAY_BUFFER);
     void update();
@@ -69,8 +59,6 @@ public:
     GLint attribute_coord;
 
     bool depthTexture;
-#if TRANSFORM
-#endif
 };
 
 #endif /* defined(__GLFW3_test__renderableType__) */

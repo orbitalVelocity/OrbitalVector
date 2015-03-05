@@ -10,18 +10,18 @@
 #define __OrbitalVector__globe__
 
 #include <stdio.h>
-#include "renderableType.h"
+#include "OGLShader.h"
 using namespace std;
 
-class RenderableGlobe : public RenderableType
+class RenderableGlobe : public OGLShader
 {
 public:
-    RenderableGlobe(GLenum drawType) : RenderableType(drawType) {}
+    RenderableGlobe(GLenum drawType) : OGLShader(drawType) {}
     void init() override;
     void loadAsset () override;
 };
 
-class globeObject
+class globeType
 {
 public:
     RenderableGlobe renderableGlobe;

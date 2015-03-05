@@ -6,12 +6,12 @@
 //  Copyright (c) 2014 Si Li. All rights reserved.
 //
 
-#include "renderableType.h"
+#include "OGLShader.h"
 
 using namespace std;
 
 
-RenderableType::RenderableType(GLenum _drawType) : drawType(_drawType),
+OGLShader::OGLShader(GLenum _drawType) : drawType(_drawType),
                              vboIdx(0),
                              depthTexture(false)
 {
@@ -19,7 +19,7 @@ RenderableType::RenderableType(GLenum _drawType) : drawType(_drawType),
     glGenVertexArrays(1, &vao);
 }
 
-RenderableType::~RenderableType()
+OGLShader::~OGLShader()
 {
     glDeleteProgram(shaderProgram);
     for (auto &shaderID : shaderIDs)
@@ -34,7 +34,7 @@ RenderableType::~RenderableType()
 
 
 
-void RenderableType::newProgram(map<GLuint, string> &shaders, bool useProg)
+void OGLShader::newProgram(map<GLuint, string> &shaders, bool useProg)
 {
     GLint Result = GL_FALSE;
     int InfoLogLength;
@@ -113,7 +113,7 @@ void RenderableType::newProgram(map<GLuint, string> &shaders, bool useProg)
     cout << "compiled a new shader!\n";
 }
 
-void RenderableType::loadShaders(string vs, string fs, bool useProg)
+void OGLShader::loadShaders(string vs, string fs, bool useProg)
 {
     map<GLuint, string> shaders;
     auto vShader = get_file_contents(vs);
@@ -124,7 +124,7 @@ void RenderableType::loadShaders(string vs, string fs, bool useProg)
     newProgram(shaders, useProg);
 }
 
-void RenderableType::generateVertexBuffer(GLuint bufferType)
+void OGLShader::generateVertexBuffer(GLuint bufferType)
 {
     //must bind VAO first, else VBO won't be linked to VAO
     glBindVertexArray(vao);
@@ -136,7 +136,7 @@ void RenderableType::generateVertexBuffer(GLuint bufferType)
 }
 
 
-void RenderableType::setAttribute(string attribName)
+void OGLShader::setAttribute(string attribName)
 {
     GLint posAttrib = glGetAttribLocation(shaderProgram, attribName.c_str());
     
@@ -148,7 +148,7 @@ void RenderableType::setAttribute(string attribName)
 }
 
 //single data type per attrib
-void RenderableType::loadAttribute(string attribName, vector<float> &path, GLuint drawHint, GLuint bufferType)
+void OGLShader::loadAttribute(string attribName, vector<float> &path, GLuint drawHint, GLuint bufferType)
 {
     //transfer position data
     glBindVertexArray(vao);
@@ -165,13 +165,13 @@ void RenderableType::loadAttribute(string attribName, vector<float> &path, GLuin
 }
 
 
-void RenderableType::update()
+void OGLShader::update()
 {
 //call back function?
 }
 
 
-void RenderableType::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
+void OGLShader::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
                       glm::vec3 color, GLuint *indices)
 {
     GLint uniformID;
@@ -191,7 +191,7 @@ void RenderableType::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 li
     
 }
 
-void RenderableType::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model, GLuint *indices)
+void OGLShader::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model, GLuint *indices)
 {
     auto uniformID = glGetUniformLocation(shaderProgram, "camera");
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(_camera.matrix()));
@@ -211,7 +211,7 @@ void RenderableType::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &m
     
 }
 
-void RenderableType::drawIndexed(glm::mat4 &model, glm::vec3 &color, GLuint *indices)
+void OGLShader::drawIndexed(glm::mat4 &model, glm::vec3 &color, GLuint *indices)
 {
     auto uniformID = glGetUniformLocation(shaderProgram, "model");
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(model));
@@ -229,7 +229,7 @@ void RenderableType::drawIndexed(glm::mat4 &model, glm::vec3 &color, GLuint *ind
     
 }
 
-void RenderableType::draw(glm::mat4 &mvp)
+void OGLShader::draw(glm::mat4 &mvp)
 {
     
     GLint uTransform = glGetUniformLocation(shaderProgram, "model");
@@ -242,7 +242,7 @@ void RenderableType::draw(glm::mat4 &mvp)
     check_gl_error();
     
 }
-void RenderableType::draw(glm::mat4 &mvp, glm::vec3 color)
+void OGLShader::draw(glm::mat4 &mvp, glm::vec3 color)
 {
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
     check_gl_error();

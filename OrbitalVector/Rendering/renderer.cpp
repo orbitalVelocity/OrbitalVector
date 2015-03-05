@@ -205,6 +205,11 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
     
 }
 
+void Renderer::renderPass()
+{
+    
+}
+
 //runs right between frames -- no shaders are running now
 void Renderer::postFrame()
 {

@@ -10,13 +10,13 @@
 #define __OrbitalVector__grid__
 
 #include <stdio.h>
-#include "renderableType.h"
+#include "OGLShader.h"
 using namespace std;
 
-class RenderableGrid : public RenderableType
+class RenderableGrid : public OGLShader
 {
 public:
-    RenderableGrid(GLenum drawType) : RenderableType(drawType) {}
+    RenderableGrid(GLenum drawType) : OGLShader(drawType) {}
     void init() override;
     void loadAsset () override;
 };

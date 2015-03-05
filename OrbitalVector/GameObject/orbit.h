@@ -9,16 +9,16 @@
 #ifndef __GLFW3_test__orbit__
 #define __GLFW3_test__orbit__
 
-#include "renderableType.h"
+#include "OGLShader.h"
 #include "rk547m.h"
 #include <iostream>
 #include <set>
 using namespace std;
 
-class Orbit : public RenderableType
+class RenderableOrbit : public OGLShader
 {
 public:
-    Orbit(GLenum _drawType);
+    RenderableOrbit(GLenum _drawType);
     
     void init() override;
     void loadPath();

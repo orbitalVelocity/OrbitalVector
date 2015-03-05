@@ -15,11 +15,11 @@
 #include <iostream>
 using namespace std;
 
-class RenderableType
+class OGLShader
 {
 public:
-    RenderableType(GLenum _drawType);
-    ~RenderableType();
+    OGLShader(GLenum _drawType);
+    ~OGLShader();
     
     virtual void init(){}//FIXME: make full virtual
     void loadShaders(string vs, string fs, bool useProg=true);

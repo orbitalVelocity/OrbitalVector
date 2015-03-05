@@ -42,7 +42,7 @@ public:
     //entity manager goes here
     
     //orbit is a type of entity, yes?
-    Orbit orbit;
+    RenderableOrbit orbit;
     
     glm::vec3 lightPos; //lights are entities with self emitters
         //brightness,           type: cone/bulbs/area/cubic

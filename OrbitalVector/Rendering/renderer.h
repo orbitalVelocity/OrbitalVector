@@ -12,7 +12,7 @@
 
 #include <iostream>
 #include "includes.h"
-#include "renderableType.h"
+#include "OGLShader.h"
 #include "orbit.h"
 #include "camera.h"
 #include "gameLogic.h"
@@ -84,8 +84,8 @@ public:
     void postFrame();
     
 public:
-    //    vector<RenderableType> renderables;
-    RenderableType ship, sprite, missile;
+    //    vector<OGLShader> renderables;
+    OGLShader ship, sprite, missile;
     RenderableGrid grid;
     RenderableGlobe globe;
     glm::vec3 lightPos;
@@ -97,7 +97,7 @@ public:
     
     //    RenderTarget rt, rtBloom, rtBloomV, rtShadowMap;
     vector<RenderTarget> rt;
-    RenderableType hdr, highPass, shadowMap,
+    OGLShader hdr, highPass, shadowMap,
     blit, composite, fxaa;
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;

@@ -13,17 +13,17 @@
 using namespace std;
 
 
-Orbit::Orbit(GLenum _drawType) : RenderableType(_drawType), x(0), y(90) {
+RenderableOrbit::RenderableOrbit(GLenum _drawType) : RenderableType(_drawType), x(0), y(90) {
 }
 
-void Orbit::init()
+void RenderableOrbit::init()
 {
     paths.resize(1);
     paths[0].reserve(360);
         loadPath();
 }
 
-void Orbit::calcTrajectory(int &pathSteps)
+void RenderableOrbit::calcTrajectory(int &pathSteps)
 {
     auto &ks2 = ks;
     auto sys2 = sys;
@@ -137,7 +137,7 @@ void Orbit::calcTrajectory(int &pathSteps)
     }
 }
 
-void Orbit::loadPath()
+void RenderableOrbit::loadPath()
 {
     //load shaders
     string vertFilename = "lineVertex.glsl";
@@ -158,7 +158,7 @@ void Orbit::loadPath()
     
 }
 
-void Orbit::update()
+void RenderableOrbit::update()
 {
     static int count = 0;
     int pathSteps = 980;
@@ -193,7 +193,7 @@ void Orbit::update()
 }
 
 //what was this for??
-//bool Orbit::nextMesh()
+//bool RenderableOrbit::nextMesh()
 //{
 //    static int count = 0;
 //    glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -212,7 +212,7 @@ void Orbit::update()
 //}
 
 
-void Orbit::draw(glm::mat4 &mvp, glm::vec3 color)
+void RenderableOrbit::draw(glm::mat4 &mvp, glm::vec3 color)
 {
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
     check_gl_error();

@@ -15,6 +15,7 @@ RenderableType::RenderableType(GLenum _drawType) : drawType(_drawType),
                              vboIdx(0),
                              depthTexture(false)
 {
+    //assumption: each renderable type has its own Vertex Array Object
     glGenVertexArrays(1, &vao);
 }
 
@@ -123,28 +124,43 @@ void RenderableType::loadShaders(string vs, string fs, bool useProg)
     newProgram(shaders, useProg);
 }
 
-
-//single data type per attrib
-void RenderableType::loadAttrib(string attribName, vector<float> &path, GLuint drawHint, GLuint bufferType)
+void RenderableType::generateVertexBuffer(GLuint bufferType)
 {
-    //transfer position data
+    //must bind VAO first, else VBO won't be linked to VAO
+    glBindVertexArray(vao);
     vbo.resize(vboIdx+1);           //vbo only used in this funciton
     glGenBuffers(1, &vbo[vboIdx]);
     
-    glBindVertexArray(vao);
     glBindBuffer(bufferType, vbo[vboIdx]);
-        check_gl_error();
+    check_gl_error();
+}
+
+
+void RenderableType::setAttribute(string attribName)
+{
+    GLint posAttrib = glGetAttribLocation(shaderProgram, attribName.c_str());
+    
+    //sets an array of 3 floats with no gap [x,y,z,x,y,z,x,y,z...]
+    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), NULL);
+    glEnableVertexAttribArray(posAttrib);
+
+    check_gl_error();
+}
+
+//single data type per attrib
+void RenderableType::loadAttribute(string attribName, vector<float> &path, GLuint drawHint, GLuint bufferType)
+{
+    //transfer position data
+    glBindVertexArray(vao);
+
+    generateVertexBuffer(bufferType);
     
     glBufferData(bufferType, sizeof(float)*path.size(), path.data(), drawHint);
         check_gl_error();
     
     //set position attribute
-    GLint posAttrib = glGetAttribLocation(shaderProgram, attribName.c_str());
-    glEnableVertexAttribArray(posAttrib);
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), NULL);
-        check_gl_error();
+    setAttribute(attribName);
     
-    glBindVertexArray(0);
     vboIdx++;
 }
 

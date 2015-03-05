@@ -13,7 +13,7 @@
 using namespace std;
 
 
-Orbit::Orbit(GLenum _drawType) : drawType(_drawType), x(0), y(90) {
+Orbit::Orbit(GLenum _drawType) : RenderableType(_drawType), x(0), y(90) {
 }
 
 void Orbit::init()
@@ -22,44 +22,6 @@ void Orbit::init()
     paths[0].reserve(360);
         loadPath();
 }
-
-void Orbit::newProgram(map<GLuint, string> &shaders)
-{
-    vector<GLuint> shaderIDs(shaders.size());
-    
-    // Create and compile the vertex shader
-    int i = 0;
-    for (auto &shader: shaders) {
-        auto shaderType = shader.first;
-        auto shaderSource = shader.second;
-        const char* src = shaderSource.c_str();
-        shaderIDs[i] = glCreateShader(shaderType);
-        
-        glShaderSource(shaderIDs[i], 1, &src, NULL);
-        check_gl_error();
-        glCompileShader(shaderIDs[i]);
-        check_gl_error();
-        i++;
-    }
-    
-    // Link the vertex and fragment shader into a shader program
-    shaderProgram = glCreateProgram();
-    for (auto &shaderID : shaderIDs)
-    {
-        glAttachShader(shaderProgram, shaderID);
-        check_gl_error();
-    }
-    glBindFragDataLocation(shaderProgram, 0, "outColor");
-    check_gl_error();
-    glLinkProgram(shaderProgram);
-    check_gl_error();
-    glUseProgram(shaderProgram);
-    check_gl_error();
-    
-    
-    
-}
-
 
 void Orbit::calcTrajectory(int &pathSteps)
 {
@@ -88,7 +50,10 @@ void Orbit::calcTrajectory(int &pathSteps)
         path[2] = sys2[j+count].sn.pos.z;
         count++;
     }
+   
     
+    //calculate future positions in while loop
+    //find max/min distances at each iteration of loop
     auto origin = sys2[j].sn.pos;
     bool apoFound = false;
     bool periFound = false;
@@ -162,6 +127,8 @@ void Orbit::calcTrajectory(int &pathSteps)
         }
     }
     
+    //clean up
+    //FIXME: unnecessary if I know how to make incremental line drawing instead of drawing each line segments w/ 2 points
     //delete the last three floats from each path
     for (auto &path : paths) {
         path.erase(path.end()-1);
@@ -175,31 +142,19 @@ void Orbit::loadPath()
     //load shaders
     string vertFilename = "lineVertex.glsl";
     string fragFilename = "lineFragment.glsl";
-    map<GLuint, string> shaders;
+    loadShaders(vertFilename, fragFilename);
+
+   
+    generateVertexBuffer(GL_ARRAY_BUFFER);
     
-    auto vertexSource = get_file_contents(vertFilename);
-    auto fragmentSource = get_file_contents(fragFilename);
-    shaders.insert({GL_VERTEX_SHADER, vertexSource});
-    shaders.insert({GL_FRAGMENT_SHADER, fragmentSource});
-    newProgram(shaders);
+    setAttribute("position");
     
-    
-    //replaces loadAttrib
-    glGenBuffers(1, &vbo);
-    glGenVertexArrays(1, &vao);
-    
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    check_gl_error();
-    
-    GLint posAttrib = glGetAttribLocation(shaderProgram, "position");
-    check_gl_error();
-    glEnableVertexAttribArray(posAttrib);
-    check_gl_error();
-    glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), NULL);
-    check_gl_error();
+    //compute mesh of orbit
     update();
+    
+    //unbinds vao, prevents subsequent GL calls from modifying this object
     glBindVertexArray(0);
+//    vboIdx++; //FIXME: doesn't work w/ multiple vbo's!
     
 }
 
@@ -217,7 +172,7 @@ void Orbit::update()
     }
     int totalPathSize = (int)(pathSteps * sizeof(float));
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[vboIdx]);
     check_gl_error();
     glBufferData(GL_ARRAY_BUFFER, totalPathSize, nullptr, GL_STREAM_DRAW);
     check_gl_error();
@@ -237,23 +192,24 @@ void Orbit::update()
     count++;
 }
 
-bool Orbit::nextMesh()
-{
-    static int count = 0;
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    check_gl_error();
-    auto pathSize = paths[count].size();
-    glBufferData(GL_ARRAY_BUFFER, pathSize, nullptr, GL_STREAM_DRAW);
-    check_gl_error();
-    float *pathGL = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    memcpy(pathGL, paths[count].data(), pathSize);
-    check_gl_error();
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    check_gl_error();
-    count = (count + 1) % paths.size() - 1; //gravwell offset
-    
-    return count != 0;
-}
+//what was this for??
+//bool Orbit::nextMesh()
+//{
+//    static int count = 0;
+//    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+//    check_gl_error();
+//    auto pathSize = paths[count].size();
+//    glBufferData(GL_ARRAY_BUFFER, pathSize, nullptr, GL_STREAM_DRAW);
+//    check_gl_error();
+//    float *pathGL = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+//    memcpy(pathGL, paths[count].data(), pathSize);
+//    check_gl_error();
+//    glUnmapBuffer(GL_ARRAY_BUFFER);
+//    check_gl_error();
+//    count = (count + 1) % paths.size() - 1; //gravwell offset
+//    
+//    return count != 0;
+//}
 
 
 void Orbit::draw(glm::mat4 &mvp, glm::vec3 color)

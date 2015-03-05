@@ -56,92 +56,56 @@ void Renderer::init(int width, int height)
     {
         shipIdx = 0;
         ship.loadShaders("shipVertex.glsl", "shipFragment.glsl");
-        ship.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
-        check_gl_error();
-        ship.loadAttrib("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
-        glBindVertexArray(ship.vao);
-        check_gl_error();
-        glGenBuffers(1, &ship.elementBuffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ship.elementBuffer);
-        check_gl_error();
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     shapes[shipIdx].mesh.indices.size() * sizeof(GLuint),
-                     shapes[shipIdx].mesh.indices.data(),
-                     GL_STATIC_DRAW
-                     );
-        ship.drawCount = (int)shapes[shipIdx].mesh.indices.size();
+        
+        ship.loadAttribute("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
+        ship.loadAttribute("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
+        ship.setupBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, shapes[shipIdx].mesh.indices);
+
     }
     
     
     {
         auto shipIdx = 1;
         sprite.loadShaders("spriteVertex.glsl", "spriteFragment.glsl", true);
-        sprite.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
+        sprite.loadAttribute("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
         check_gl_error();
-        sprite.loadAttrib("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
-        glBindVertexArray(sprite.vao);
-        check_gl_error();
-        glGenBuffers(1, &sprite.elementBuffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprite.elementBuffer);
-        check_gl_error();
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     shapes[shipIdx].mesh.indices.size() * sizeof(GLuint),
-                     shapes[shipIdx].mesh.indices.data(),
-                     GL_STATIC_DRAW
-                     );
-        sprite.drawCount = (int)shapes[shipIdx].mesh.indices.size();
+        sprite.loadAttribute("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
+        sprite.setupBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, shapes[shipIdx].mesh.indices);
     }
     
     if (1)
     {
         shipIdx = 2;
         missile.loadShaders("shipVertex.glsl", "shipFragment.glsl");
-        missile.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
+        missile.loadAttribute("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
         check_gl_error();
-        missile.loadAttrib("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
-        glBindVertexArray(missile.vao);
-        check_gl_error();
-        glGenBuffers(1, &missile.elementBuffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, missile.elementBuffer);
-        check_gl_error();
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     shapes[shipIdx].mesh.indices.size() * sizeof(GLuint),
-                     shapes[shipIdx].mesh.indices.data(),
-                     GL_STATIC_DRAW
-                     );
-        missile.drawCount = (int)shapes[shipIdx].mesh.indices.size();
-        shipIdx = 0;
+        missile.loadAttribute("normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
+        missile.setupBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, shapes[shipIdx].mesh.indices);
     }
+    shipIdx = 0;
     
     // Create and compile our GLSL program from the shaders
     vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
     hdr.loadShaders("passthrough.vs", "bloom.fs", true);
-    hdr.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+    hdr.loadAttribute("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+    
     composite.loadShaders("passthrough.vs", "composite.fs", true);
-    composite.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+    composite.loadAttribute("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
     
     fxaa.loadShaders("passthrough.vs", "fxaa.fs", true);
-    fxaa.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+    fxaa.loadAttribute("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
     
     highPass.loadShaders("passthrough.vs", "highpass.fs", true);
-    highPass.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+    highPass.loadAttribute("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
     
     blit.loadShaders("passthrough.vs", "passthrough.fs", true);
-    blit.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+    blit.loadAttribute("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
     
     {
         shadowMap.depthTexture = true;
         shadowMap.loadShaders("simplePassthrough.vs", "depth.fs", true);
-        shadowMap.loadAttrib("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
-        glBindVertexArray(shadowMap.vao);
-        glGenBuffers(1, &shadowMap.elementBuffer);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, shadowMap.elementBuffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-                     shapes[shipIdx].mesh.indices.size() * sizeof(GLuint),
-                     shapes[shipIdx].mesh.indices.data(),
-                     GL_STATIC_DRAW
-                     );
-        shadowMap.drawCount = (int)shapes[shipIdx].mesh.indices.size();
+        shadowMap.loadAttribute("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
+        shadowMap.setupBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, shapes[shipIdx].mesh.indices);
     }
     
     //setup hdr and associated rt
@@ -258,7 +222,7 @@ void Renderer::postFrame()
         //reload bloom
         fxaa.loadShaders("passthrough.vs", "fxaa.fs", false);
         //        vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
-        //        hdr.loadAttrib("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+        //        hdr.loadAttribute("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
     }
 }
 

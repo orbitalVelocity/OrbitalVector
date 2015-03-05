@@ -44,5 +44,5 @@ void RenderableGrid::loadAsset()
     
     drawType = GL_LINES;
     drawCount = (int)(path.size()/vecSize);
-    loadAttrib("position", path, GL_DYNAMIC_DRAW);
+    loadAttribute("position", path, GL_DYNAMIC_DRAW);
 }

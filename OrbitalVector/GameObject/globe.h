@@ -24,7 +24,7 @@ public:
 class globeObject
 {
 public:
-    RenderableGlobe renderableGrid;
+    RenderableGlobe renderableGlobe;
 };
 
 #endif /* defined(__OrbitalVector__globe__) */

@@ -26,7 +26,25 @@ public:
     void newProgram(map<GLuint, string> &shaders, bool useProg=true);
     
     virtual void loadAsset(){}//FIXME: make full virtual
-    void loadAttrib(string name, vector<float> &input,
+    
+    void generateVertexBuffer(GLuint bufferType);
+    
+    template<typename T>
+    void setupBuffer(GLuint bufferType, GLuint drawType, vector<T> &array)
+    {
+        //must bind VAO first, else VBO won't be linked to VAO
+        glBindVertexArray(vao);
+        generateVertexBuffer(bufferType);
+        glBufferData(bufferType,
+                     array.size() * sizeof(T),
+                     array.data(),
+                     drawType);
+        check_gl_error();
+        drawCount = (int)array.size();
+    }
+    
+    void setAttribute(string name);
+    void loadAttribute(string name, vector<float> &input,
                     GLuint hint, GLuint type=GL_ARRAY_BUFFER);
     void update();
     void drawIndexed(glm::mat4 &model,

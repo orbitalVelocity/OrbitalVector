@@ -92,5 +92,5 @@ void RenderableGlobe::loadAsset()
     //setup GL states
     drawCount = (int)(vertexData.size()/3);
     drawType = GL_TRIANGLES;
-    loadAttrib("position", vertexData, GL_STATIC_DRAW);
+    loadAttribute("position", vertexData, GL_STATIC_DRAW);
 }

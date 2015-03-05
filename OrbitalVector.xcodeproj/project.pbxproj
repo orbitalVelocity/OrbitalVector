@@ -345,9 +345,9 @@
 				F1D4680C1AA511CB00869C62 /* grid.cpp */,
 				F1D4680D1AA511CB00869C62 /* grid.h */,
 				F19330AA1AA552E3009B42B0 /* globe.cpp */,
+				F19330AB1AA552E3009B42B0 /* globe.h */,
 				F19330AD1AA570EB009B42B0 /* orbit.cpp */,
 				F19330AE1AA570EB009B42B0 /* orbit.h */,
-				F19330AB1AA552E3009B42B0 /* globe.h */,
 			);
 			name = GameObject;
 			sourceTree = "<group>";

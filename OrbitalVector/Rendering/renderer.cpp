@@ -11,8 +11,6 @@
 #include "glm/gtx/closest_point.hpp"
 
 using namespace glm;
-
-
 bool showDepth = false;
 
 
@@ -86,6 +84,9 @@ void Renderer::init(int width, int height)
     
     // Create and compile our GLSL program from the shaders
     vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
+    quadVAO.setupBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, v);
+    
+#if true//NOSHADER
     hdr.loadShaders("passthrough.vs", "bloom.fs", true);
     hdr.loadAttribute("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
     
@@ -94,9 +95,19 @@ void Renderer::init(int width, int height)
     
     fxaa.loadShaders("passthrough.vs", "fxaa.fs", true);
     fxaa.loadAttribute("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
-    
+
     highPass.loadShaders("passthrough.vs", "highpass.fs", true);
     highPass.loadAttribute("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
+//    glBindVertexArray(quadVAO.vao);
+//    highPass.setAttribute("position");
+//#else
+    glBindVertexArray(quadVAO.vao); //need to bind vao before setAttribute to shader
+    highpassShader.init();
+//    shadowmapShader.init();
+    blurShader.init();
+//    compositeShader.init();
+//    fxaaShader.init();
+#endif
     
     blit.loadShaders("passthrough.vs", "passthrough.fs", true);
     blit.loadAttribute("position", v, GL_STATIC_DRAW, GL_ARRAY_BUFFER);
@@ -108,7 +119,11 @@ void Renderer::init(int width, int height)
         shadowMap.setupBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, shapes[shipIdx].mesh.indices);
     }
     
+    //FIXME: some modifications to compositeShader and fxaaShader is causing a cascaded error that results in downSizeFactor getting messed up, causing an incomplete buffer in rt.init
+    //compositeShader and fxaaShader can't compile for some reason, most likely not the reason as reported by the debugger
+    //something I did this morning has caused the error, think think think...
     //setup hdr and associated rt
+    //SOLUTION: just had to clean and rebuild, haha
     rt[SN::shadowMap   ].useMipMap = true;
     rt[SN::shadowMap   ].init(fbWidth, fbHeight, true);
     
@@ -142,6 +157,7 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
     }
     //from opengl-tutorial.org tutorial 14: render to target
     
+    //bind framebuffer object with texture object together
     glGenFramebuffers(1, &FramebufferName);
     glBindFramebuffer(GL_FRAMEBUFFER, FramebufferName);
     
@@ -205,10 +221,6 @@ void RenderTarget::init(int fbWidth, int fbHeight, bool depthTexture)
     
 }
 
-void Renderer::renderPass()
-{
-    
-}
 
 //runs right between frames -- no shaders are running now
 void Renderer::postFrame()
@@ -265,9 +277,10 @@ void Renderer::render()
             glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glUseProgram(shadowMap.shaderProgram);
+            
             depthMVP = depthProjectionMatrix * depthViewMatrix *
-            gameLogic.sShip[shipIdx].orientation
-            * gameLogic.sShip[shipIdx].size;
+                gameLogic.sShip[shipIdx].orientation
+                * gameLogic.sShip[shipIdx].size;
             shadowMap.drawIndexed(world, scene.camera, depthMVP, shapes[shipIdx].mesh.indices.data());
         }
         //TODO: fix glViewPort toggle in stages too!
@@ -287,7 +300,7 @@ void Renderer::render()
         {
             auto lastRT = myRT++;
             glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
-            
+#if NOSHADER
             glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
@@ -299,9 +312,15 @@ void Renderer::render()
             auto loc = glGetUniformLocation(highPass.shaderProgram, "renderedTexture");
             glUniform1i(loc, 0);
             
+//            glBindVertexArray(quadVAO.vao);
             glBindVertexArray(highPass.vao);
             glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
             check_gl_error();
+#else
+            highpassShader.renderPass(quadVAO.vao,
+                                rt[myRT].FramebufferName,
+                                rt[lastRT].renderedTexture);
+#endif
         }
         
         if (renderStage & stage4) //first blur
@@ -309,6 +328,7 @@ void Renderer::render()
             auto lastRT = myRT++;
             rtForComp[1] = myRT;
             glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
+#if NOSHADER
             glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
@@ -319,6 +339,7 @@ void Renderer::render()
             glUseProgram(hdr.shaderProgram);
             auto loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
             glUniform1i(loc, 0);
+            
             loc = glGetUniformLocation(hdr.shaderProgram, "offset");
             float offsetx = 0, offsety = 0;
             offsetx = 1.0f / fbWidth / 4.0;
@@ -327,6 +348,12 @@ void Renderer::render()
             glBindVertexArray(hdr.vao);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             check_gl_error();
+#else
+            blurShader.setOffsets(1.0f/fbWidth/downSizeFactor, 0);
+            blurShader.renderPass(quadVAO.vao,
+                                  rt[myRT].FramebufferName,
+                                  rt[lastRT].renderedTexture);
+#endif
         }
         
         if (renderStage & stage5) //second blur
@@ -334,6 +361,7 @@ void Renderer::render()
             auto lastRT = myRT++;
             rtForComp[2] = myRT;
             glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
+#if NOSHADER
             glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
@@ -352,12 +380,20 @@ void Renderer::render()
             glBindVertexArray(hdr.vao);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             check_gl_error();
+#else
+            blurShader.setOffsets(0, 1.0f/fbWidth/downSizeFactor);
+            blurShader.renderPass(quadVAO.vao,
+                                  rt[myRT].FramebufferName,
+                                  rt[lastRT].renderedTexture);
+#endif
+            
         }
         
         if (renderStage & stage6) //composite
         {
             myRT++;
             glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
+#if true//NOSHADER
             glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
@@ -386,13 +422,26 @@ void Renderer::render()
             
             glBindVertexArray(composite.vao);
             glDrawArrays(GL_TRIANGLES, 0, 6);
-            check_gl_error();
+            check_gl_error()
+#else
+            compositeShader.rtForComp.resize(3);
+            for (int i=0; i<3; i++) {
+                compositeShader.rtForComp[i] = rtForComp[i];
+            }
+            compositeShader.renderPass(quadVAO.vao,
+                                       rt[myRT].FramebufferName,
+                                       rt[rtForComp[0]].renderedTexture,
+                                       rt[rtForComp[1]].renderedTexture,
+                                       rt[rtForComp[2]].renderedTexture);
+#endif
+            
         }
         
         if (renderStage & stage7) //fxaa
         {
             auto lastRT = myRT++;
             glViewport(0, 0, fbWidth, fbHeight);
+#if true//NOSHADER
             glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             
@@ -413,6 +462,9 @@ void Renderer::render()
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glEnable(GL_BLEND);
             check_gl_error();
+#else
+            fxaaShader.renderPass(quadVAO.vao, rt[myRT].FramebufferName, fbWidth, fbHeight, rt[lastRT].renderedTexture);
+#endif
         }
         
         if (1) //always last stage

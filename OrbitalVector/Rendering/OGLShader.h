@@ -10,7 +10,6 @@
 #define __GLFW3_test__renderableType__
 
 #include "includes.h"
-#include "rk547m.h"
 #include "camera.h"
 #include <iostream>
 using namespace std;
@@ -22,10 +21,12 @@ public:
     ~OGLShader();
     
     virtual void init(){}//FIXME: make full virtual
+    virtual void loadAsset(){}//FIXME: make full virtual
+    virtual void renderPass(GLuint vao, GLuint fbName){}//FIXME: make full virtual
+    
     void loadShaders(string vs, string fs, bool useProg=true);
     void newProgram(map<GLuint, string> &shaders, bool useProg=true);
     
-    virtual void loadAsset(){}//FIXME: make full virtual
     
     void generateVertexBuffer(GLuint bufferType);
     
@@ -65,16 +66,13 @@ public:
     GLuint shaderProgram;
     GLuint vsProgram, fsProgram;
     vector<GLuint> shaderIDs;
+    
     GLuint vao, elementBuffer;
     vector<GLuint> vbo;
     int vboIdx;
     GLenum drawType;
     int drawCount;
-    
-    GLuint textProgram;
-    GLint uniform_tex;
-    GLint uniform_color;
-    GLint attribute_coord;
+   
 
     bool depthTexture;
 };

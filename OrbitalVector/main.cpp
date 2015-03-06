@@ -12,7 +12,7 @@
 //#include <OpenGL/glu.h>
 #include "includes.h" 
 #include "rk547m.h"
-#include "renderableType.h"
+#include "OGLShader.h"
 #include <GLFW/glfw3.h>
 
 #include "camera.h"
@@ -401,8 +401,8 @@ int main(int argc, const char * argv[])
     // creating vector of string
     TextRenderer textObj(pxRatio, ws.fbWidth, ws.fbHeight);
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
-    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.apo)));
-    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, to_string(scene.orbit.peri)));
+    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, std::to_string(scene.orbit.apo)));
+    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, std::to_string(scene.orbit.peri)));
 
     auto UITextSetup = [&](){
         auto vp = scene.camera.matrix() * world;
@@ -410,8 +410,8 @@ int main(int argc, const char * argv[])
         textObj.guiText[1].pos = getVec2(vp, scene.orbit.apoPos);
         textObj.guiText[2].pos = getVec2(vp, scene.orbit.periPos);
         
-        textObj.guiText[1].text = to_string(scene.orbit.apo);
-        textObj.guiText[2].text = to_string(scene.orbit.peri);
+        textObj.guiText[1].text = std::to_string(scene.orbit.apo);
+        textObj.guiText[2].text = std::to_string(scene.orbit.peri);
     };
     
     // performance measurement

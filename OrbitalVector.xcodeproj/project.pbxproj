@@ -148,6 +148,12 @@
 		F19330AB1AA552E3009B42B0 /* globe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = globe.h; path = GameObject/globe.h; sourceTree = "<group>"; };
 		F19330AD1AA570EB009B42B0 /* orbit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = orbit.cpp; path = GameObject/orbit.cpp; sourceTree = "<group>"; };
 		F19330AE1AA570EB009B42B0 /* orbit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = orbit.h; path = GameObject/orbit.h; sourceTree = "<group>"; };
+		F19330B21AA7FDA6009B42B0 /* shadowMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = shadowMap.h; path = Shaders/shadowMap.h; sourceTree = "<group>"; };
+		F19330B41AA8009C009B42B0 /* VertexArrayObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VertexArrayObject.h; sourceTree = "<group>"; };
+		F19330B51AA80BC5009B42B0 /* Highpass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Highpass.h; path = Shaders/Highpass.h; sourceTree = "<group>"; };
+		F19330B61AA96AC3009B42B0 /* fxaa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = fxaa.h; path = Shaders/fxaa.h; sourceTree = "<group>"; };
+		F19330B71AA96AD1009B42B0 /* composite.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = composite.h; path = Shaders/composite.h; sourceTree = "<group>"; };
+		F19330B91AA96B59009B42B0 /* blur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = blur.h; path = Shaders/blur.h; sourceTree = "<group>"; };
 		F1B3C67018D935EC00971791 /* OrbitalVector */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OrbitalVector; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1B3C67318D935EC00971791 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F1B3C67518D935EC00971791 /* GLFW3_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GLFW3_test.1; sourceTree = "<group>"; };
@@ -251,6 +257,18 @@
 			path = fontstash;
 			sourceTree = "<group>";
 		};
+		F19330B01AA7FD55009B42B0 /* Shaders */ = {
+			isa = PBXGroup;
+			children = (
+				F19330B21AA7FDA6009B42B0 /* shadowMap.h */,
+				F19330B91AA96B59009B42B0 /* blur.h */,
+				F19330B51AA80BC5009B42B0 /* Highpass.h */,
+				F19330B61AA96AC3009B42B0 /* fxaa.h */,
+				F19330B71AA96AD1009B42B0 /* composite.h */,
+			);
+			name = Shaders;
+			sourceTree = "<group>";
+		};
 		F1B3C66718D935EC00971791 = {
 			isa = PBXGroup;
 			children = (
@@ -285,6 +303,7 @@
 				F1D4680B1AA5116C00869C62 /* GameObject */,
 				F1D4680A1AA50BFA00869C62 /* Rendering */,
 				F151168A19DE1FE50018635B /* gameLogic.cpp */,
+				F19330B01AA7FD55009B42B0 /* Shaders */,
 				F151168B19DE1FE50018635B /* gameLogic.h */,
 				F156D08C1A16D9AD00C26739 /* unitManager.cpp */,
 				F156D08D1A16D9AD00C26739 /* unitManager.h */,
@@ -335,6 +354,7 @@
 				F1EAC34E1A0BDE42006B29CB /* renderer.h */,
 				F15E8E9A19BD406B003E566C /* OGLShader.cpp */,
 				F15E8E9B19BD406B003E566C /* OGLShader.h */,
+				F19330B41AA8009C009B42B0 /* VertexArrayObject.h */,
 			);
 			path = Rendering;
 			sourceTree = "<group>";

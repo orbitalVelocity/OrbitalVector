@@ -7,13 +7,13 @@
 //
 
 #include "orbit.h"
-#include "renderableType.h"
+#include "OGLShader.h"
 #include "rk547m.h"
 
 using namespace std;
 
 
-RenderableOrbit::RenderableOrbit(GLenum _drawType) : RenderableType(_drawType), x(0), y(90) {
+RenderableOrbit::RenderableOrbit(GLenum _drawType) : OGLShader(_drawType), x(0), y(90) {
 }
 
 void RenderableOrbit::init()

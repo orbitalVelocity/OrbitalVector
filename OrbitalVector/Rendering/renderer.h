@@ -12,7 +12,16 @@
 
 #include <iostream>
 #include "includes.h"
+
+#include "VertexArrayObject.h"
+//shaders
 #include "OGLShader.h"
+#include "Highpass.h"
+#include "blur.h"
+//#include "fxaa.h"
+//#include "composite.h"
+//#include "shadowMap.h"
+
 #include "orbit.h"
 #include "camera.h"
 #include "gameLogic.h"
@@ -20,6 +29,7 @@
 #include "grid.h"
 #include "globe.h"
 
+#define NOSHADER true
 enum SN {
     shadowMap,
     forward,
@@ -64,6 +74,11 @@ public:
     highPass(GL_TRIANGLES),
     composite(GL_TRIANGLES),
     fxaa(GL_TRIANGLES),
+    highpassShader(GL_TRIANGLES),
+    blurShader(GL_TRIANGLES),
+//    shadowmapShader(GL_TRIANGLES),
+//    fxaaShader(GL_TRIANGLES),
+//    compositeShader(GL_TRIANGLES),
     shadowMap(GL_TRIANGLES),
     blit(GL_TRIANGLES),
     downSizeFactor(1.0),
@@ -84,6 +99,7 @@ public:
     void postFrame();
     
 public:
+    VertexArrayObject quadVAO;
     //    vector<OGLShader> renderables;
     OGLShader ship, sprite, missile;
     RenderableGrid grid;
@@ -98,7 +114,14 @@ public:
     //    RenderTarget rt, rtBloom, rtBloomV, rtShadowMap;
     vector<RenderTarget> rt;
     OGLShader hdr, highPass, shadowMap,
-    blit, composite, fxaa;
+        blit, composite, fxaa;
+    
+//    ShadowMapShader shadowmapShader;
+    HighpassShader highpassShader;
+    BlurShader blurShader;
+//    FXAAShader fxaaShader;
+//    CompositeShader compositeShader;
+    
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;
     GLuint texID, timeID, coefficientID;

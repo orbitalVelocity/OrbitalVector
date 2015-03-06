@@ -11,7 +11,7 @@
 
 #include <iostream>
 #include "includes.h"
-#include "renderableType.h"
+#include "OGLShader.h"
 #include "orbit.h"
 #include "camera.h"
 

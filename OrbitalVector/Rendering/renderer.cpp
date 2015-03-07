@@ -105,7 +105,7 @@ void Renderer::init(int width, int height)
     highpassShader.init();
 //    shadowmapShader.init();
     blurShader.init();
-//    compositeShader.init();
+    compositeShader.init();
 //    fxaaShader.init();
 #endif
     
@@ -301,27 +301,10 @@ void Renderer::render()
         {
             auto lastRT = myRT++;
             glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
-#if NOSHADER
-            glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
-            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, rt[lastRT].renderedTexture);
-            check_gl_error();
-            
-            glUseProgram(highPass.shaderProgram);
-            auto loc = glGetUniformLocation(highPass.shaderProgram, "renderedTexture");
-            glUniform1i(loc, 0);
-            
-//            glBindVertexArray(quadVAO.vao);
-            glBindVertexArray(highPass.vao);
-            glDrawArrays(GL_TRIANGLES, 0, 6); // 2*3 indices starting at 0 -> 2 triangles
-            check_gl_error();
-#else
+
             highpassShader.renderPass(quadVAO.vao,
                                 rt[myRT].FramebufferName,
                                 rt[lastRT].renderedTexture);
-#endif
         }
         
         if (renderStage & stage4) //first blur
@@ -329,32 +312,11 @@ void Renderer::render()
             auto lastRT = myRT++;
             rtForComp[1] = myRT;
             glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
-#if NOSHADER
-            glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
-            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, rt[lastRT].renderedTexture);
-            glGenerateMipmap(GL_TEXTURE_2D);
-            
-            glUseProgram(hdr.shaderProgram);
-            auto loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
-            glUniform1i(loc, 0);
-            
-            loc = glGetUniformLocation(hdr.shaderProgram, "offset");
-            float offsetx = 0, offsety = 0;
-            offsetx = 1.0f / fbWidth / 4.0;
-            glUniform2fv(loc, 1, value_ptr(vec2(offsetx, offsety)));
-            
-            glBindVertexArray(hdr.vao);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            check_gl_error();
-#else
+
             blurShader.setOffsets(1.0f/fbWidth/4.0, 0);
             blurShader.renderPass(quadVAO.vao,
                                   rt[myRT].FramebufferName,
                                   rt[lastRT].renderedTexture);
-#endif
         }
         
         if (renderStage & stage5) //second blur
@@ -362,31 +324,11 @@ void Renderer::render()
             auto lastRT = myRT++;
             rtForComp[2] = myRT;
             glViewport(0, 0, fbWidth/downSizeFactor, fbHeight/downSizeFactor);
-#if NOSHADER
-            glBindFramebuffer(GL_FRAMEBUFFER, rt[myRT].FramebufferName);
-            glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, rt[lastRT-1].renderedTexture);
-            glGenerateMipmap(GL_TEXTURE_2D);
-            
-            glUseProgram(hdr.shaderProgram);
-            auto loc = glGetUniformLocation(hdr.shaderProgram, "renderedTexture");
-            glUniform1i(loc, 0);
-            loc = glGetUniformLocation(hdr.shaderProgram, "offset");
-            float offsetx = 0, offsety = 0;
-            offsety = 1.0f / fbHeight / 4.0;
-            glUniform2fv(loc, 1, value_ptr(vec2(offsetx, offsety)));
-            
-            glBindVertexArray(hdr.vao);
-            glDrawArrays(GL_TRIANGLES, 0, 6);
-            check_gl_error();
-#else
+
             blurShader.setOffsets(0, 1.0f/fbHeight/4.0);
             blurShader.renderPass(quadVAO.vao,
                                   rt[myRT].FramebufferName,
                                   rt[lastRT-1].renderedTexture);
-#endif
             
         }
         

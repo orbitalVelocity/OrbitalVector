@@ -16,11 +16,11 @@
 #include "VertexArrayObject.h"
 //shaders
 #include "OGLShader.h"
+//#include "shadowMap.h"
 #include "Highpass.h"
 #include "blur.h"
+#include "composite.h"
 //#include "fxaa.h"
-//#include "composite.h"
-//#include "shadowMap.h"
 
 #include "orbit.h"
 #include "camera.h"
@@ -76,9 +76,9 @@ public:
     fxaa(GL_TRIANGLES),
     highpassShader(GL_TRIANGLES),
     blurShader(GL_TRIANGLES),
+    compositeShader(GL_TRIANGLES),
 //    shadowmapShader(GL_TRIANGLES),
 //    fxaaShader(GL_TRIANGLES),
-//    compositeShader(GL_TRIANGLES),
     shadowMap(GL_TRIANGLES),
     blit(GL_TRIANGLES),
     downSizeFactor(1.0),
@@ -119,8 +119,8 @@ public:
 //    ShadowMapShader shadowmapShader;
     HighpassShader highpassShader;
     BlurShader blurShader;
+    CompositeShader compositeShader;
 //    FXAAShader fxaaShader;
-//    CompositeShader compositeShader;
     
     GLuint quad_vertexbuffer;
     GLuint quad_vertexPosition_modelspace;

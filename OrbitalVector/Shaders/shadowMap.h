@@ -22,12 +22,15 @@ public:
         loadShaders("simplePassthrough.vs", "depth.fs", true);
         setAttribute("position");
     }
-    void renderPass(GLuint vao, GLuint fbName) override
+    void renderPass(GLuint vao, GLuint fbName, )
     {
         glBindFramebuffer(GL_FRAMEBUFFER, fbName);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glUseProgram(shaderProgram);
     }
+    
+public:
+    glm::mat4 depthMVP;
 };
 
 #endif /* defined(__OrbitalVector__shadowMap__) */

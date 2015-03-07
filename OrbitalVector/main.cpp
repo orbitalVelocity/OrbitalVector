@@ -285,10 +285,10 @@ void getText(TextRenderer &textObj, PerfMon &perfMon, WindowStates &ws)
     textObj.pushBackDebug(textOut);
     textOut << "win " << winWidth << " x " << winHeight
     << " fb size " << fbWidth << " x " << fbHeight;
+    textObj.pushBackDebug(textOut);
     
     
     //the following code should go into UserInput and GameLogic, not out here
-//    textObj.pushBackDebug(textOut);
 //    textOut << "planet (" << printVec3(sys[0].sn.pos) << ")";
 //    textObj.pushBackDebug(textOut);
 //    textOut << "planet v: " << glm::length(sys[0].sn.vel);
@@ -339,7 +339,7 @@ void getText(TextRenderer &textObj, PerfMon &perfMon, WindowStates &ws)
     
     
     
-    return;
+//    return;
     textOut << "shadow pass: 1   " << ((renderStage & stage1) ? "On" : " ");
     textObj.pushBackDebug(textOut);
     textOut << "forward pass: 2  " << ((renderStage & stage2) ? "On" : " ");

@@ -29,7 +29,7 @@
 #include "grid.h"
 #include "globe.h"
 
-#define NOSHADER true
+#define NOSHADER false
 enum SN {
     shadowMap,
     forward,

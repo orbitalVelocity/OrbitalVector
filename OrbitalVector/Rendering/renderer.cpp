@@ -256,6 +256,7 @@ void Renderer::update()
 
 void Renderer::render()
 {
+    
     /* Set up a blank screen */
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -349,7 +350,7 @@ void Renderer::render()
             glDrawArrays(GL_TRIANGLES, 0, 6);
             check_gl_error();
 #else
-            blurShader.setOffsets(1.0f/fbWidth/downSizeFactor, 0);
+            blurShader.setOffsets(1.0f/fbWidth/4.0, 0);
             blurShader.renderPass(quadVAO.vao,
                                   rt[myRT].FramebufferName,
                                   rt[lastRT].renderedTexture);
@@ -381,10 +382,10 @@ void Renderer::render()
             glDrawArrays(GL_TRIANGLES, 0, 6);
             check_gl_error();
 #else
-            blurShader.setOffsets(0, 1.0f/fbWidth/downSizeFactor);
+            blurShader.setOffsets(0, 1.0f/fbHeight/4.0);
             blurShader.renderPass(quadVAO.vao,
                                   rt[myRT].FramebufferName,
-                                  rt[lastRT].renderedTexture);
+                                  rt[lastRT-1].renderedTexture);
 #endif
             
         }

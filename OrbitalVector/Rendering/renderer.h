@@ -12,6 +12,7 @@
 
 #include <iostream>
 #include "includes.h"
+#include "ecs.h"
 
 #include "VertexArrayObject.h"
 //shaders
@@ -28,6 +29,7 @@
 #include "scene.h"
 #include "grid.h"
 #include "globe.h"
+
 
 #define NOSHADER false
 enum SN {

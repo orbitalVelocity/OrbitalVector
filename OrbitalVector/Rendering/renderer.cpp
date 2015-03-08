@@ -473,10 +473,13 @@ void Renderer::forwardRender()
     int shipOffset = sysIndexOffset[BodyType::SHIP];
     int shipNum = numBodyPerType[BodyType::SHIP];
     //int shipNum = gameLogic.sShip.size();
+    
+    //draw each ship
     for (int i=0; i < shipNum; i++) {
         auto mvp =
         world *
-        translate(mat4(), sys[i+shipOffset].sn.pos) *
+//        translate(mat4(), sys[i+shipOffset].sn.pos) *
+        translate(mat4(), getShipPos(i)) *
         gameLogic.sShip[i].orientation
         * gameLogic.sShip[i].size;
         

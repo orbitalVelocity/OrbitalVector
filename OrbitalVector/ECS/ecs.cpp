@@ -8,6 +8,13 @@
 
 #include <stdio.h>
 #include "ecs.h"
-#include "entityx/entityx.h"
-EntityX entityx;
 
+
+vec3 getShipPos(int index)
+{
+#if OLDECS
+    return sys[index+SHIPOFFSET].sn.pos;
+#else
+    return entityx::entity.get<POSITION>(index);
+#endif
+}

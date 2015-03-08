@@ -11,7 +11,6 @@
 
 #include "includes.h"
 
-using namespace std;
 
 class VertexArrayObject
 {

@@ -18,7 +18,6 @@
 #include "input.h"
 
 
-using namespace std;
 
 
 class GameLogic{
@@ -26,14 +25,14 @@ public:
     float deltaMove, deltaRotate;
     float timeWarp;
     int activeShip;
-    vector<Spatial> sGlobe, sOrbit, sShip;
+    std::vector<Spatial> sGlobe, sOrbit, sShip;
     GLFWwindow *window;
     Scene &scene;
     UserInput &userInput;
     //UI related
     int selected, mouseHover; //sysIdx
     //debug related
-    vector<float> shortestDist;
+    std::vector<float> shortestDist;
 public:
     GameLogic(GLFWwindow*, Scene &s, UserInput &i) ;
     void update(float dt);
@@ -42,7 +41,7 @@ public:
      processes list of actions
      @param actionList &actionList      list of actions
      */
-    void processActionList(vector<ActionType> &actionList);
+    void processActionList(std::vector<ActionType> &actionList);
     void addSatellite(body &);
     void userInteraction();
     void linePick();//vector<float> &, int &);

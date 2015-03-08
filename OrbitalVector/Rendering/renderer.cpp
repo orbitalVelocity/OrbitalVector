@@ -10,7 +10,6 @@
 #include "tiny_obj_loader.h"
 #include "glm/gtx/closest_point.hpp"
 
-using namespace glm;
 bool showDepth = false;
 
 
@@ -40,7 +39,7 @@ void Renderer::init(int width, int height)
     fbWidth = width;
     fbHeight = height;
     auto shipIdx = gameLogic.activeShip;
-    lightPos = vec3(0, 0, -1000);
+    lightPos = glm::vec3(0, 0, -1000);
     
     globe.init();
     check_gl_error();
@@ -83,7 +82,7 @@ void Renderer::init(int width, int height)
     shipIdx = 0;
     
     // Create and compile our GLSL program from the shaders
-    vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
+    std::vector<float> v(quad, quad + sizeof quad / sizeof quad[0]);
     quadVAO.setupBuffer(GL_ARRAY_BUFFER, GL_STATIC_DRAW, v);
     
 #if true//NOSHADER
@@ -243,11 +242,11 @@ void Renderer::postFrame()
     }
 }
 
-vec3 srcPerspective(0,0,-4);
-mat4 depthProjectionMatrix = ortho<float>(-1,1,-1,1,-10,10);
+glm::vec3 srcPerspective(0,0,-4);
+glm::mat4 depthProjectionMatrix = glm::ortho<float>(-1,1,-1,1,-10,10);
 //		mat4 depthProjectionMatrix = ortho<float>(-10,10,-10,10,-10,20);
-mat4 depthViewMatrix = lookAt(srcPerspective, vec3(0,0,0), vec3(0,1,0));
-mat4 depthMVP;
+glm::mat4 depthViewMatrix = glm::lookAt(srcPerspective, glm::vec3(0,0,0), glm::vec3(0,1,0));
+glm::mat4 depthMVP;
 
 void Renderer::update()
 {
@@ -444,10 +443,10 @@ void Renderer::forwardRender()
     
     auto _camera = scene.camera.matrix();
     
-    vec3 planetColor   (0.4, 0.0, 0.0);
-    vec3 shipColor     (0.9, 0.9, 0.9);
-    vec3 shipOrbitColor(0.4, 0.8, 0.0);
-    vec3 gridColor     (0.2, 0.21, 0.2);
+    glm::vec3 planetColor   (0.4, 0.0, 0.0);
+    glm::vec3 shipColor     (0.9, 0.9, 0.9);
+    glm::vec3 shipOrbitColor(0.4, 0.8, 0.0);
+    glm::vec3 gridColor     (0.2, 0.21, 0.2);
     
     // orbit and grid
     {
@@ -462,7 +461,7 @@ void Renderer::forwardRender()
     
     //ship
     //add shadow related uniforms
-    mat4 biasMatrix(
+    glm::mat4 biasMatrix(
                     0.5, 0.0, 0.0, 0.0,
                     0.0, 0.5, 0.0, 0.0,
                     0.0, 0.0, 0.5, 0.0,
@@ -479,7 +478,7 @@ void Renderer::forwardRender()
         auto mvp =
         world *
 //        translate(mat4(), sys[i+shipOffset].sn.pos) *
-        translate(mat4(), getShipPos(i)) *
+        glm::translate(glm::mat4(), getShipPos(i)) *
         gameLogic.sShip[i].orientation
         * gameLogic.sShip[i].size;
         
@@ -487,21 +486,21 @@ void Renderer::forwardRender()
         glUniform1i(loc, 0);
         loc = glGetUniformLocation(ship.shaderProgram, "depthBiasMVP");
         
-		mat4 depthBiasMVP = biasMatrix * depthMVP;
+		glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
         ship.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
         check_gl_error();
         //break;
     }
     glUseProgram(sprite.shaderProgram);
-    auto drawSelector = [&](int i, vec3 &color)
+    auto drawSelector = [&](int i, glm::vec3 &color)
     {
-        if (i < 1 || i >= sys.size()) {
+        if (i < 1 || i >= getNumberOfEntities()) {//sys.size()) {
             return;
         }
-        auto centralPos = vec3(world * vec4(sys[i].sn.pos, 1.0));
+        auto centralPos = glm::vec3(world * glm::vec4(getEntityPosition(i), 1.0));//sys[i].sn.pos, 1.0));
         auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
-        glUniform3fv(loc, 1, value_ptr(centralPos));
+        glUniform3fv(loc, 1, glm::value_ptr(centralPos));
         sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
     };
     
@@ -527,7 +526,7 @@ void Renderer::forwardRender()
         auto mvp =
         world
 //        * lookAt(sys[i].sn.vel, vec3(0), vec3(0,1,0))
-        * translate(mat4(), sys[i].sn.pos);
+        * glm::translate(glm::mat4(), getMissilePos(i));//sys[i].sn.pos);
         
         missile.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
 

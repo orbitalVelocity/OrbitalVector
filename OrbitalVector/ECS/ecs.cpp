@@ -10,11 +10,44 @@
 #include "ecs.h"
 
 
-vec3 getShipPos(int index)
+glm::vec3 getShipPos(int index)
 {
 #if OLDECS
     return sys[index+SHIPOFFSET].sn.pos;
 #else
-    return entityx::entity.get<POSITION>(index);
+    //convert index to ship index or something
+    //keep another vector to store just ship?
+    int shipIndex = convertindextoshipindex(index);
+    return getEntityPosition(shipIndex);
+#endif
+}
+
+glm::vec3 getMissilePos(int index)
+{
+#if OLDECS
+    return sys[index+MISSILEOFFSET].sn.pos;
+#else
+    //convert index to missile index or something
+    //keep another vector to store just missile?
+    int missileIndex = convertindextomissileindex(index);
+    return getEntityPosition(missileIndex);
+#endif
+}
+
+glm::vec3 getEntityPosition(int index)
+{
+#if OLDECS
+    return sys[index].sn.pos;
+#else
+    return ecs.get<Position>(index);
+#endif
+}
+
+int getNumberOfEntities()
+{
+#if OLDECS
+    return sys.size();
+#else
+    return ecs.size();
 #endif
 }

@@ -9,7 +9,6 @@
 #include "scene.h"
 #include "glm/gtx/closest_point.hpp"
 
-using namespace glm;
 
 std::vector<tinyobj::shape_t> shapes;
 std::vector<tinyobj::material_t> materials;
@@ -27,11 +26,11 @@ TestLoadObj(
         std::cerr << err << std::endl;
         return false;
     }
-    vec3 com;
+    glm::vec3 com;
     auto &pos = shapes[0].mesh.positions;
     for (int i=0; i< pos.size(); i+=3)
     {
-        com += vec3(pos[i+0],
+        com += glm::vec3(pos[i+0],
                          pos[i+1],
                          pos[i+2]);
     }
@@ -48,8 +47,8 @@ TestLoadObj(
 }
 
 void initCamera(Camera & camera, int width, int height) {
-    camera.setPosition(vec3(0, 0, 10.0f));
-    camera.setFocus(vec3(0,3.0f,0));
+    camera.setPosition(glm::vec3(0, 0, 10.0f));
+    camera.setFocus(glm::vec3(0,3.0f,0));
     camera.setClip(0.01f, 2000.0f);
     camera.setFOV(45.0f);
     camera.setAspectRatio((float)width/(float)height);
@@ -63,7 +62,7 @@ void writeBinObject(string _fileName)
     assert(true == TestLoadObj(fileName.c_str()));
 
     //write to binary
-    vector<int> vecSizes(3);
+    std::vector<int> vecSizes(3);
     fileName = _fileName + ".bin";
     FILE* pFile = fopen(fileName.c_str(), "wb");
     
@@ -123,7 +122,7 @@ void Scene::init(int width, int height)
 {
     initCamera(camera, width, height);
     
-    lightPos = vec3(0, 0, -1000);
+    lightPos = glm::vec3(0, 0, -1000);
 
     /* mesh loading */
 //    assert(true == TestLoadObj("cornell_box.obj"));

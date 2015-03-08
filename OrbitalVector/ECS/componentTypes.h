@@ -11,19 +11,18 @@
 
 #include "includes.h"
 
-using namespace glm;
 
 struct Velocity {
     Velocity() {}
-    Velocity(vec3 p) : pos(p) {}
+    Velocity(glm::vec3 p) : pos(p) {}
     
-    vec3 pos;
+    glm::vec3 pos;
 };
 
 struct Position {
     Position() {}
-    Position(vec3 p) : pos(p) {}
+    Position(glm::vec3 p) : pos(p) {}
     
-    vec3 pos;
+    glm::vec3 pos;
 };
 #endif

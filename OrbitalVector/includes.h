@@ -27,9 +27,13 @@
 #include "glm/ext.hpp"
 #include <glm/gtc/type_ptr.hpp>
 #include "GLError.h"
-using namespace std;
 
-void _debug_cout(string msg, const char *file, int line);
+//for convenience
+#include "ecs.h"
+
+
+
+void _debug_cout(std::string msg, const char *file, int line);
 
 #define debug_cout(x) _debug_cout(x,__FILE__,__LINE__)
 
@@ -38,8 +42,8 @@ extern bool globalReload;
 extern bool globalShowFXAAAAirection;
 extern int renderStage;
 extern const int stage1, stage2, stage3, stage4, stage5, stage6, stage7, stage8, stage9, stage10;
-string get_file_contents(string filename);
-string printVec3(glm::vec3 v);
+std::string get_file_contents(std::string filename);
+std::string printVec3(glm::vec3 v);
 glm::vec2 getVec2(glm::mat4 vp, glm::vec3 _pos);
 
 template <class T>
@@ -83,7 +87,7 @@ public:
     
     int index = 0;
     float _average, _min, _max;
-    vector<T> data;
+    std::vector<T> data;
 };
 
 #endif

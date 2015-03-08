@@ -14,20 +14,21 @@
 #include "componentTypes.h"
 
 #define OLDECS true
-using namespace glm;
-using namespace entityx;
 
 const int SHIPOFFSET = 1;
+const int MISSILEOFFSET = 3; //only works with 1 grav, 2 ships, and 1 missile
 
-vec3 getShipPos(int index);
+glm::vec3 getShipPos(int index);
+glm::vec3 getMissilePos(int index);
+glm::vec3 getEntityPosition(int index);
+int getNumberOfEntities();
 
 
-
-class Level : public EntityX {
+class Level : public entityx::EntityX {
 private:
     
 public:
-    explicit Level(string filename) {
+    explicit Level(std::string filename) {
 //        systems.add<DebugSystem>();
 //        systems.add<MovementSystem>();
 //        systems.add<CollisionSystem>();
@@ -43,12 +44,12 @@ public:
     }
 
     //loads level of name filename
-    void load(string filename);
+    void load(std::string filename);
    
     //grabs entity from data loaded in load
-    vector<Entity> entity_data();
+    std::vector<entityx::Entity> entity_data();
     
-    void update(TimeDelta dt) {
+    void update(entityx::TimeDelta dt) {
 //        systems.update<DebugSystem>(dt);
 //        systems.update<MovementSystem>(dt);
 //        systems.update<CollisionSystem>(dt);

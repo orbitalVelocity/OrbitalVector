@@ -8,8 +8,6 @@
 
 #include "gameLogic.h"
 
-using namespace std;
-using namespace glm;
 
 GameLogic::GameLogic(GLFWwindow *w, Scene &s, UserInput &i)
            : window(w), scene(s), userInput(i)
@@ -43,35 +41,36 @@ void GameLogic::linePick()
     mouseY = screenHeight - mouseY; //for some reason, mouseY is flipped from tutorial
     auto mouseX_NDC = ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f;
     auto mouseY_NDC = ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f;
-    vec4 lRayStart_NDC(
+    glm::vec4 lRayStart_NDC(
                        mouseX_NDC, mouseY_NDC,
                        -1.0, // The near plane maps to Z=-1 in Normalized Device Coordinates
                        1.0f
                        );
-    vec4 lRayEnd_NDC(
+    glm::vec4 lRayEnd_NDC(
                      mouseX_NDC, mouseY_NDC,
                      0.0,
                      1.0f
                      );
-    mat4 M = inverse(scene.camera.matrix());
-    vec4 lRayStart_world  = M * lRayStart_NDC;
+    glm::mat4 M = glm::inverse(scene.camera.matrix());
+    glm::vec4 lRayStart_world  = M * lRayStart_NDC;
     lRayStart_world /= lRayStart_world.w;
-    vec4 lRayEnd_world    = M * lRayEnd_NDC  ;
+    glm::vec4 lRayEnd_world    = M * lRayEnd_NDC  ;
     lRayEnd_world   /= lRayEnd_world.w  ;
-	vec3 lRayDir_world(lRayEnd_world - lRayStart_world);
-	lRayDir_world = normalize(lRayDir_world);
+	glm::vec3 lRayDir_world(lRayEnd_world - lRayStart_world);
+	lRayDir_world = glm::normalize(lRayDir_world);
     
     //iterate over all objects and find shortest distance
     shortestDist.clear();
     auto objIdx = 0;
     mouseHover = -1;
-    for (const auto &b : sys)   //todo: optimize w/ octree
+//    for (const auto &b : sys)   //TODO: optimize w/ octree
+    for (auto i=0; i < getNumberOfEntities(); i++)
     {
-        auto posNDC = scene.camera.matrix() * world * vec4(b.sn.pos, 1.0);
+        auto posNDC = scene.camera.matrix() * world * glm::vec4(getEntityPosition(i), 1.0);
         posNDC /= posNDC.w;
-        auto mouseNDC = vec2(mouseX_NDC * screenWidth, mouseY_NDC * screenHeight);
-        auto screenPosNDC = vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
-        auto dist = length(mouseNDC - screenPosNDC);
+        auto mouseNDC = glm::vec2(mouseX_NDC * screenWidth, mouseY_NDC * screenHeight);
+        auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
+        auto dist = glm::length(mouseNDC - screenPosNDC);
         shortestDist.push_back(dist);
         
         const int thresholdInPixels = 40;
@@ -102,7 +101,7 @@ void GameLogic::missileLogic(float dt)
             continue;
         }
         //find vector to target
-        vec3 targetVector = normalize(sys[selected].sn.pos - sys[i].sn.pos);
+        glm::vec3 targetVector = glm::normalize(sys[selected].sn.pos - sys[i].sn.pos);
         //add a bit of velocity in that direction?
         float scale = 0.1;
         sys[i].sn.vel += targetVector * scale;
@@ -130,7 +129,7 @@ void GameLogic::userInteraction()
     }
     
     //scroll behavior
-    scene.camera.offsetPos(vec3(0,0, -userInput.yScroll));
+    scene.camera.offsetPos(glm::vec3(0,0, -userInput.yScroll));
     userInput.yScroll = 0;
 }
 
@@ -139,7 +138,7 @@ void GameLogic::handleCollision()
     if (true)
     {
         //contains elements to be removed
-        vector<bool> markedForRemoval(sys.size(), false);
+        std::vector<bool> markedForRemoval(sys.size(), false);
         
         //find collisions and mark candidates for deletion
         markForDeletion(sys, markedForRemoval);
@@ -187,10 +186,10 @@ void GameLogic::update(float dt)
     sGlobe[2].move(sys[1].sn.pos-progradeOffset);
   
     //center the world around player ship
-    world = translate(mat4(), -sys[1].sn.pos);
+    world = glm::translate(glm::mat4(), -sys[1].sn.pos);
 }
 
-void GameLogic::processActionList(vector<ActionType> &actionList)
+void GameLogic::processActionList(std::vector<ActionType> &actionList)
 {
     glm::vec3 forwardVector;
     for (auto &action : actionList )

@@ -14,16 +14,14 @@
 #include "spatial.h"
 #include "unit.h"
 
-using namespace std;
-using namespace glm;
 
 class UnitManager
 {
 public:
-    vector<vec3> vPos, vVel;
-    vector<double> vGM;
-    vector<Spatial> vSpatial;
-    vector<Unit> vUnit;
+    std::vector<glm::vec3> vPos, vVel;
+    std::vector<double> vGM;
+    std::vector<Spatial> vSpatial;
+    std::vector<Unit> vUnit;
     
 public:
     UnitManager(){}

@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include "OGLShader.h"
-using namespace std;
 
 class RenderableGlobe : public OGLShader
 {

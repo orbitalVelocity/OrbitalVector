@@ -13,7 +13,6 @@
 #include "rk547m.h"
 #include <iostream>
 #include <set>
-using namespace std;
 
 class RenderableOrbit : public OGLShader
 {

@@ -12,7 +12,6 @@
 #include "includes.h"
 #include "camera.h"
 #include <iostream>
-using namespace std;
 
 class OGLShader
 {

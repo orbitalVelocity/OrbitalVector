@@ -9,7 +9,6 @@
 #ifndef OrbitalVector_blur_h
 #define OrbitalVector_blur_h
 #include "OGLShader.h"
-using namespace glm;
 
 class BlurShader: public OGLShader
 {
@@ -42,7 +41,7 @@ public:
         
         assert(offsetx != offsety && "offsets should be asymetrical for 1D blur");
         loc = glGetUniformLocation(shaderProgram, "offset");
-        glUniform2fv(loc, 1, value_ptr(vec2(offsetx, offsety)));
+        glUniform2fv(loc, 1, glm::value_ptr(glm::vec2(offsetx, offsety)));
         
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 6);

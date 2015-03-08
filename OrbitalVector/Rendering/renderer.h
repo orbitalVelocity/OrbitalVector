@@ -43,7 +43,6 @@ enum SN {
     //don't need to worry about this last pass blit,
     maxStages
 };
-using namespace std;
 
 class RenderTarget {
 public:

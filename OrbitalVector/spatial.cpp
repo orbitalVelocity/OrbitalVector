@@ -26,7 +26,7 @@ Spatial::Spatial(float r) : x(0), y(90) {
     if (r < 50) {
         r = 50;
     }
-    float v = sqrt(gm/r);
+    float v = std::sqrt(gm/r);
     glm::vec3 rad(r, 0, 0);
     glm::vec3 vel(0, 0, v);
     cout << "new ship: r: " << r << ", v: " << v << endl;

@@ -41,7 +41,7 @@ void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, vector<G
             }
             
             //make it 1 unit from origin
-            GLfloat curDist = sqrt(midPoint[j][0]*midPoint[j][0]+midPoint[j][1]*midPoint[j][1]+midPoint[j][2]*midPoint[j][2]);
+            GLfloat curDist = std::sqrt(midPoint[j][0]*midPoint[j][0]+midPoint[j][1]*midPoint[j][1]+midPoint[j][2]*midPoint[j][2]);
             GLfloat scaleFactor = 1 / curDist;
             
             for(int k=0; k<3; k++)

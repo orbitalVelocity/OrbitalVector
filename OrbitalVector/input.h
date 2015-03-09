@@ -40,7 +40,7 @@ public:
     float yScroll, xScroll;
     float xMouse, yMouse;
     bool lmbPressed, rmbPressed;
-    vector<ActionType> actionList;
+    std::vector<ActionType> actionList;
 public:
     UserInput();
     void setEventHandling() {

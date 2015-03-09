@@ -97,6 +97,9 @@ void initPhysics()
     double m = 7e12;
     double G = 6.673e-11;
     double gm = m * G;
+    
+    initECS();
+    
 #define oldway 0
 #if oldway
     sys.push_back(body(state(glm::vec3(), glm::vec3(0, 0, -.1)),

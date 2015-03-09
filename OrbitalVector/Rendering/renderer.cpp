@@ -519,14 +519,15 @@ void Renderer::forwardRender()
     globe.draw(mvp, planetColor);
     
     //draw projectile
-    int projectileOffset = sysIndexOffset[BodyType::PROJECTILE];
-    for (int i=projectileOffset; i < sys.size(); i++)
-    {
     glUseProgram(missile.shaderProgram);
+//    int projectileOffset = sysIndexOffset[BodyType::PROJECTILE];
+//    for (int i=projectileOffset; i < sys.size(); i++)
+    for (int i=0; i < getNumberOfMissiles(); i++)
+    {
         auto mvp =
-        world
+            world
 //        * lookAt(sys[i].sn.vel, vec3(0), vec3(0,1,0))
-        * glm::translate(glm::mat4(), getMissilePos(i));//sys[i].sn.pos);
+            * glm::translate(glm::mat4(), getMissilePos(i));//sys[i].sn.pos);
         
         missile.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
 

@@ -10,15 +10,15 @@
 
 void RenderableGlobe::init()
 {
-    string vertFilename = "planetVertex.glsl";
-    string fragFilename = "planetFragment.glsl";
+    std::string vertFilename = "planetVertex.glsl";
+    std::string fragFilename = "planetFragment.glsl";
     loadShaders(vertFilename, fragFilename);
     
     loadAsset();
 }
 
 
-void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, vector<GLfloat> &buffer)
+void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, std::vector<GLfloat> &buffer)
 {
     GLfloat *tris[3] = {tri0, tri1, tri2};
     if (depth==0)
@@ -61,7 +61,7 @@ void _tesselate(int depth, GLfloat *tri0, GLfloat *tri1, GLfloat *tri2, vector<G
 void RenderableGlobe::loadAsset()
 {
     // Make a sphere
-    vector<GLfloat> vertexData;
+    std::vector<GLfloat> vertexData;
     GLfloat X = .525731112119133606;
     GLfloat Z = .850650808352039932;
     static GLfloat vdata[12][3] = {

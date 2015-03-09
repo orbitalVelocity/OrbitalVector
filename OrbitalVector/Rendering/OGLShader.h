@@ -23,14 +23,14 @@ public:
     virtual void loadAsset(){}//FIXME: make full virtual
     virtual void renderPass(GLuint vao, GLuint fbName){}//FIXME: make full virtual
     
-    void loadShaders(string vs, string fs, bool useProg=true);
-    void newProgram(map<GLuint, string> &shaders, bool useProg=true);
+    void loadShaders(std::string vs, std::string fs, bool useProg=true);
+    void newProgram(std::map<GLuint, std::string> &shaders, bool useProg=true);
     
     
     void generateVertexBuffer(GLuint bufferType);
     
     template<typename T>
-    void setupBuffer(GLuint bufferType, GLuint drawType, vector<T> &array)
+    void setupBuffer(GLuint bufferType, GLuint drawType, std::vector<T> &array)
     {
         //must bind VAO first, else VBO won't be linked to VAO
         glBindVertexArray(vao);
@@ -43,8 +43,8 @@ public:
         drawCount = (int)array.size();
     }
     
-    void setAttribute(string name);
-    void loadAttribute(string name, vector<float> &input,
+    void setAttribute(std::string name);
+    void loadAttribute(std::string name, std::vector<float> &input,
                     GLuint hint, GLuint type=GL_ARRAY_BUFFER);
     void update();
     void drawIndexed(glm::mat4 &model,
@@ -64,10 +64,10 @@ public:
     GLuint programPipeline;
     GLuint shaderProgram;
     GLuint vsProgram, fsProgram;
-    vector<GLuint> shaderIDs;
+    std::vector<GLuint> shaderIDs;
     
     GLuint vao, elementBuffer;
-    vector<GLuint> vbo;
+    std::vector<GLuint> vbo;
     int vboIdx;
     GLenum drawType;
     int drawCount;

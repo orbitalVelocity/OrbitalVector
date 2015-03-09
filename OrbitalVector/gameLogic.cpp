@@ -7,7 +7,7 @@
 //
 
 #include "gameLogic.h"
-
+#include "ecs.h"
 
 GameLogic::GameLogic(GLFWwindow *w, Scene &s, UserInput &i)
            : window(w), scene(s), userInput(i)
@@ -95,16 +95,19 @@ void GameLogic::missileLogic(float dt)
     //for each missile, aim at selected target and fire
     auto start = sysIndexOffset[BodyType::PROJECTILE];
     auto stop = start + numBodyPerType[BodyType::PROJECTILE];
-    for (int i = start; i < stop; i++)
+//    for (int i = start; i < stop; i++)
+    for (int i = 0; i < getNumberOfMissiles(); i++)
     {
         if (selected == i) {
             continue;
         }
         //find vector to target
-        glm::vec3 targetVector = glm::normalize(sys[selected].sn.pos - sys[i].sn.pos);
-        //add a bit of velocity in that direction?
+        glm::vec3 targetVector = glm::normalize(sys[selected].sn.pos - getMissilePos(i));
+        //add a bit of velocity in that direction
         float scale = 0.1;
-        sys[i].sn.vel += targetVector * scale;
+        *getMissileVelocityPointer(i) += targetVector * scale;
+//        sys[i].sn.vel += targetVector * scale;
+        
         cout << "update projectile: " << i << endl;
     }
 }
@@ -165,7 +168,10 @@ void GameLogic::update(float dt)
     missileLogic(gameDT);
     
     //calculate new position/velocity
-    orbitPhysicsUpdate(gameDT, ks, sys, false);
+//    auto sys = getAllOrbitalObjects();
+//    orbitPhysicsUpdate(gameDT, ks, sys, false);
+//    setAllOrbitalObjects(sys);
+    updateOrbitalPhysics(dt, ks, false);
     
     //calculate trajectories every 30 frames
     static int orbitCount = 0;
@@ -180,13 +186,13 @@ void GameLogic::update(float dt)
     sGlobe[0].move(sys[0].sn.pos);
     //UI
     //prograde
-    auto progradeOffset = glm::normalize(sys[1].sn.vel);
-    sGlobe[1].move(sys[1].sn.pos+progradeOffset);
+    auto progradeOffset = glm::normalize(getMyShipVel());//sys[1].sn.vel);
+    sGlobe[1].move(getMyShipPos()+progradeOffset);
     //retrograde
-    sGlobe[2].move(sys[1].sn.pos-progradeOffset);
+    sGlobe[2].move(getMyShipPos()-progradeOffset);
   
     //center the world around player ship
-    world = glm::translate(glm::mat4(), -sys[1].sn.pos);
+    world = glm::translate(glm::mat4(), -getMyShipPos());//sys[1].sn.pos);
 }
 
 void GameLogic::processActionList(std::vector<ActionType> &actionList)

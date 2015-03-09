@@ -1,6 +1,6 @@
 //
 //  includes.h
-//  GLFW3_test
+//  root header file for all basic functionality (and maybe more...)
 //
 //  Created by Si Li on 9/7/14.
 //  Copyright (c) 2014 Si Li. All rights reserved.
@@ -28,8 +28,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "GLError.h"
 
-//for convenience
-#include "ecs.h"
+//for convenience, refactor out later?
 
 
 

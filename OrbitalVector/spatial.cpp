@@ -40,6 +40,7 @@ Spatial::Spatial(float r) : x(0), y(90) {
                     );
 
     InsertToSys(tmp, BodyType::SHIP);
+
 }
 
 void Spatial::scale(const glm::vec3 s)

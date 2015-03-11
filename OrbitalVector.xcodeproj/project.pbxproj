@@ -301,8 +301,8 @@
 			isa = PBXGroup;
 			children = (
 				F19330BB1AABC6D3009B42B0 /* ecs.h */,
-				F19331151AABEEDC009B42B0 /* componentTypes.h */,
 				F19330BC1AABE6A5009B42B0 /* ecs.cpp */,
+				F19331151AABEEDC009B42B0 /* componentTypes.h */,
 			);
 			name = ECS;
 			sourceTree = "<group>";

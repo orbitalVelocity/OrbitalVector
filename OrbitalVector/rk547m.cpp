@@ -8,6 +8,8 @@
 
 #include "rk547m.h"
 #include <vector>
+#include "ecs.h"
+
 using namespace std;
 
 #define MIN_DT .1
@@ -76,6 +78,15 @@ void InsertToSys(body &body, int type)
     numBodyPerType[type] += (BodyType)(1);
     updateSysIndexOffset();
     cout << "inserted to offset: " << offset << endl;
+    
+    //insert to ECS
+//    myLevel.createEntity(
+//                       body.sn.pos,
+//                       body.sn.vel,
+//                       {},
+//                       body.mu,
+//                       body.radius,
+//                       type);
 }
 
 void updateSysIndexOffset()

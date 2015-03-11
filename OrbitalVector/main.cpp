@@ -424,7 +424,6 @@ int main(int argc, const char * argv[])
     
     while (!glfwWindowShouldClose(ws.pWindow))
     {
-        /* performance measurement setup */
         perfMon.update(glfwGetTime());
         auto dt = perfMon.dt;
     
@@ -434,9 +433,6 @@ int main(int argc, const char * argv[])
         auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
         textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
 		
-        /* physics, handle user input, ai, game states,
-         * it's a lot here 
-         */
         gameLogic.processActionList(inputObject.actionList);
         gameLogic.update(dt);
         renderer.update();
@@ -445,7 +441,6 @@ int main(int argc, const char * argv[])
         getLinePick(textObj, gameLogic);
         UITextSetup();
        
-        /* render */
         renderer.render();
         textObj.render();
        

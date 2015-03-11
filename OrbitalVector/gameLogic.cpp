@@ -95,8 +95,8 @@ void GameLogic::missileLogic(float dt)
     //for each missile, aim at selected target and fire
     auto start = sysIndexOffset[BodyType::PROJECTILE];
     auto stop = start + numBodyPerType[BodyType::PROJECTILE];
-//    for (int i = start; i < stop; i++)
-    for (int i = 0; i < getNumberOfMissiles(); i++)
+    for (int i = start; i < stop; i++)
+//    for (int i = 0; i < getNumberOfMissiles(); i++)
     {
         if (selected == i) {
             continue;
@@ -168,9 +168,6 @@ void GameLogic::update(float dt)
     missileLogic(gameDT);
     
     //calculate new position/velocity
-//    auto sys = getAllOrbitalObjects();
-//    orbitPhysicsUpdate(gameDT, ks, sys, false);
-//    setAllOrbitalObjects(sys);
     updateOrbitalPhysics(dt, ks, false);
     
     //calculate trajectories every 30 frames
@@ -203,6 +200,7 @@ void GameLogic::processActionList(std::vector<ActionType> &actionList)
         switch (action) {
             case ActionType::transForward:
                 forwardVector = glm::vec3(sShip[activeShip].orientation * glm::vec4(0, 0, 1, 1));
+//                forwardVector = glm::vec3(sShip[activeShip].orientation * glm::vec4(0, 0, 1, 1));
                 sys[1].incCustom(.1, forwardVector);
                 break;
             case ActionType::yawLeft:
@@ -235,7 +233,7 @@ void GameLogic::processActionList(std::vector<ActionType> &actionList)
         
         if (action == ActionType::newShip)
         {
-            sShip.push_back(Spatial(200.0));    //Spatial constructor inserts body into sys already!
+            sShip.push_back(Spatial(200.0));    //Spatial constructor inserts body into sys already! and creates a ship in ECS
             sShip.back().scale(glm::vec3(1));
         }
         if (action == ActionType::fireGun)

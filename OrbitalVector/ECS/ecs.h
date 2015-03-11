@@ -34,11 +34,15 @@ std::vector<body> getAllOrbitalObjects();
 void setAllOrbitalObjects(std::vector<body>);
 void updateOrbitalPhysics(float dt, std::vector<std::vector<state> > &ks, bool variableDT);
 
+void createRandomShip();
+
+
 void initECS();
 
 class Level : public entityx::EntityX {
 private:
     entityx::Entity myShipID;
+    entityx::Entity mainGrav;
 public:
     explicit Level(std::string filename) {
 //        systems.add<DebugSystem>();
@@ -83,9 +87,50 @@ public:
         entity.assign<Orientation>(orientation);
         entity.assign<Radius>(r);
     }
+    
+    void createRandomShip();
+    void createEntity(
+                    glm::vec3 pos,
+                    glm::vec3 vel,
+                    glm::mat4 orientation,
+                    double gm,
+                    float r,
+                    int type)
+    {
+        auto newShip = entities.create();
+        loadEntity(newShip,
+                   pos,
+                   vel,
+                   orientation,
+                   gm,
+                   r,
+                   mainGrav.id(),
+                   (BodyType)type);
+    }
+    
+    void createShip(
+                    glm::vec3 pos,
+                    glm::vec3 vel,
+                    glm::mat4 orientation,
+                    double gm,
+                    float r)
+    {
+        auto newShip = entities.create();
+        loadEntity(newShip,
+                   pos,
+                   vel,
+                   orientation,
+                   gm,
+                   r,
+                   mainGrav.id(),
+                   BodyType::SHIP);
+    }
+    
     //loads level of name filename
     void load(std::string filename)
     {
+        return;
+        //FIXME: this is because InsertToSys creates new entities directly
         double m = 7e12;
         double G = 6.673e-11;
         double gm = m * G;
@@ -93,7 +138,7 @@ public:
         //load json and create entities
         auto nullEntity = entities.create();
         nullEntity.invalidate();
-        auto mainGrav = entities.create();
+        mainGrav = entities.create();
         loadEntity(mainGrav,
                    {},
                    glm::vec3(0,0,-.1),
@@ -131,4 +176,5 @@ public:
     
 };
 
+extern Level myLevel;
 #endif

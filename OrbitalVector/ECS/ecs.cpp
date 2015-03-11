@@ -100,16 +100,22 @@ std::vector<body> getAllOrbitalObjects()
                               bt->orbitalBodyType));
     }
     
-    assert(sys.size() == numEntities);
+//    assert(sys.size() == numEntities);
     return newSys;
 }
 
+/**
+ *  Take all entities in ECS and convert to a vector<body> a la sys
+ *  Run orbitPhysicsUpdate as usual and convert it back
+ *  backwards compatibility is acheived by updating sys as well
+ *  Caveat: adding/removing units must be done via ECS
+ */
 void updateOrbitalPhysics(float dt, vector<vector<state> > &ks, bool adaptive)
 {
-#if OLDECS
     
-    auto sys2 = getAllOrbitalObjects();
+//    auto sys2 = getAllOrbitalObjects();
     
+//    check if sys and sys2 match up
 //    all sys and sys2 should be exactly the same!
 //    assert(sys.size() == sys2.size());
 //    for (int i=0; i < sys.size(); i++)
@@ -123,13 +129,14 @@ void updateOrbitalPhysics(float dt, vector<vector<state> > &ks, bool adaptive)
 //    }
 
     
-//    orbitPhysicsUpdate(dt, ks, sys, adaptive);
-    orbitPhysicsUpdate(dt, ks, sys2, adaptive);
-    setAllOrbitalObjects(sys2);
-    sys = sys2;
+    orbitPhysicsUpdate(dt, ks, sys, adaptive);
     
-    //check if sys and sys2 match up
-#else
+//    orbitPhysicsUpdate(dt, ks, sys2, adaptive);
+//    setAllOrbitalObjects(sys2);
+#if OLDECS
+    //FIXME: super hacky get rid of this asap: when getting rid of sys in general
+//    sys = sys2;
+    
 #endif
 }
 
@@ -173,6 +180,41 @@ glm::vec3 getMyShipVel()
 #else
     return myshipentity.component<Velocity>();
 #endif
+}
+
+void createRandomShip()
+{
+    myLevel.createRandomShip();
+}
+
+void Level::createRandomShip()
+{
+    auto newShip = myLevel.entities.create();
+    
+    double m = 7e12;
+    double G = 6.673e-11;
+    double gm = m * G;
+    
+    //FIXME: use std::rand instead
+    srand ((unsigned int)time(NULL));
+    
+    auto r = (rand() / 1000) % 300;
+    r += 100;
+    float v = std::sqrt(gm/r);
+    glm::vec3 rad(r, 0, 0);
+    glm::vec3 vel(0, 0, v);
+    cout << "new ship: r: " << r << ", v: " << v << endl;
+    m = 1e1;
+    gm = m * G;
+
+    myLevel.loadEntity(newShip,
+                       rad,
+                       vel,
+                       {},
+                       gm,
+                       r,
+                       mainGrav.id(),
+                       BodyType::SHIP);
 }
 
 

@@ -11,8 +11,8 @@
 void RenderableGrid::init()
 {
     //load shaders
-    string vertFilename = "lineVertex.glsl";
-    string fragFilename = "lineFragment.glsl";
+    std::string vertFilename = "lineVertex.glsl";
+    std::string fragFilename = "lineFragment.glsl";
     loadShaders(vertFilename, fragFilename);
     
     loadAsset();

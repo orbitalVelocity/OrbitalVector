@@ -41,23 +41,24 @@ void GameLogic::linePick()
     mouseY = screenHeight - mouseY; //for some reason, mouseY is flipped from tutorial
     auto mouseX_NDC = ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f;
     auto mouseY_NDC = ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f;
-    glm::vec4 lRayStart_NDC(
-                       mouseX_NDC, mouseY_NDC,
-                       -1.0, // The near plane maps to Z=-1 in Normalized Device Coordinates
-                       1.0f
-                       );
-    glm::vec4 lRayEnd_NDC(
-                     mouseX_NDC, mouseY_NDC,
-                     0.0,
-                     1.0f
-                     );
-    glm::mat4 M = glm::inverse(scene.camera.matrix());
-    glm::vec4 lRayStart_world  = M * lRayStart_NDC;
-    lRayStart_world /= lRayStart_world.w;
-    glm::vec4 lRayEnd_world    = M * lRayEnd_NDC  ;
-    lRayEnd_world   /= lRayEnd_world.w  ;
-	glm::vec3 lRayDir_world(lRayEnd_world - lRayStart_world);
-	lRayDir_world = glm::normalize(lRayDir_world);
+//    glm::vec4 lRayStart_NDC(
+//                       mouseX_NDC, mouseY_NDC,
+//                       -1.0, // The near plane maps to Z=-1 in Normalized Device Coordinates
+//                       1.0f
+//                       );
+//    glm::vec4 lRayEnd_NDC(
+//                     mouseX_NDC, mouseY_NDC,
+//                     0.0,
+//                     1.0f
+//                     );
+//    glm::mat4 M = glm::inverse(scene.camera.matrix());
+//    glm::vec4 lRayStart_world  = M * lRayStart_NDC;
+//    lRayStart_world /= lRayStart_world.w;
+//    glm::vec4 lRayEnd_world    = M * lRayEnd_NDC  ;
+//    lRayEnd_world   /= lRayEnd_world.w  ;
+//	glm::vec3 lRayDir_world(lRayEnd_world - lRayStart_world);
+//	lRayDir_world = glm::normalize(lRayDir_world);
+    auto mouseNDC = glm::vec2(mouseX_NDC * screenWidth, mouseY_NDC * screenHeight);
     
     //iterate over all objects and find shortest distance
     shortestDist.clear();
@@ -68,7 +69,6 @@ void GameLogic::linePick()
     {
         auto posNDC = scene.camera.matrix() * world * glm::vec4(getEntityPosition(i), 1.0);
         posNDC /= posNDC.w;
-        auto mouseNDC = glm::vec2(mouseX_NDC * screenWidth, mouseY_NDC * screenHeight);
         auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
         auto dist = glm::length(mouseNDC - screenPosNDC);
         shortestDist.push_back(dist);
@@ -95,8 +95,8 @@ void GameLogic::missileLogic(float dt)
     //for each missile, aim at selected target and fire
     auto start = sysIndexOffset[BodyType::PROJECTILE];
     auto stop = start + numBodyPerType[BodyType::PROJECTILE];
-    for (int i = start; i < stop; i++)
-//    for (int i = 0; i < getNumberOfMissiles(); i++)
+//    for (int i = start; i < stop; i++)
+    for (int i = 0; i < getNumberOfMissiles(); i++)
     {
         if (selected == i) {
             continue;

@@ -80,13 +80,13 @@ void InsertToSys(body &body, int type)
     cout << "inserted to offset: " << offset << endl;
     
     //insert to ECS
-//    myLevel.createEntity(
-//                       body.sn.pos,
-//                       body.sn.vel,
-//                       {},
-//                       body.mu,
-//                       body.radius,
-//                       type);
+    myLevel.createEntity(
+                       body.sn.pos,
+                       body.sn.vel,
+                       {},
+                       body.mu,
+                       body.radius,
+                       type);
 }
 
 void updateSysIndexOffset()

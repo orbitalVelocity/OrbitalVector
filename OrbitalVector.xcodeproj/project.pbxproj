@@ -32,15 +32,11 @@
 		F15E8EA619BD4696003E566C /* LoadShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EA219BD4696003E566C /* LoadShader.cpp */; };
 		F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB319BD47C9003E566C /* fontstash.cpp */; };
 		F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB519BD47C9003E566C /* opengl_fontstashcallbacks.cpp */; };
+		F17416FB1AB5F33600D2269F /* linePickSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F17416F91AB5F33600D2269F /* linePickSystem.cpp */; };
 		F1764D8219ECDE2B0031443F /* simplePassThrough.vs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1764D8119ECDE250031443F /* simplePassThrough.vs */; };
 		F19330AC1AA552E3009B42B0 /* globe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330AA1AA552E3009B42B0 /* globe.cpp */; };
 		F19330AF1AA570EB009B42B0 /* orbit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330AD1AA570EB009B42B0 /* orbit.cpp */; };
 		F19330BD1AABE6A5009B42B0 /* ecs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330BC1AABE6A5009B42B0 /* ecs.cpp */; };
-		F193310B1AABECFF009B42B0 /* Entity.cc in Sources */ = {isa = PBXBuildFile; fileRef = F19330F41AABECFF009B42B0 /* Entity.cc */; };
-		F193310D1AABECFF009B42B0 /* Event.cc in Sources */ = {isa = PBXBuildFile; fileRef = F19330F81AABECFF009B42B0 /* Event.cc */; };
-		F193310F1AABECFF009B42B0 /* Pool.cc in Sources */ = {isa = PBXBuildFile; fileRef = F19330FD1AABECFF009B42B0 /* Pool.cc */; };
-		F19331111AABECFF009B42B0 /* Timer.cc in Sources */ = {isa = PBXBuildFile; fileRef = F19331001AABECFF009B42B0 /* Timer.cc */; };
-		F19331121AABECFF009B42B0 /* System.cc in Sources */ = {isa = PBXBuildFile; fileRef = F19331031AABECFF009B42B0 /* System.cc */; };
 		F1B3C67418D935EC00971791 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1B3C67318D935EC00971791 /* main.cpp */; };
 		F1B3C67618D935EC00971791 /* GLFW3_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1B3C67518D935EC00971791 /* GLFW3_test.1 */; };
 		F1B3C67F18D9397400971791 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67E18D9397400971791 /* IOKit.framework */; };
@@ -149,6 +145,8 @@
 		F15E8EB619BD47C9003E566C /* opengl_fontstashcallbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opengl_fontstashcallbacks.h; sourceTree = "<group>"; };
 		F15E8EB719BD47C9003E566C /* stb_image_write.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		F15E8EB819BD47C9003E566C /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
+		F17416F91AB5F33600D2269F /* linePickSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = linePickSystem.cpp; path = Systems/linePickSystem.cpp; sourceTree = "<group>"; };
+		F17416FA1AB5F33600D2269F /* linePickSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = linePickSystem.h; path = Systems/linePickSystem.h; sourceTree = "<group>"; };
 		F1764D8119ECDE250031443F /* simplePassThrough.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = simplePassThrough.vs; path = glsl/simplePassThrough.vs; sourceTree = "<group>"; };
 		F19330AA1AA552E3009B42B0 /* globe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = globe.cpp; path = GameObject/globe.cpp; sourceTree = "<group>"; };
 		F19330AB1AA552E3009B42B0 /* globe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = globe.h; path = GameObject/globe.h; sourceTree = "<group>"; };
@@ -162,25 +160,6 @@
 		F19330B91AA96B59009B42B0 /* blur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = blur.h; path = Shaders/blur.h; sourceTree = "<group>"; };
 		F19330BB1AABC6D3009B42B0 /* ecs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ecs.h; path = ECS/ecs.h; sourceTree = "<group>"; };
 		F19330BC1AABE6A5009B42B0 /* ecs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ecs.cpp; path = ECS/ecs.cpp; sourceTree = "<group>"; };
-		F19330EC1AABECFF009B42B0 /* catch.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = catch.hpp; sourceTree = "<group>"; };
-		F19330ED1AABECFF009B42B0 /* simplesignal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simplesignal.h; sourceTree = "<group>"; };
-		F19330EF1AABECFF009B42B0 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = config.h; path = entityx/config.h; sourceTree = SOURCE_ROOT; };
-		F19330F01AABECFF009B42B0 /* config.h.in */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = config.h.in; path = entityx/config.h.in; sourceTree = SOURCE_ROOT; };
-		F19330F21AABECFF009B42B0 /* Dependencies.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Dependencies.h; sourceTree = "<group>"; };
-		F19330F41AABECFF009B42B0 /* Entity.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Entity.cc; path = entityx/Entity.cc; sourceTree = SOURCE_ROOT; };
-		F19330F51AABECFF009B42B0 /* Entity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Entity.h; path = entityx/Entity.h; sourceTree = SOURCE_ROOT; };
-		F19330F71AABECFF009B42B0 /* entityx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = entityx.h; path = entityx/entityx.h; sourceTree = SOURCE_ROOT; };
-		F19330F81AABECFF009B42B0 /* Event.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Event.cc; path = entityx/Event.cc; sourceTree = SOURCE_ROOT; };
-		F19330F91AABECFF009B42B0 /* Event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Event.h; path = entityx/Event.h; sourceTree = SOURCE_ROOT; };
-		F19330FC1AABECFF009B42B0 /* NonCopyable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NonCopyable.h; sourceTree = "<group>"; };
-		F19330FD1AABECFF009B42B0 /* Pool.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Pool.cc; sourceTree = "<group>"; };
-		F19330FE1AABECFF009B42B0 /* Pool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pool.h; sourceTree = "<group>"; };
-		F19331001AABECFF009B42B0 /* Timer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Timer.cc; sourceTree = "<group>"; };
-		F19331011AABECFF009B42B0 /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
-		F19331021AABECFF009B42B0 /* quick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = quick.h; path = entityx/quick.h; sourceTree = SOURCE_ROOT; };
-		F19331031AABECFF009B42B0 /* System.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = System.cc; path = entityx/System.cc; sourceTree = SOURCE_ROOT; };
-		F19331041AABECFF009B42B0 /* System.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = System.h; path = entityx/System.h; sourceTree = SOURCE_ROOT; };
-		F19331071AABECFF009B42B0 /* TagsComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TagsComponent.h; sourceTree = "<group>"; };
 		F19331151AABEEDC009B42B0 /* componentTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = componentTypes.h; path = ECS/componentTypes.h; sourceTree = "<group>"; };
 		F1B3C67018D935EC00971791 /* OrbitalVector */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OrbitalVector; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1B3C67318D935EC00971791 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
@@ -285,6 +264,15 @@
 			path = fontstash;
 			sourceTree = "<group>";
 		};
+		F17416F81AB5F2C100D2269F /* Systems */ = {
+			isa = PBXGroup;
+			children = (
+				F17416F91AB5F33600D2269F /* linePickSystem.cpp */,
+				F17416FA1AB5F33600D2269F /* linePickSystem.h */,
+			);
+			name = Systems;
+			sourceTree = "<group>";
+		};
 		F19330B01AA7FD55009B42B0 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
@@ -307,67 +295,6 @@
 			name = ECS;
 			sourceTree = "<group>";
 		};
-		F19330EA1AABECFF009B42B0 /* entityx */ = {
-			isa = PBXGroup;
-			children = (
-				F19330EB1AABECFF009B42B0 /* 3rdparty */,
-				F19330EF1AABECFF009B42B0 /* config.h */,
-				F19330F01AABECFF009B42B0 /* config.h.in */,
-				F19330F11AABECFF009B42B0 /* deps */,
-				F19330F41AABECFF009B42B0 /* Entity.cc */,
-				F19330F51AABECFF009B42B0 /* Entity.h */,
-				F19330F71AABECFF009B42B0 /* entityx.h */,
-				F19330F81AABECFF009B42B0 /* Event.cc */,
-				F19330F91AABECFF009B42B0 /* Event.h */,
-				F19330FB1AABECFF009B42B0 /* help */,
-				F19331021AABECFF009B42B0 /* quick.h */,
-				F19331031AABECFF009B42B0 /* System.cc */,
-				F19331041AABECFF009B42B0 /* System.h */,
-				F19331061AABECFF009B42B0 /* tags */,
-			);
-			path = entityx;
-			sourceTree = SOURCE_ROOT;
-		};
-		F19330EB1AABECFF009B42B0 /* 3rdparty */ = {
-			isa = PBXGroup;
-			children = (
-				F19330EC1AABECFF009B42B0 /* catch.hpp */,
-				F19330ED1AABECFF009B42B0 /* simplesignal.h */,
-			);
-			name = 3rdparty;
-			path = entityx/3rdparty;
-			sourceTree = SOURCE_ROOT;
-		};
-		F19330F11AABECFF009B42B0 /* deps */ = {
-			isa = PBXGroup;
-			children = (
-				F19330F21AABECFF009B42B0 /* Dependencies.h */,
-			);
-			name = deps;
-			path = entityx/deps;
-			sourceTree = SOURCE_ROOT;
-		};
-		F19330FB1AABECFF009B42B0 /* help */ = {
-			isa = PBXGroup;
-			children = (
-				F19330FC1AABECFF009B42B0 /* NonCopyable.h */,
-				F19330FD1AABECFF009B42B0 /* Pool.cc */,
-				F19330FE1AABECFF009B42B0 /* Pool.h */,
-				F19331001AABECFF009B42B0 /* Timer.cc */,
-				F19331011AABECFF009B42B0 /* Timer.h */,
-			);
-			name = help;
-			path = entityx/help;
-			sourceTree = SOURCE_ROOT;
-		};
-		F19331061AABECFF009B42B0 /* tags */ = {
-			isa = PBXGroup;
-			children = (
-				F19331071AABECFF009B42B0 /* TagsComponent.h */,
-			);
-			path = tags;
-			sourceTree = "<group>";
-		};
 		F1B3C66718D935EC00971791 = {
 			isa = PBXGroup;
 			children = (
@@ -376,7 +303,6 @@
 				F1B3C68018D9397B00971791 /* Cocoa.framework */,
 				F1B3C67E18D9397400971791 /* IOKit.framework */,
 				F1B3C67C18D9396300971791 /* libglfw3.a */,
-				F19330EA1AABECFF009B42B0 /* entityx */,
 				F1B3C67218D935EC00971791 /* OrbitalVector */,
 				F1011C6919C6933D00602446 /* glsl */,
 				F15E8E9E19BD4696003E566C /* rendertest */,
@@ -402,6 +328,7 @@
 				F1011C6619C68C6700602446 /* scene.h */,
 				F151168B19DE1FE50018635B /* gameLogic.h */,
 				F151168A19DE1FE50018635B /* gameLogic.cpp */,
+				F17416F81AB5F2C100D2269F /* Systems */,
 				F19330BA1AABC6A4009B42B0 /* ECS */,
 				F1D4680B1AA5116C00869C62 /* GameObject */,
 				F1D4680A1AA50BFA00869C62 /* Rendering */,
@@ -525,14 +452,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				F151168C19DE1FE50018635B /* gameLogic.cpp in Sources */,
-				F19331111AABECFF009B42B0 /* Timer.cc in Sources */,
 				F1011C6719C68C6700602446 /* scene.cpp in Sources */,
 				F15E8E9C19BD406B003E566C /* OGLShader.cpp in Sources */,
 				F19330BD1AABE6A5009B42B0 /* ecs.cpp in Sources */,
 				F19330AC1AA552E3009B42B0 /* globe.cpp in Sources */,
 				F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */,
 				F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */,
-				F193310F1AABECFF009B42B0 /* Pool.cc in Sources */,
 				F1011C7719C7F17200602446 /* includes.cpp in Sources */,
 				F1DBBA1219F6758F0022F107 /* GPUTimer.cpp in Sources */,
 				F19330AF1AA570EB009B42B0 /* orbit.cpp in Sources */,
@@ -545,14 +470,12 @@
 				F111F26E19D9E94200DD4439 /* input.cpp in Sources */,
 				F1EAC34C1A0B1DDB006B29CB /* unit.cpp in Sources */,
 				F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */,
-				F193310B1AABECFF009B42B0 /* Entity.cc in Sources */,
 				F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */,
-				F19331121AABECFF009B42B0 /* System.cc in Sources */,
 				F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */,
 				F1D4680E1AA511CB00869C62 /* grid.cpp in Sources */,
 				F15D70DE19CFD303008F6573 /* spatial.cpp in Sources */,
-				F193310D1AABECFF009B42B0 /* Event.cc in Sources */,
 				F1C8EFC019CE1B26008CCC90 /* tiny_obj_loader.cc in Sources */,
+				F17416FB1AB5F33600D2269F /* linePickSystem.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -634,6 +557,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/lib/glm/",
 					"$(SRCROOT)/lib/glew/include/",
@@ -650,7 +574,10 @@
 					/usr/local/Cellar/glew/1.11.0/lib,
 				);
 				OTHER_CFLAGS = "-O0";
-				OTHER_LDFLAGS = "-lGLEW";
+				OTHER_LDFLAGS = (
+					"-lGLEW",
+					"-lentityx",
+				);
 				PRODUCT_NAME = OrbitalVector;
 			};
 			name = Debug;
@@ -660,6 +587,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				FRAMEWORK_SEARCH_PATHS = /Library/Frameworks;
 				HEADER_SEARCH_PATHS = (
 					"$(SRCROOT)/lib/glm/",
 					"$(SRCROOT)/lib/glew/include/",
@@ -676,7 +604,10 @@
 					/usr/local/Cellar/glew/1.11.0/lib,
 				);
 				OTHER_CFLAGS = "-O0";
-				OTHER_LDFLAGS = "-lGLEW";
+				OTHER_LDFLAGS = (
+					"-lGLEW",
+					"-lentityx",
+				);
 				PRODUCT_NAME = OrbitalVector;
 			};
 			name = Release;

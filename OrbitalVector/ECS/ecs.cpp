@@ -40,10 +40,11 @@ glm::vec3 getMissilePos(int index)
 glm::vec3* getMissileVelocityPointer(int index)
 {
 #if OLDECS
-    return &(sys[index].sn.vel);
+    int offset = sysIndexOffset[BodyType::PROJECTILE];
+    return &(sys[index+offset].sn.vel);
 #else
-    ecs.
     entityx::ComponentHandle<Velocity> velocity = missile.component<Velocity>;
+    myLevel.entities.entities_with_components(position, velocity)
     return velocity->vel;
 #endif
 }
@@ -112,11 +113,13 @@ std::vector<body> getAllOrbitalObjects()
  */
 void updateOrbitalPhysics(float dt, vector<vector<state> > &ks, bool adaptive)
 {
+#if OLDECS
+//    orbitPhysicsUpdate(dt, ks, sys, adaptive);
+//#else
+    auto sys2 = getAllOrbitalObjects();
     
-//    auto sys2 = getAllOrbitalObjects();
-    
-//    check if sys and sys2 match up
-//    all sys and sys2 should be exactly the same!
+    //check if sys and sys2 match up
+    //all sys and sys2 should be exactly the same!
 //    assert(sys.size() == sys2.size());
 //    for (int i=0; i < sys.size(); i++)
 //    {
@@ -128,14 +131,11 @@ void updateOrbitalPhysics(float dt, vector<vector<state> > &ks, bool adaptive)
 //        assert(sysvel == sys2vel);
 //    }
 
+    orbitPhysicsUpdate(dt, ks, sys2, adaptive);
     
-    orbitPhysicsUpdate(dt, ks, sys, adaptive);
-    
-//    orbitPhysicsUpdate(dt, ks, sys2, adaptive);
-//    setAllOrbitalObjects(sys2);
-#if OLDECS
+    setAllOrbitalObjects(sys2);
     //FIXME: super hacky get rid of this asap: when getting rid of sys in general
-//    sys = sys2;
+    sys = sys2;
     
 #endif
 }

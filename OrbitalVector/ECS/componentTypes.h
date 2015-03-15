@@ -11,49 +11,56 @@
 
 #include "rk547m.h"
 #include "includes.h"
+#include "entityx/Entity.h"
 
-struct Velocity {
+struct Velocity : public entityx::Component<Velocity>
+{
     Velocity() {}
     Velocity(glm::vec3 v) : vel(v) {}
     
     glm::vec3 vel;
 };
 
-struct Position {
+struct Position : public entityx::Component<Position>
+{
     Position() {}
     Position(glm::vec3 p) : pos(p) {}
     
     glm::vec3 pos;
 };
 
-struct GM {
+struct GM : public entityx::Component<GM>
+{
     GM() {}
     GM(double _gm) : gm(_gm) {}
     double gm;
 };
 
-struct Parent {
+struct Parent : public entityx::Component<Parent>
+{
     Parent() {}
     Parent(entityx::Entity::Id p) : parent(p) {}
     
     entityx::Entity::Id parent;
 };
 
-struct OrbitalBodyType {
+struct OrbitalBodyType : public entityx::Component<OrbitalBodyType>
+{
     OrbitalBodyType() {}
     OrbitalBodyType(BodyType bt) : orbitalBodyType(bt) {}
     
     BodyType orbitalBodyType;
 };
 
-struct Orientation {
+struct Orientation :public entityx::Component<Orientation>
+{
     Orientation () {}
     Orientation (glm::mat4 o) : orientation(o) {}
     
     glm::mat4 orientation;
 };
 
-struct Radius {
+struct Radius : public entityx::Component<Radius>{
     Radius () {}
     Radius (float r) : radius(r) {}
     

@@ -19,7 +19,13 @@
 
 
 
-
+/**
+ * refactor: break this into systems for interfacing w/ ECS
+ * collision system
+ * linepick system
+ * weapon system?? - ideally, should be driven by events from AI/user control
+ *
+ */
 class GameLogic{
 public:
     float deltaMove, deltaRotate;

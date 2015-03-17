@@ -21,13 +21,13 @@ public:
     entityx::Entity entity;
     
     MyPair(double t, entityx::Entity e) : time(t), entity(e) {}
-    
+    bool operator>(const MyPair &rhs) const
+    {
+        return time > rhs.time;
+    }
     
 };
-bool operator>(const MyPair &lhs, const MyPair &rhs)
-{
-    return lhs.time > rhs.time;
-}
+
 
 class CollisionSystem: public entityx::System<CollisionSystem>
 //                        public entityx::Receiver<CollisionEvent>

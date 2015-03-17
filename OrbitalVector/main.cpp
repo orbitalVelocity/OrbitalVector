@@ -98,8 +98,6 @@ void initPhysics()
     double G = 6.673e-11;
     double gm = m * G;
     
-    initECS();
-    
 #define oldway 0
 #if oldway
     sys.push_back(body(state(glm::vec3(), glm::vec3(0, 0, -.1)),
@@ -387,6 +385,7 @@ int main(int argc, const char * argv[])
     glfwGetWindowSize(ws.pWindow, &ws.winWidth, &ws.winHeight);
     glfwGetFramebufferSize(ws.pWindow, &ws.fbWidth, &ws.fbHeight);
     glViewport(0, 0, ws.fbWidth, ws.fbHeight);
+   
     
     // Calculate pixel ratio for hi-dpi devices.
     auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
@@ -421,6 +420,11 @@ int main(int argc, const char * argv[])
     glfwSetTime(0);
     PerfMon perfMon;
     perfMon.tPrevFrame = glfwGetTime();
+    
+    //FIXME: for refactoring only
+    myGameSingleton.pWindow = ws.pWindow;
+    myGameSingleton.pCamera = &scene.camera;
+    myGameSingleton.init(&inputObject);
     
     while (!glfwWindowShouldClose(ws.pWindow))
     {

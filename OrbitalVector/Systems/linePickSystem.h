@@ -21,13 +21,16 @@ class LinePickSystem : public entityx::System<LinePickSystem>
 {
 public:
     
-    LinePickSystem();
+    LinePickSystem(GLFWwindow *w, Camera *c);
     
     //consider a wrapper around *window to store
     //cursor position, screen dimensions, framebuffer dimensions
     void update(entityx::EntityManager & entities,
                 entityx::EventManager & events,
-                GLFWwindow *window,
-                Camera &camera);
+                double dt);
+
+private:
+    GLFWwindow *pWindow;
+    Camera *pCamera;
 };
 #endif /* defined(__OrbitalVector__linePickSystem__) */

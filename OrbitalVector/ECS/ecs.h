@@ -12,6 +12,10 @@
 #include "rk547m.h"
 #include "entityx/entityx.h"
 #include "componentTypes.h"
+#include "camera.h"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include "input.h"
 
 #define OLDECS true
 
@@ -37,28 +41,18 @@ void updateOrbitalPhysics(float dt, std::vector<std::vector<state> > &ks, bool v
 void createRandomShip();
 
 
-void initECS();
 
-class Level : public entityx::EntityX {
-private:
+class GameSingleton : public entityx::EntityX {
+    //FIXME: make this private after removing gameLogic/scene class
+public:
     entityx::Entity myShipID;
     entityx::Entity mainGrav;
+    Camera *pCamera;
+    GLFWwindow *pWindow;
 public:
-    explicit Level(std::string filename) {
-//        systems.add<DebugSystem>();
-//        systems.add<MovementSystem>();
-//        systems.add<CollisionSystem>();
-        systems.configure();
-        
-        load(filename);
-        
-//        for (auto e : entity_data()) {
-//            entityx::Entity entity = entities.create();
-//            entity.assign<Position>(e.component<Position>());
-//            entity.assign<Velocity>(e.component<Velocity>());
-//        }
-    }
+    explicit GameSingleton(std::string filename);
 
+    void init(UserInput *ui);
     /**
      * Convenience function for creating a generic orbiting body in ECS
      * @parameter pos glm::vec3 position
@@ -76,105 +70,33 @@ public:
                     double _gm,
                     float r,
                     entityx::Entity::Id _parent,
-                    BodyType bt
-                    )
-    {
-        entity.assign<Position>(pos);
-        entity.assign<Velocity>(vel);
-        entity.assign<GM>(_gm);
-        entity.assign<Parent>(_parent);
-        entity.assign<OrbitalBodyType>(bt);
-        entity.assign<Orientation>(orientation);
-        entity.assign<Radius>(r);
-    }
+                    BodyType bt);
+    
     
     void createRandomShip();
-    void createEntity(
-                    glm::vec3 pos,
-                    glm::vec3 vel,
-                    glm::mat4 orientation,
-                    double gm,
-                    float r,
-                    int type)
-    {
-        auto newShip = entities.create();
-        loadEntity(newShip,
-                   pos,
-                   vel,
-                   orientation,
-                   gm,
-                   r,
-                   mainGrav.id(),
-                   (BodyType)type);
-    }
+    void createEntity(glm::vec3 pos,
+                      glm::vec3 vel,
+                      glm::mat4 orientation,
+                      double gm,
+                      float r,
+                      int type);
     
-    void createShip(
-                    glm::vec3 pos,
+    void createShip(glm::vec3 pos,
                     glm::vec3 vel,
                     glm::mat4 orientation,
                     double gm,
-                    float r)
-    {
-        auto newShip = entities.create();
-        loadEntity(newShip,
-                   pos,
-                   vel,
-                   orientation,
-                   gm,
-                   r,
-                   mainGrav.id(),
-                   BodyType::SHIP);
-    }
+                    float r);
+    
     
     //loads level of name filename
-    void load(std::string filename)
-    {
-        return;
-        //FIXME: this is because InsertToSys creates new entities directly
-        double m = 7e12;
-        double G = 6.673e-11;
-        double gm = m * G;
-        
-        //load json and create entities
-        auto nullEntity = entities.create();
-        nullEntity.invalidate();
-        mainGrav = entities.create();
-        loadEntity(mainGrav,
-                   {},
-                   glm::vec3(0,0,-.1),
-                   {},
-                   gm,
-                   10,
-                   nullEntity.id(),
-                   BodyType::GRAV
-                   );
-
-        
-        m = 1e5;
-        gm = m * G;
-        
-        myShipID = entities.create();
-        loadEntity(myShipID,
-                   {110,0,0},
-                   {0,0,2.3},
-                   {},
-                   gm,
-                   10,
-                   mainGrav.id(),
-                   BodyType::SHIP
-                   );
-    };
+    void load(std::string filename);
    
     //grabs entity from data loaded in load
-    std::vector<entityx::Entity> entity_data();
+//    std::vector<entityx::Entity> entity_data();
     
-    void update(entityx::TimeDelta dt) {
-//        systems.update<DebugSystem>(dt);
-//        systems.update<MovementSystem>(dt);
-//        systems.update<CollisionSystem>(dt);
-    }
+    void update(double dt);
     
 };
 
-extern Level myLevel;
+extern GameSingleton myGameSingleton;
 #endif

@@ -9,9 +9,12 @@
 #include "linePickSystem.h"
 #include "ecs.h"
 #include "componentTypes.h"
+#include "events.h"
+
 using namespace entityx;
 
-LinePickSystem::LinePickSystem()
+LinePickSystem::LinePickSystem(GLFWwindow *w, Camera *c) :
+                pWindow(w), pCamera(c)
 {
     
 }
@@ -19,14 +22,13 @@ LinePickSystem::LinePickSystem()
 
 void LinePickSystem::update(EntityManager & entities,
                             EventManager &events,
-                            GLFWwindow *window,
-                            Camera &camera)
+                            double dt)
 {
     //construct mouse/cursor casted ray
     double mouseX, mouseY;
     int screenWidth, screenHeight;
-    glfwGetCursorPos(window, &mouseX, &mouseY);
-    glfwGetWindowSize(window, &screenWidth, &screenHeight);
+    glfwGetCursorPos(pWindow, &mouseX, &mouseY);
+    glfwGetWindowSize(pWindow, &screenWidth, &screenHeight);
     
     //get ray casted under cursor
     mouseY = screenHeight - mouseY; //for some reason, mouseY is flipped from tutorial
@@ -40,11 +42,11 @@ void LinePickSystem::update(EntityManager & entities,
     Entity selectableEntity;
     for (Entity entity : entities.entities_with_components(position))
     {
-        auto posNDC = camera.matrix() * world * glm::vec4(position->pos, 1.0);
+        auto posNDC = pCamera->matrix() * world * glm::vec4(position->pos, 1.0);
         posNDC /= posNDC.w;
         auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
         auto onScreenDistance = glm::length(mouse_NDC - screenPosNDC);
-        auto distanceFromCamera = glm::length(position->pos - camera.position);
+        auto distanceFromCamera = glm::length(position->pos - pCamera->position);
         
         //FIXME: threshold also depends on aparent size of object
         //       related to depth in 3D space
@@ -59,7 +61,7 @@ void LinePickSystem::update(EntityManager & entities,
         
         if (selectableEntity.valid()) {
             std::cout << "can select entity " << selectableEntity.id() << std::endl;
-//            events.emit<PotentialSelectEvent>(selectableEntity);
+            events.emit<PotentialSelectEvent>(selectableEntity);
         }
             
     }

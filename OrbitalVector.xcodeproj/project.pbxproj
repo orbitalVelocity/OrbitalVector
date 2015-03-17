@@ -37,6 +37,7 @@
 		F19330AC1AA552E3009B42B0 /* globe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330AA1AA552E3009B42B0 /* globe.cpp */; };
 		F19330AF1AA570EB009B42B0 /* orbit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330AD1AA570EB009B42B0 /* orbit.cpp */; };
 		F19330BD1AABE6A5009B42B0 /* ecs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330BC1AABE6A5009B42B0 /* ecs.cpp */; };
+		F1A9BD661AB6480800EF92B7 /* userInputSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1A9BD641AB6480800EF92B7 /* userInputSystem.cpp */; };
 		F1B3C67418D935EC00971791 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1B3C67318D935EC00971791 /* main.cpp */; };
 		F1B3C67618D935EC00971791 /* GLFW3_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1B3C67518D935EC00971791 /* GLFW3_test.1 */; };
 		F1B3C67F18D9397400971791 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67E18D9397400971791 /* IOKit.framework */; };
@@ -161,6 +162,9 @@
 		F19330BB1AABC6D3009B42B0 /* ecs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ecs.h; path = ECS/ecs.h; sourceTree = "<group>"; };
 		F19330BC1AABE6A5009B42B0 /* ecs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ecs.cpp; path = ECS/ecs.cpp; sourceTree = "<group>"; };
 		F19331151AABEEDC009B42B0 /* componentTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = componentTypes.h; path = ECS/componentTypes.h; sourceTree = "<group>"; };
+		F1A9BD641AB6480800EF92B7 /* userInputSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = userInputSystem.cpp; path = Systems/userInputSystem.cpp; sourceTree = "<group>"; };
+		F1A9BD651AB6480800EF92B7 /* userInputSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = userInputSystem.h; path = Systems/userInputSystem.h; sourceTree = "<group>"; };
+		F1A9BD671AB664A300EF92B7 /* events.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = events.h; path = ECS/events.h; sourceTree = "<group>"; };
 		F1B3C67018D935EC00971791 /* OrbitalVector */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OrbitalVector; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1B3C67318D935EC00971791 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F1B3C67518D935EC00971791 /* GLFW3_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GLFW3_test.1; sourceTree = "<group>"; };
@@ -269,6 +273,8 @@
 			children = (
 				F17416F91AB5F33600D2269F /* linePickSystem.cpp */,
 				F17416FA1AB5F33600D2269F /* linePickSystem.h */,
+				F1A9BD641AB6480800EF92B7 /* userInputSystem.cpp */,
+				F1A9BD651AB6480800EF92B7 /* userInputSystem.h */,
 			);
 			name = Systems;
 			sourceTree = "<group>";
@@ -290,6 +296,7 @@
 			children = (
 				F19330BB1AABC6D3009B42B0 /* ecs.h */,
 				F19330BC1AABE6A5009B42B0 /* ecs.cpp */,
+				F1A9BD671AB664A300EF92B7 /* events.h */,
 				F19331151AABEEDC009B42B0 /* componentTypes.h */,
 			);
 			name = ECS;
@@ -471,6 +478,7 @@
 				F1EAC34C1A0B1DDB006B29CB /* unit.cpp in Sources */,
 				F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */,
 				F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */,
+				F1A9BD661AB6480800EF92B7 /* userInputSystem.cpp in Sources */,
 				F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */,
 				F1D4680E1AA511CB00869C62 /* grid.cpp in Sources */,
 				F15D70DE19CFD303008F6573 /* spatial.cpp in Sources */,

@@ -80,7 +80,7 @@ void InsertToSys(body &body, int type)
     cout << "inserted to offset: " << offset << endl;
     
     //insert to ECS
-    myLevel.createEntity(
+    myGameSingleton.createEntity(
                        body.sn.pos,
                        body.sn.vel,
                        {},

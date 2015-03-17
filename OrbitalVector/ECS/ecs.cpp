@@ -8,8 +8,10 @@
 
 #include <stdio.h>
 #include "ecs.h"
+#include "linePickSystem.h"
+#include "userInputSystem.h"
 
-Level myLevel("testMap");
+GameSingleton myGameSingleton("testMap");
 
 glm::vec3 getShipPos(int index)
 {
@@ -44,7 +46,7 @@ glm::vec3* getMissileVelocityPointer(int index)
     return &(sys[index+offset].sn.vel);
 #else
     entityx::ComponentHandle<Velocity> velocity = missile.component<Velocity>;
-    myLevel.entities.entities_with_components(position, velocity)
+    myGameSingleton.entities.entities_with_components(position, velocity)
     return velocity->vel;
 #endif
 }
@@ -85,7 +87,7 @@ std::vector<body> getAllOrbitalObjects()
     //TODO: use auto & instead for optimizatioN?
     auto numEntities = 0;
     std::vector<body> newSys;
-    for (auto entity : myLevel.entities.entities_with_components(position, velocity))
+    for (auto entity : myGameSingleton.entities.entities_with_components(position, velocity))
     {
         numEntities++;
         auto pos = entity.component<Position>();
@@ -152,7 +154,7 @@ void setAllOrbitalObjects(std::vector<body> _sys)
     BodyType types[] = {BodyType::GRAV, BodyType::SHIP, BodyType::PROJECTILE};
     for (auto type : types)
     {
-        for( auto entity : myLevel.entities.entities_with_components(position, velocity, gm, radius, parent, orbitalBodyType))
+        for( auto entity : myGameSingleton.entities.entities_with_components(position, velocity, gm, radius, parent, orbitalBodyType))
         {
             if (orbitalBodyType->orbitalBodyType == type) {
                 position->pos = _sys[index].sn.pos;
@@ -182,14 +184,122 @@ glm::vec3 getMyShipVel()
 #endif
 }
 
-void createRandomShip()
-{
-    myLevel.createRandomShip();
+
+GameSingleton::GameSingleton(std::string filename) {
+//        systems.add<DebugSystem>();
+//        systems.add<MovementSystem>();
+//        systems.add<CollisionSystem>();
+    
+    load(filename);
+    
+//        for (auto e : entity_data()) {
+//            entityx::Entity entity = entities.create();
+//            entity.assign<Position>(e.component<Position>());
+//            entity.assign<Velocity>(e.component<Velocity>());
+//        }
 }
 
-void Level::createRandomShip()
+void GameSingleton::loadEntity(entityx::Entity entity,
+                    glm::vec3 pos,
+                    glm::vec3 vel,
+                    glm::mat4 orientation,
+                    double _gm,
+                    float r,
+                    entityx::Entity::Id _parent,
+                    BodyType bt
+                    )
 {
-    auto newShip = myLevel.entities.create();
+    entity.assign<Position>(pos);
+    entity.assign<Velocity>(vel);
+    entity.assign<GM>(_gm);
+    entity.assign<Parent>(_parent);
+    entity.assign<OrbitalBodyType>(bt);
+    entity.assign<Orientation>(orientation);
+    entity.assign<Radius>(r);
+}
+
+void GameSingleton::createEntity(glm::vec3 pos,
+                  glm::vec3 vel,
+                  glm::mat4 orientation,
+                  double gm,
+                  float r,
+                  int type)
+{
+    auto newShip = entities.create();
+    loadEntity(newShip,
+               pos,
+               vel,
+               orientation,
+               gm,
+               r,
+               mainGrav.id(),
+               (BodyType)type);
+}
+
+void GameSingleton::createShip(
+                    glm::vec3 pos,
+                    glm::vec3 vel,
+                    glm::mat4 orientation,
+                    double gm,
+                    float r)
+{
+    auto newShip = entities.create();
+    loadEntity(newShip,
+               pos,
+               vel,
+               orientation,
+               gm,
+               r,
+               mainGrav.id(),
+               BodyType::SHIP);
+}
+
+void GameSingleton::load(std::string filename)
+{
+    return;
+    //FIXME: this is because InsertToSys creates new entities directly
+    double m = 7e12;
+    double G = 6.673e-11;
+    double gm = m * G;
+    
+    //load json and create entities
+    auto nullEntity = entities.create();
+    nullEntity.invalidate();
+    mainGrav = entities.create();
+    loadEntity(mainGrav,
+               {},
+               glm::vec3(0,0,-.1),
+               {},
+               gm,
+               10,
+               nullEntity.id(),
+               BodyType::GRAV
+               );
+    
+    
+    m = 1e5;
+    gm = m * G;
+    
+    myShipID = entities.create();
+    loadEntity(myShipID,
+               {110,0,0},
+               {0,0,2.3},
+               {},
+               gm,
+               10,
+               mainGrav.id(),
+               BodyType::SHIP
+               );
+}
+
+void createRandomShip()
+{
+    myGameSingleton.createRandomShip();
+}
+
+void GameSingleton::createRandomShip()
+{
+    auto newShip = myGameSingleton.entities.create();
     
     double m = 7e12;
     double G = 6.673e-11;
@@ -207,7 +317,7 @@ void Level::createRandomShip()
     m = 1e1;
     gm = m * G;
 
-    myLevel.loadEntity(newShip,
+    myGameSingleton.loadEntity(newShip,
                        rad,
                        vel,
                        {},
@@ -217,11 +327,25 @@ void Level::createRandomShip()
                        BodyType::SHIP);
 }
 
-
-void initECS()
+//FIXME: merge back into constructor after getting rid of gamelogic and scene classes
+void GameSingleton::init(UserInput *ui)
 {
+    systems.add<LinePickSystem>(pWindow, pCamera);
+    systems.add<UserInputSystem>(pWindow, ui);
+    systems.configure();
     
 }
+
+void GameSingleton::update(double dt)
+{
+    systems.update<LinePickSystem>(dt);
+    systems.update<UserInputSystem>(dt); //this does nothing right now
+//        systems.update<DebugSystem>(dt);
+//        systems.update<MovementSystem>(dt);
+//        systems.update<CollisionSystem>(dt);
+    
+}
+
 
 
 

@@ -13,7 +13,34 @@
 #include "includes.h"
 #include "entityx/Entity.h"
 
-struct Velocity : public entityx::Component<Velocity>
+#define COMPONENT( X ) struct X : public entityx::Component<X>
+
+COMPONENT(PlayerControl)
+{
+    PlayerControl() {}
+};
+
+COMPONENT(Weapon)
+{
+    Weapon() {}
+    
+};
+
+enum UISelectionType
+{
+    HOVER,
+    SELECTED
+};
+
+COMPONENT(UISelection)
+{
+    UISelection() {}
+    UISelection(int t) : type(t) {}
+    int type;
+};
+
+
+COMPONENT(Velocity)
 {
     Velocity() {}
     Velocity(glm::vec3 v) : vel(v) {}

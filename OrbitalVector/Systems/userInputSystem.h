@@ -27,8 +27,7 @@ public:
     void init(UserInput *ui);
     void update(entityx::EntityManager &entities,
                 entityx::EventManager &events,
-                double dt)
-    {}
+                double dt);
     
     void receive(const PotentialSelectEvent &e);
     

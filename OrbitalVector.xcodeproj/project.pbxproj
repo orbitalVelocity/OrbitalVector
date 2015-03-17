@@ -38,6 +38,10 @@
 		F19330AF1AA570EB009B42B0 /* orbit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330AD1AA570EB009B42B0 /* orbit.cpp */; };
 		F19330BD1AABE6A5009B42B0 /* ecs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330BC1AABE6A5009B42B0 /* ecs.cpp */; };
 		F1A9BD661AB6480800EF92B7 /* userInputSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1A9BD641AB6480800EF92B7 /* userInputSystem.cpp */; };
+		F1A9BD6A1AB7BB1B00EF92B7 /* missileSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1A9BD681AB7BB1B00EF92B7 /* missileSystem.cpp */; };
+		F1A9BD6D1AB7C29100EF92B7 /* collisionSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1A9BD6B1AB7C29100EF92B7 /* collisionSystem.cpp */; };
+		F1A9BD701AB7EA1E00EF92B7 /* debugTextSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1A9BD6E1AB7EA1E00EF92B7 /* debugTextSystem.cpp */; };
+		F1A9BD731AB8787300EF92B7 /* eventScheduleSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1A9BD711AB8787300EF92B7 /* eventScheduleSystem.cpp */; };
 		F1B3C67418D935EC00971791 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1B3C67318D935EC00971791 /* main.cpp */; };
 		F1B3C67618D935EC00971791 /* GLFW3_test.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1B3C67518D935EC00971791 /* GLFW3_test.1 */; };
 		F1B3C67F18D9397400971791 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C67E18D9397400971791 /* IOKit.framework */; };
@@ -165,6 +169,14 @@
 		F1A9BD641AB6480800EF92B7 /* userInputSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = userInputSystem.cpp; path = Systems/userInputSystem.cpp; sourceTree = "<group>"; };
 		F1A9BD651AB6480800EF92B7 /* userInputSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = userInputSystem.h; path = Systems/userInputSystem.h; sourceTree = "<group>"; };
 		F1A9BD671AB664A300EF92B7 /* events.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = events.h; path = ECS/events.h; sourceTree = "<group>"; };
+		F1A9BD681AB7BB1B00EF92B7 /* missileSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = missileSystem.cpp; path = Systems/missileSystem.cpp; sourceTree = "<group>"; };
+		F1A9BD691AB7BB1B00EF92B7 /* missileSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = missileSystem.h; path = Systems/missileSystem.h; sourceTree = "<group>"; };
+		F1A9BD6B1AB7C29100EF92B7 /* collisionSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = collisionSystem.cpp; path = Systems/collisionSystem.cpp; sourceTree = "<group>"; };
+		F1A9BD6C1AB7C29100EF92B7 /* collisionSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = collisionSystem.h; path = Systems/collisionSystem.h; sourceTree = "<group>"; };
+		F1A9BD6E1AB7EA1E00EF92B7 /* debugTextSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = debugTextSystem.cpp; path = Systems/debugTextSystem.cpp; sourceTree = "<group>"; };
+		F1A9BD6F1AB7EA1E00EF92B7 /* debugTextSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = debugTextSystem.h; path = Systems/debugTextSystem.h; sourceTree = "<group>"; };
+		F1A9BD711AB8787300EF92B7 /* eventScheduleSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = eventScheduleSystem.cpp; path = Systems/eventScheduleSystem.cpp; sourceTree = "<group>"; };
+		F1A9BD721AB8787300EF92B7 /* eventScheduleSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = eventScheduleSystem.h; path = Systems/eventScheduleSystem.h; sourceTree = "<group>"; };
 		F1B3C67018D935EC00971791 /* OrbitalVector */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = OrbitalVector; sourceTree = BUILT_PRODUCTS_DIR; };
 		F1B3C67318D935EC00971791 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		F1B3C67518D935EC00971791 /* GLFW3_test.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = GLFW3_test.1; sourceTree = "<group>"; };
@@ -271,10 +283,18 @@
 		F17416F81AB5F2C100D2269F /* Systems */ = {
 			isa = PBXGroup;
 			children = (
+				F1A9BD681AB7BB1B00EF92B7 /* missileSystem.cpp */,
+				F1A9BD691AB7BB1B00EF92B7 /* missileSystem.h */,
 				F17416F91AB5F33600D2269F /* linePickSystem.cpp */,
 				F17416FA1AB5F33600D2269F /* linePickSystem.h */,
 				F1A9BD641AB6480800EF92B7 /* userInputSystem.cpp */,
 				F1A9BD651AB6480800EF92B7 /* userInputSystem.h */,
+				F1A9BD6B1AB7C29100EF92B7 /* collisionSystem.cpp */,
+				F1A9BD6C1AB7C29100EF92B7 /* collisionSystem.h */,
+				F1A9BD6E1AB7EA1E00EF92B7 /* debugTextSystem.cpp */,
+				F1A9BD6F1AB7EA1E00EF92B7 /* debugTextSystem.h */,
+				F1A9BD711AB8787300EF92B7 /* eventScheduleSystem.cpp */,
+				F1A9BD721AB8787300EF92B7 /* eventScheduleSystem.h */,
 			);
 			name = Systems;
 			sourceTree = "<group>";
@@ -458,10 +478,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F1A9BD731AB8787300EF92B7 /* eventScheduleSystem.cpp in Sources */,
 				F151168C19DE1FE50018635B /* gameLogic.cpp in Sources */,
 				F1011C6719C68C6700602446 /* scene.cpp in Sources */,
+				F1A9BD6A1AB7BB1B00EF92B7 /* missileSystem.cpp in Sources */,
 				F15E8E9C19BD406B003E566C /* OGLShader.cpp in Sources */,
 				F19330BD1AABE6A5009B42B0 /* ecs.cpp in Sources */,
+				F1A9BD6D1AB7C29100EF92B7 /* collisionSystem.cpp in Sources */,
 				F19330AC1AA552E3009B42B0 /* globe.cpp in Sources */,
 				F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */,
 				F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */,
@@ -473,6 +496,7 @@
 				F156D08E1A16D9AD00C26739 /* unitManager.cpp in Sources */,
 				F111F26B19D48F8C00DD4439 /* text.cpp in Sources */,
 				F15E8EA619BD4696003E566C /* LoadShader.cpp in Sources */,
+				F1A9BD701AB7EA1E00EF92B7 /* debugTextSystem.cpp in Sources */,
 				F1EAC34F1A0BDE42006B29CB /* renderer.cpp in Sources */,
 				F111F26E19D9E94200DD4439 /* input.cpp in Sources */,
 				F1EAC34C1A0B1DDB006B29CB /* unit.cpp in Sources */,

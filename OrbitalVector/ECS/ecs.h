@@ -16,6 +16,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "input.h"
+#include "text.h"
 
 #define OLDECS true
 
@@ -52,7 +53,7 @@ public:
 public:
     explicit GameSingleton(std::string filename);
 
-    void init(UserInput *ui);
+    void init(UserInput *ui, TextRenderer *text);
     /**
      * Convenience function for creating a generic orbiting body in ECS
      * @parameter pos glm::vec3 position

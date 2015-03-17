@@ -233,10 +233,22 @@ void GameLogic::processActionList(std::vector<ActionType> &actionList)
                 break;
         }
         
+        auto newEntity = [](body body, BodyType type)
+        {
+            myGameSingleton.createEntity(
+                                         body.sn.pos,
+                                         body.sn.vel,
+                                         {},
+                                         body.mu,
+                                         body.radius,
+                                         type);
+        };
+        
         if (action == ActionType::newShip)
         {
             sShip.push_back(Spatial(200.0));    //Spatial constructor inserts body into sys already! and creates a ship in ECS
             sShip.back().scale(glm::vec3(1));
+            //FIXME: can't call body right now cause temp body is created inside Spatial constructor
         }
         if (action == ActionType::fireGun)
         {
@@ -254,6 +266,7 @@ void GameLogic::processActionList(std::vector<ActionType> &actionList)
             body bullet(state(pos, vel), 10, gm, nullptr, BodyType::SHIP);
 //            addSatellite(bullet);
             InsertToSys(bullet, BodyType::PROJECTILE);
+//            newEntity(bullet, BodyType::PROJECTILE);
         }
 
     }

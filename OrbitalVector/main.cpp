@@ -269,7 +269,6 @@ void getText(TextRenderer &textObj, PerfMon &perfMon, WindowStates &ws)
     auto winHeight = ws.winHeight;
     
     stringstream textOut;
-    textObj.debugTexts.clear();
     textOut << "Frame: " << std::fixed << std::setprecision(1)
     << 1000.0/perfMon.fps.average()
     << "ms max: " << 1000.0/perfMon.fps.min()
@@ -424,7 +423,7 @@ int main(int argc, const char * argv[])
     //FIXME: for refactoring only
     myGameSingleton.pWindow = ws.pWindow;
     myGameSingleton.pCamera = &scene.camera;
-    myGameSingleton.init(&inputObject);
+    myGameSingleton.init(&inputObject, &textObj);
     
     while (!glfwWindowShouldClose(ws.pWindow))
     {
@@ -437,6 +436,7 @@ int main(int argc, const char * argv[])
         auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
         textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
 		
+        textObj.debugTexts.clear();
         gameLogic.processActionList(inputObject.actionList);
         gameLogic.update(dt);
         renderer.update();

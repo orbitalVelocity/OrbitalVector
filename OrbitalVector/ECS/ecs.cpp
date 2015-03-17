@@ -10,6 +10,9 @@
 #include "ecs.h"
 #include "linePickSystem.h"
 #include "userInputSystem.h"
+#include "missileSystem.h"
+#include "collisionSystem.h"
+#include "debugTextSystem.h"
 
 GameSingleton myGameSingleton("testMap");
 
@@ -328,10 +331,13 @@ void GameSingleton::createRandomShip()
 }
 
 //FIXME: merge back into constructor after getting rid of gamelogic and scene classes
-void GameSingleton::init(UserInput *ui)
+void GameSingleton::init(UserInput *ui, TextRenderer *text)
 {
     systems.add<LinePickSystem>(pWindow, pCamera);
     systems.add<UserInputSystem>(pWindow, ui);
+    systems.add<MissileSystem>();
+    systems.add<CollisionSystem>();
+    systems.add<DebugTextSystem>(text);
     systems.configure();
     
 }
@@ -340,8 +346,10 @@ void GameSingleton::update(double dt)
 {
     systems.update<LinePickSystem>(dt);
     systems.update<UserInputSystem>(dt); //this does nothing right now
-//        systems.update<DebugSystem>(dt);
+    systems.update<MissileSystem>(dt);
 //        systems.update<MovementSystem>(dt);
+    systems.update<CollisionSystem>(dt);
+    systems.update<DebugTextSystem>(dt); //this does nothing right now
 //        systems.update<CollisionSystem>(dt);
     
 }

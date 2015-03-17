@@ -15,6 +15,17 @@
 
 #define COMPONENT( X ) struct X : public entityx::Component<X>
 
+COMPONENT(MissileLogic)
+{
+    MissileLogic() {}
+    MissileLogic(entityx::Entity p, entityx::Entity t)
+    : parent(p), target(t) {}
+    
+    entityx::Entity target;
+    entityx::Entity parent;
+    
+};
+
 COMPONENT(PlayerControl)
 {
     PlayerControl() {}

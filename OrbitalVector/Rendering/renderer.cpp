@@ -505,8 +505,8 @@ void Renderer::forwardRender()
     };
     
 #if 1
+    //old way
 //    drawSelector(gameLogic.selected, shipOrbitColor);
-    drawSelector(gameLogic.mouseHover, gridColor);
 
     //new way of drawing from ECS
     auto color = shipOrbitColor;
@@ -519,6 +519,7 @@ void Renderer::forwardRender()
         glUniform3fv(loc, 1, glm::value_ptr(centralPos));
         sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
     }
+    drawSelector(gameLogic.mouseHover, gridColor);
 #endif
     
     glUseProgram(globe.shaderProgram);

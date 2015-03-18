@@ -32,7 +32,7 @@ glm::vec3 getShipPos(int index)
 glm::vec3 getMissilePos(int index)
 {
 #if OLDECS
-    int offset = sysIndexOffset[BodyType::PROJECTILE];
+    int offset = sysIndexOffset[BodyType::MISSILE];
     return sys[index+offset].sn.pos;
 #else
     //convert index to missile index or something
@@ -45,7 +45,7 @@ glm::vec3 getMissilePos(int index)
 glm::vec3* getMissileVelocityPointer(int index)
 {
 #if OLDECS
-    int offset = sysIndexOffset[BodyType::PROJECTILE];
+    int offset = sysIndexOffset[BodyType::MISSILE];
     return &(sys[index+offset].sn.vel);
 #else
     entityx::ComponentHandle<Velocity> velocity = missile.component<Velocity>;
@@ -70,7 +70,7 @@ int getNumberOfShips()
 }
 int getNumberOfMissiles()
 {
-    return numBodyPerType[BodyType::PROJECTILE];
+    return numBodyPerType[BodyType::MISSILE];
 }
 
 int getNumberOfEntities()
@@ -154,7 +154,7 @@ void setAllOrbitalObjects(std::vector<body> _sys)
     entityx::ComponentHandle<Parent> parent;
     entityx::ComponentHandle<OrbitalBodyType> orbitalBodyType;
     auto index = 0;
-    BodyType types[] = {BodyType::GRAV, BodyType::SHIP, BodyType::PROJECTILE};
+    BodyType types[] = {BodyType::GRAV, BodyType::SHIP, BodyType::MISSILE};
     for (auto type : types)
     {
         for( auto entity : myGameSingleton.entities.entities_with_components(position, velocity, gm, radius, parent, orbitalBodyType))
@@ -237,6 +237,10 @@ void GameSingleton::createEntity(glm::vec3 pos,
                r,
                mainGrav.id(),
                (BodyType)type);
+    
+    if (type == BodyType::MISSILE and not selectedEntities.empty()) {
+        newShip.assign<MissileLogic>(myShip, selectedEntities.front());
+    }
 }
 
 void GameSingleton::createShip(

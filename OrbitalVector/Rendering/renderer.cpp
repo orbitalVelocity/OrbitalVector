@@ -492,6 +492,7 @@ void Renderer::forwardRender()
         check_gl_error();
         //break;
     }
+    
     glUseProgram(sprite.shaderProgram);
     auto drawSelector = [&](int i, glm::vec3 color)
     {
@@ -539,7 +540,7 @@ void Renderer::forwardRender()
     
     //draw projectile
     glUseProgram(missile.shaderProgram);
-//    int projectileOffset = sysIndexOffset[BodyType::PROJECTILE];
+//    int projectileOffset = sysIndexOffset[BodyType::MISSILE];
 //    for (int i=projectileOffset; i < sys.size(); i++)
     for (int i=0; i < getNumberOfMissiles(); i++)
     {

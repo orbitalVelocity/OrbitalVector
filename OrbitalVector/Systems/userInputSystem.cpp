@@ -132,8 +132,8 @@ void UserInputSystem::update(entityx::EntityManager &entities,
 //            * 3.0f;
 //            body bullet(state(pos, vel), 10, gm, nullptr, BodyType::SHIP);
 //            //            addSatellite(bullet);
-//            InsertToSys(bullet, BodyType::PROJECTILE);
-//            //            newEntity(bullet, BodyType::PROJECTILE);
+//            InsertToSys(bullet, BodyType::MISSILE);
+//            //            newEntity(bullet, BodyType::MISSILE);
         }
         
     }

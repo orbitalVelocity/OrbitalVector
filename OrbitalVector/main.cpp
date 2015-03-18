@@ -313,8 +313,8 @@ void getText(TextRenderer &textObj, PerfMon &perfMon, WindowStates &ws)
 //    textOut << "miss offset: " << sysIndexOffset[BodyType::MISSILE]
 //    << " size: " << numBodyPerType[BodyType::MISSILE];
 //    textObj.pushBackDebug(textOut);
-//    textOut << "proj offset: " << sysIndexOffset[BodyType::PROJECTILE]
-//    << " size: " << numBodyPerType[BodyType::PROJECTILE];
+//    textOut << "proj offset: " << sysIndexOffset[BodyType::MISSILE]
+//    << " size: " << numBodyPerType[BodyType::MISSILE];
 //    textObj.pushBackDebug(textOut);
    
 //    //mouse debug

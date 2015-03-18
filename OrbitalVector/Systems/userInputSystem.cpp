@@ -11,7 +11,7 @@
 
 using namespace entityx;
 
-UserInputSystem::UserInputSystem(UserInput *ui, std::vector<Entity> &s) : legacyUserInput(ui), selectedEntities(s)
+UserInputSystem::UserInputSystem(UserInput *ui, std::vector<Entity> &s, std::vector<Entity> &h) : legacyUserInput(ui), selectedEntities(s), mouseOverEntities(h)
 {
     
 }
@@ -22,7 +22,7 @@ void UserInputSystem::configure(EventManager& eventManager)
 }
 
 /**
- *  only gets called when a mouse hovers over an entity
+ *  only gets called when mouse overs an entity
  */
 void UserInputSystem::receive(const PotentialSelectEvent& e)
 {
@@ -33,6 +33,10 @@ void UserInputSystem::receive(const PotentialSelectEvent& e)
     auto cameraRotateMode = legacyUserInput->rmbPressed;
     auto selectionMode = legacyUserInput->lmbPressed and not cameraRotateMode;
     
+    //FIXME: ideally, MB callback will signal event to trigger this function too
+    //          in order to detect when a user has clicked a place that
+    //OR don't put any of this in the receive, leave it in linePick, so much easier that way!
+    //OR give the MB call back access to selectedEntities as well so it can update dynamically as well (but now we have multiple locations that writes to the same set of structures... :( easy for bugs to creep out!
     auto enableMultiSelection = false;
     if (not enableMultiSelection) {
         if (selectionMode) {
@@ -45,9 +49,9 @@ void UserInputSystem::receive(const PotentialSelectEvent& e)
         selectedEntities.emplace_back(potentiallySelectedEntity);
         std::cout << "selected: " << potentiallySelectedEntity.id() << std::endl;
         
-    } else { //else hovermode
+    } else { //else mouseOverMode
         mouseOverEntities.emplace_back(potentiallySelectedEntity);
-        std::cout << "hovered: " << potentiallySelectedEntity.id() << std::endl;
+        std::cout << "mouseOver: " << potentiallySelectedEntity.id() << std::endl;
     }
 
     //what happens when the cursor moves? is that called in a callback??

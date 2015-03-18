@@ -30,7 +30,8 @@ class UserInputSystem : public entityx::System<UserInputSystem>,
                         public entityx::Receiver<PotentialSelectEvent>
 {
 public:
-    UserInputSystem(UserInput *ui, std::vector<entityx::Entity> &selected);
+    UserInputSystem(UserInput *ui, std::vector<entityx::Entity> &selected,
+                    std::vector<entityx::Entity> &hover);
     void configure(entityx::EventManager& eventManager);
     
     void update(entityx::EntityManager &entities,
@@ -51,9 +52,9 @@ private:
     entityx::Entity myShip;
     
     entityx::Entity potentiallySelectedEntity;
-    entityx::Entity hoverOverEntity;
+    entityx::Entity mouseOverEntity;
     
-    std::vector<entityx::Entity> mouseOverEntities;
+    std::vector<entityx::Entity> &mouseOverEntities;
     std::vector<entityx::Entity> &selectedEntities;
 };
 #endif /* defined(__OrbitalVector__userInputSystem__) */

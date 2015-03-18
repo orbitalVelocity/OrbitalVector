@@ -81,7 +81,7 @@ void GameLogic::linePick()
                 selected = objIdx;
             else {
                 mouseHover = objIdx;
-                cout << "mouse hover is: " << mouseHover << endl;
+                cout << "mouseOver is: " << mouseHover << endl;
             }
         }
         

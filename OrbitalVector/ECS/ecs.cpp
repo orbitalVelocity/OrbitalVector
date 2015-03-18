@@ -337,7 +337,7 @@ void GameSingleton::init(UserInput *ui, TextRenderer *text)
     legacyUserInput = ui;
     
     systems.add<LinePickSystem>();
-    systems.add<UserInputSystem>(ui, selectedEntities);
+    systems.add<UserInputSystem>(ui, selectedEntities, mouseOverEntities);
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();
     systems.add<DebugTextSystem>(text);

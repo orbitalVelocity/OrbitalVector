@@ -18,7 +18,7 @@
 #include "camera.h"
 
 /**
- * Finds closest entity the cursor is hovering over
+ * Finds closest entity the cursor is over
  * Emmits a "potentially selected" event
  * Up to userInputSystem to determine what to do with this
  */

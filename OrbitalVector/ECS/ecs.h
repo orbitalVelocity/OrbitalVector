@@ -52,6 +52,7 @@ public:
     GLFWwindow *pWindow;
     UserInput *legacyUserInput;
     std::vector<entityx::Entity> selectedEntities;
+    std::vector<entityx::Entity> mouseOverEntities;
 public:
     explicit GameSingleton(std::string filename);
 

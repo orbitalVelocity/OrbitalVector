@@ -493,7 +493,7 @@ void Renderer::forwardRender()
         //break;
     }
     glUseProgram(sprite.shaderProgram);
-    auto drawSelector = [&](int i, glm::vec3 &color)
+    auto drawSelector = [&](int i, glm::vec3 color)
     {
         if (i < 1 || i >= getNumberOfEntities()) {//sys.size()) {
             return;
@@ -507,19 +507,25 @@ void Renderer::forwardRender()
 #if 1
     //old way
 //    drawSelector(gameLogic.selected, shipOrbitColor);
+//    drawSelector(gameLogic.mouseHover, gridColor);
 
     //new way of drawing from ECS
-    auto color = shipOrbitColor;
-    for (auto selected : myGameSingleton.selectedEntities)
+    auto drawSelectorNew = [&](vector<entityx::Entity> entities, glm::vec3 color)
     {
-        auto positionHandle = myGameSingleton.entities.component<Position>(selected.id());
-        
-        auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));//sys[i].sn.pos, 1.0));
-        auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
-        glUniform3fv(loc, 1, glm::value_ptr(centralPos));
-        sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
-    }
-    drawSelector(gameLogic.mouseHover, gridColor);
+        for (auto selected : entities)
+        {
+            auto positionHandle = selected.component<Position>();
+            
+            auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));//sys[i].sn.pos, 1.0));
+            auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
+            glUniform3fv(loc, 1, glm::value_ptr(centralPos));
+            sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
+        }
+    };
+
+    drawSelectorNew(myGameSingleton.selectedEntities, shipOrbitColor);
+    drawSelectorNew(myGameSingleton.mouseOverEntities, gridColor);
+    
 #endif
     
     glUseProgram(globe.shaderProgram);

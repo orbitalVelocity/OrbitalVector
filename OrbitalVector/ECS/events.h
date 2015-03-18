@@ -55,4 +55,12 @@ EVENT(DebugEvent)
     std::string message;
 };
 
+EVENT(FireWeaponEvent)
+{
+    FireWeaponEvent(entityx::Entity e)
+    : entity(e)
+    {}
+    
+    entityx::Entity entity;
+};
 #endif

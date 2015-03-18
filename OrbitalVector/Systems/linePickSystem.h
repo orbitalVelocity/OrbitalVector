@@ -17,20 +17,26 @@
 #include "entityx/System.h"
 #include "camera.h"
 
+/**
+ * Finds closest entity the cursor is hovering over
+ * Emmits a "potentially selected" event
+ * Up to userInputSystem to determine what to do with this
+ */
 class LinePickSystem : public entityx::System<LinePickSystem>
 {
 public:
     
-    LinePickSystem(GLFWwindow *w, Camera *c);
+    LinePickSystem();
     
     //consider a wrapper around *window to store
     //cursor position, screen dimensions, framebuffer dimensions
     void update(entityx::EntityManager & entities,
                 entityx::EventManager & events,
-                double dt);
+                double dt,
+                GLFWwindow *w, Camera *c);
 
-private:
-    GLFWwindow *pWindow;
-    Camera *pCamera;
+    void update(entityx::EntityManager & entities,
+                entityx::EventManager & events,
+                double dt) override {}
 };
 #endif /* defined(__OrbitalVector__linePickSystem__) */

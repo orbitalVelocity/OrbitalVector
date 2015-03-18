@@ -46,10 +46,12 @@ void createRandomShip();
 class GameSingleton : public entityx::EntityX {
     //FIXME: make this private after removing gameLogic/scene class
 public:
-    entityx::Entity myShipID;
+    entityx::Entity myShip;
     entityx::Entity mainGrav;
     Camera *pCamera;
     GLFWwindow *pWindow;
+    UserInput *legacyUserInput;
+    std::vector<entityx::Entity> selectedEntities;
 public:
     explicit GameSingleton(std::string filename);
 

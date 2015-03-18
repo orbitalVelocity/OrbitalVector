@@ -283,8 +283,8 @@ void GameSingleton::load(std::string filename)
     m = 1e5;
     gm = m * G;
     
-    myShipID = entities.create();
-    loadEntity(myShipID,
+    myShip = entities.create();
+    loadEntity(myShip,
                {110,0,0},
                {0,0,2.3},
                {},
@@ -333,8 +333,11 @@ void GameSingleton::createRandomShip()
 //FIXME: merge back into constructor after getting rid of gamelogic and scene classes
 void GameSingleton::init(UserInput *ui, TextRenderer *text)
 {
-    systems.add<LinePickSystem>(pWindow, pCamera);
-    systems.add<UserInputSystem>(pWindow, ui);
+    //FIXME: remove UI asap
+    legacyUserInput = ui;
+    
+    systems.add<LinePickSystem>();
+    systems.add<UserInputSystem>(ui, selectedEntities);
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();
     systems.add<DebugTextSystem>(text);
@@ -344,8 +347,8 @@ void GameSingleton::init(UserInput *ui, TextRenderer *text)
 
 void GameSingleton::update(double dt)
 {
-    systems.update<LinePickSystem>(dt);
-    systems.update<UserInputSystem>(dt); //this does nothing right now
+    systems.system<LinePickSystem>()->update(entities, events, dt, pWindow, pCamera);
+    systems.system<UserInputSystem>()->update(entities, events, dt, legacyUserInput, myShip);
     systems.update<MissileSystem>(dt);
 //        systems.update<MovementSystem>(dt);
     systems.update<CollisionSystem>(dt);

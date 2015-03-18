@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include "entityx/System.h"
 
+/**
+ * determines how to steer missile towards target (or not!)
+ */
 class MissileSystem: public entityx::System<MissileSystem>
 {
 public:
@@ -21,7 +24,5 @@ public:
     void update(entityx::EntityManager & entities,
                 entityx::EventManager & events,
                 double dt);
-    
-private:
 };
 #endif /* defined(__OrbitalVector__missileSystem__) */

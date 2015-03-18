@@ -59,7 +59,7 @@ COMPONENT(Velocity)
     glm::vec3 vel;
 };
 
-struct Position : public entityx::Component<Position>
+COMPONENT(Position)
 {
     Position() {}
     Position(glm::vec3 p) : pos(p) {}
@@ -67,14 +67,14 @@ struct Position : public entityx::Component<Position>
     glm::vec3 pos;
 };
 
-struct GM : public entityx::Component<GM>
+COMPONENT(GM)
 {
     GM() {}
     GM(double _gm) : gm(_gm) {}
     double gm;
 };
 
-struct Parent : public entityx::Component<Parent>
+COMPONENT(Parent)
 {
     Parent() {}
     Parent(entityx::Entity::Id p) : parent(p) {}
@@ -82,7 +82,7 @@ struct Parent : public entityx::Component<Parent>
     entityx::Entity::Id parent;
 };
 
-struct OrbitalBodyType : public entityx::Component<OrbitalBodyType>
+COMPONENT(OrbitalBodyType)
 {
     OrbitalBodyType() {}
     OrbitalBodyType(BodyType bt) : orbitalBodyType(bt) {}
@@ -90,7 +90,7 @@ struct OrbitalBodyType : public entityx::Component<OrbitalBodyType>
     BodyType orbitalBodyType;
 };
 
-struct Orientation :public entityx::Component<Orientation>
+COMPONENT(Orientation)
 {
     Orientation () {}
     Orientation (glm::mat4 o) : orientation(o) {}
@@ -98,7 +98,8 @@ struct Orientation :public entityx::Component<Orientation>
     glm::mat4 orientation;
 };
 
-struct Radius : public entityx::Component<Radius>{
+COMPONENT(Radius)
+{
     Radius () {}
     Radius (float r) : radius(r) {}
     

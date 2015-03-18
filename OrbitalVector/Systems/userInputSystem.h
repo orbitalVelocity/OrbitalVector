@@ -17,27 +17,43 @@
 #include "events.h"
 #include "input.h" //legacy
 
+/**
+ * Grabs user input from the UserInput class 
+ *      FIXME: (UserInput is legacy, needs to move that into this system... maybe?)
+ *      on the other hand, this helps keep a separation of system and state 
+ *          (although... I still need to keep state, so n/m)
+ * Anyway, this turns raw user inputs into actionable commands and emmits those commands into 
+ * a commandProcessorSystem
+ *      TODO: implement commandProcessorSystem; for now, keep that in this class as AI doesn't exist yet
+ */
 class UserInputSystem : public entityx::System<UserInputSystem>,
                         public entityx::Receiver<PotentialSelectEvent>
 {
 public:
-    UserInputSystem(GLFWwindow *w, UserInput *ui);
+    UserInputSystem(UserInput *ui, std::vector<entityx::Entity> &selected);
     void configure(entityx::EventManager& eventManager);
     
-    void init(UserInput *ui);
     void update(entityx::EntityManager &entities,
                 entityx::EventManager &events,
-                double dt);
+                double dt,
+                UserInput *ui,
+                entityx::Entity e);
+    
+    void update(entityx::EntityManager & entities,
+                entityx::EventManager & events,
+                double dt) override {}
     
     void receive(const PotentialSelectEvent &e);
     
 private:
     GLFWwindow *pWindow;
+    UserInput* legacyUserInput = nullptr;   //get rid of this when userInput is absorbed into this class
+    entityx::Entity myShip;
+    
     entityx::Entity potentiallySelectedEntity;
     entityx::Entity hoverOverEntity;
-    UserInput* legacyUserInput = nullptr;   //get rid of this when userInput is absorbed into this class
     
     std::vector<entityx::Entity> mouseOverEntities;
-    std::vector<entityx::Entity> selectedEntities;
+    std::vector<entityx::Entity> &selectedEntities;
 };
 #endif /* defined(__OrbitalVector__userInputSystem__) */

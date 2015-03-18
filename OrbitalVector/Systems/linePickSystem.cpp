@@ -13,8 +13,7 @@
 
 using namespace entityx;
 
-LinePickSystem::LinePickSystem(GLFWwindow *w, Camera *c) :
-                pWindow(w), pCamera(c)
+LinePickSystem::LinePickSystem()
 {
     
 }
@@ -22,7 +21,9 @@ LinePickSystem::LinePickSystem(GLFWwindow *w, Camera *c) :
 
 void LinePickSystem::update(EntityManager & entities,
                             EventManager &events,
-                            double dt)
+                            double dt,
+                            GLFWwindow *pWindow,
+                            Camera *pCamera)
 {
     //construct mouse/cursor casted ray
     double mouseX, mouseY;

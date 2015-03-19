@@ -63,9 +63,9 @@ public:
 //invokes game logic
 class Renderer {
 public:
-    Renderer(Scene &s, GameLogic &g, UserInput &i)
+    Renderer(Scene &s, GameLogic &g, UserInput &i, Camera &c)
     : scene(s), gameLogic(g),
-    userInput(i),
+    userInput(i), camera(c),
     globe(GL_TRIANGLES),
     grid(GL_LINEAR_ATTENUATION),
     ship(GL_TRIANGLES),
@@ -131,6 +131,8 @@ public:
     bool debug;
     float downSizeFactor;
     int selected, mouseHover;
+    
+    Camera &camera;
 };
 
 

@@ -48,7 +48,7 @@ class GameSingleton : public entityx::EntityX {
 public:
     entityx::Entity myShip;
     entityx::Entity mainGrav;
-    Camera *pCamera;
+    Camera camera;
     GLFWwindow *pWindow;
     UserInput *legacyUserInput;
     std::vector<entityx::Entity> selectedEntities;
@@ -57,6 +57,9 @@ public:
     explicit GameSingleton(std::string filename);
 
     void init(UserInput *ui, TextRenderer *text);
+    void load(std::string filename, int width, int height);
+    void initCamera(int width, int height);
+   
     /**
      * Convenience function for creating a generic orbiting body in ECS
      * @parameter pos glm::vec3 position
@@ -92,9 +95,6 @@ public:
                     float r);
     
     
-    //loads level of name filename
-    void load(std::string filename);
-   
     //grabs entity from data loaded in load
 //    std::vector<entityx::Entity> entity_data();
     

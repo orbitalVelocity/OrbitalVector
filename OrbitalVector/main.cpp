@@ -390,7 +390,7 @@ int main(int argc, const char * argv[])
     auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
     
     //FIXME: for refactoring only
-    myGameSingleton.load("test");
+    myGameSingleton.load("test", width, height);
     assert(myGameSingleton.myShip.valid());
     updateOrbitalPhysics(.001, ks, true);
 //    initPhysics();
@@ -400,7 +400,7 @@ int main(int argc, const char * argv[])
     Scene scene;
     GameLogic gameLogic(ws.pWindow, scene, inputObject);
     scene.init(ws.fbWidth, ws.fbHeight);
-    Renderer renderer(scene, gameLogic, inputObject);
+    Renderer renderer(scene, gameLogic, inputObject, myGameSingleton.camera);
     renderer.init(ws.fbWidth, ws.fbHeight);
         check_gl_error();
     
@@ -411,7 +411,7 @@ int main(int argc, const char * argv[])
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, std::to_string(scene.orbit.peri)));
 
     auto UITextSetup = [&](){
-        auto vp = scene.camera.matrix() * world;
+        auto vp = myGameSingleton.camera.matrix() * world;
         textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
         textObj.guiText[1].pos = getVec2(vp, scene.orbit.apoPos);
         textObj.guiText[2].pos = getVec2(vp, scene.orbit.periPos);
@@ -429,7 +429,7 @@ int main(int argc, const char * argv[])
 //    myGameSingleton.load("test");
 //    assert(myGameSingleton.myShip.valid());
     myGameSingleton.pWindow = ws.pWindow;
-    myGameSingleton.pCamera = &scene.camera;
+//    myGameSingleton.pCamera = &scene.camera;
     myGameSingleton.init(&inputObject, &textObj);
     
     while (!glfwWindowShouldClose(ws.pWindow))

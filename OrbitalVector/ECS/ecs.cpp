@@ -270,8 +270,18 @@ void GameSingleton::createShip(
                BodyType::SHIP);
 }
 
-void GameSingleton::load(std::string filename)
+void GameSingleton::initCamera(int width, int height) {
+    camera.setPosition(glm::vec3(0, 0, 10.0f));
+    camera.setFocus(glm::vec3(0,3.0f,0));
+    camera.setClip(0.01f, 2000.0f);
+    camera.setFOV(45.0f);
+    camera.setAspectRatio((float)width/(float)height);
+}
+
+void GameSingleton::load(std::string, int width, int height )
 {
+    initCamera(width, height);
+    
     //FIXME: this is because InsertToSys creates new entities directly
     double m = 7e12;
     double G = 6.673e-11;
@@ -370,7 +380,7 @@ void GameSingleton::update(double dt)
 //    assert(myShip.valid());
     systems.system<UserInputSystem>()->update(entities, events, dt,
                                               legacyUserInput, myShip,
-                                             pWindow, pCamera);
+                                             pWindow, camera);
     systems.update<MissileSystem>(dt);
     systems.update<OrbitalPhysicsSystem>(dt);
     systems.update<CollisionSystem>(dt);

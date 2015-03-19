@@ -120,7 +120,7 @@ void readBinObject(string _fileName)
 
 void Scene::init(int width, int height)
 {
-    initCamera(camera, width, height);
+//    initCamera(camera, width, height);
     
     lightPos = glm::vec3(0, 0, -1000);
 

@@ -41,14 +41,14 @@ public:
                 double dt,
                 UserInput *ui,
                 entityx::Entity e,
-                GLFWwindow *w, Camera *c);
+                GLFWwindow *w, Camera &);
     
     void  update(entityx::EntityManager & entities,
                 entityx::EventManager & events,
                 double dt) override {}
 
     entityx::Entity linePick(entityx::EntityManager & entities,
-                  GLFWwindow *w, Camera *c);
+                  GLFWwindow *w, Camera &c);
 
     void updateMouseSelection(entityx::Entity selectableEntity);
     

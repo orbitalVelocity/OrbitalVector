@@ -44,9 +44,9 @@ void UserInputSystem::update(entityx::EntityManager &entities,
                              UserInput *legacyUserInput,
                              entityx::Entity myShip,
                              GLFWwindow *window,
-                             Camera *pCamera)
+                             Camera &camera)
 {
-    auto selectableEntity = linePick(entities, window, pCamera);
+    auto selectableEntity = linePick(entities, window, camera);
     
     updateMouseSelection(selectableEntity);
     
@@ -61,7 +61,7 @@ void UserInputSystem::update(entityx::EntityManager &entities,
     double mouseScale = .1;
 
     if (legacyUserInput->rmbPressed) {
-        pCamera->rotate(_y*mouseScale, _x*mouseScale);
+        camera.rotate(_y*mouseScale, _x*mouseScale);
     } else if (legacyUserInput->lmbPressed && not selectableEntity.valid()) {
         //rotate mySHip
 //        sShip[0].rotate(-_x*mouseScale, _y*mouseScale, 0.0f);
@@ -71,7 +71,7 @@ void UserInputSystem::update(entityx::EntityManager &entities,
     }
 
     //scroll behavior
-    pCamera->offsetPos(glm::vec3(0,0, -legacyUserInput->yScroll));
+    camera.offsetPos(glm::vec3(0,0, -legacyUserInput->yScroll));
     legacyUserInput->yScroll = 0;
 }
 
@@ -117,7 +117,7 @@ void UserInputSystem::updateMouseSelection(Entity selectableEntity)
 
 entityx::Entity UserInputSystem::linePick(EntityManager & entities,
                            GLFWwindow *pWindow,
-                           Camera *pCamera)
+                           Camera &camera)
 {
     //construct mouse/cursor casted ray
     double mouseX, mouseY;
@@ -142,12 +142,12 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     {
         
         //convert entity position from 3D to screen NDC space
-        auto posNDC = pCamera->matrix() * world * glm::vec4(position->pos, 1.0);
+        auto posNDC = camera.matrix() * world * glm::vec4(position->pos, 1.0);
         posNDC /= posNDC.w;
         auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
         auto onScreenDistance = glm::length(mouse_NDC - screenPosNDC);
         
-        auto distanceFromCamera = glm::length(position->pos - pCamera->position);
+        auto distanceFromCamera = glm::length(position->pos - camera.position);
         
         //FIXME: threshold also depends on aparent size of object
         const int thresholdInPixels = 40;

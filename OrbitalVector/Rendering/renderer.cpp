@@ -281,7 +281,7 @@ void Renderer::render()
             depthMVP = depthProjectionMatrix * depthViewMatrix *
                 gameLogic.sShip[shipIdx].orientation
                 * gameLogic.sShip[shipIdx].size;
-            shadowMap.drawIndexed(world, scene.camera, depthMVP, shapes[shipIdx].mesh.indices.data());
+            shadowMap.drawIndexed(world, camera, depthMVP, shapes[shipIdx].mesh.indices.data());
         }
         //TODO: fix glViewPort toggle in stages too!
         if (renderStage & stage2)  //regular forward rendering
@@ -441,7 +441,7 @@ void Renderer::forwardRender()
 {
     auto shipIdx = gameLogic.activeShip;
     
-    auto _camera = scene.camera.matrix();
+    auto _camera = camera.matrix();
     
     glm::vec3 planetColor   (0.4, 0.0, 0.0);
     glm::vec3 shipColor     (0.9, 0.9, 0.9);
@@ -488,7 +488,7 @@ void Renderer::forwardRender()
         
 		glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
-        ship.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
+        ship.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
         check_gl_error();
         //break;
     }
@@ -553,7 +553,7 @@ void Renderer::forwardRender()
 //        * lookAt(sys[i].sn.vel, vec3(0), vec3(0,1,0))
             * glm::translate(glm::mat4(), getMissilePos(i));//sys[i].sn.pos);
         
-        missile.drawIndexed(world, scene.camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
+        missile.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
 
         check_gl_error();
     }

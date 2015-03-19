@@ -438,8 +438,8 @@ int main(int argc, const char * argv[])
 		
         textObj.debugTexts.clear();
         gameLogic.processActionList(inputObject.actionList);
-        gameLogic.update(dt);
         myGameSingleton.update(dt);
+        gameLogic.update(dt);
         renderer.update();
 
         getText(textObj, perfMon, ws);

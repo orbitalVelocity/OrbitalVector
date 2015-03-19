@@ -16,6 +16,7 @@
 #include "entityx/System.h"
 #include "events.h"
 #include "input.h" //legacy
+#include "camera.h" //legacy
 
 /**
  * Grabs user input from the UserInput class 
@@ -26,32 +27,39 @@
  * a commandProcessorSystem
  *      TODO: implement commandProcessorSystem; for now, keep that in this class as AI doesn't exist yet
  */
-class UserInputSystem : public entityx::System<UserInputSystem>,
-                        public entityx::Receiver<PotentialSelectEvent>
+class UserInputSystem : public entityx::System<UserInputSystem>
+//                        public entityx::Receiver<PotentialSelectEvent>
 {
 public:
     UserInputSystem(UserInput *ui, std::vector<entityx::Entity> &selected,
                     std::vector<entityx::Entity> &hover);
     void configure(entityx::EventManager& eventManager);
+//    void receive(const PotentialSelectEvent &e);
     
     void update(entityx::EntityManager &entities,
                 entityx::EventManager &events,
                 double dt,
                 UserInput *ui,
-                entityx::Entity e);
+                entityx::Entity e,
+                GLFWwindow *w, Camera *c);
     
-    void update(entityx::EntityManager & entities,
+    void  update(entityx::EntityManager & entities,
                 entityx::EventManager & events,
                 double dt) override {}
+
+    entityx::Entity linePick(entityx::EntityManager & entities,
+                  GLFWwindow *w, Camera *c);
+
+    void updateMouseSelection(entityx::Entity selectableEntity);
     
-    void receive(const PotentialSelectEvent &e);
+    void updateCamera();
     
 private:
     GLFWwindow *pWindow;
     UserInput* legacyUserInput = nullptr;   //get rid of this when userInput is absorbed into this class
     entityx::Entity myShip;
     
-    entityx::Entity potentiallySelectedEntity;
+    entityx::Entity selectableEntity;
     entityx::Entity mouseOverEntity;
     
     std::vector<entityx::Entity> &mouseOverEntities;

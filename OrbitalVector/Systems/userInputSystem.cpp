@@ -18,23 +18,75 @@ UserInputSystem::UserInputSystem(UserInput *ui, std::vector<Entity> &s, std::vec
 
 void UserInputSystem::configure(EventManager& eventManager)
 {
-    eventManager.subscribe<PotentialSelectEvent>(*this);
+//    eventManager.subscribe<PotentialSelectEvent>(*this);
 }
+
+
+void rotate(ComponentHandle<Orientation> orientationHandle,
+            float dx, float dy, float dz)
+{
+    auto yAxis = glm::vec3(1.0f, 0, 0);
+    auto xAxis = glm::vec3(0, 1.0f, 0);
+    auto zAxis = glm::vec3(0, 0, 1.0f);
+    
+    orientationHandle->x += dx;
+    orientationHandle->y += dy;
+    
+    auto tempOrientation = glm::rotate(glm::mat4(), -dx, xAxis);
+    tempOrientation = glm::rotate(tempOrientation, -dy, yAxis);
+    tempOrientation = glm::rotate(tempOrientation, -dz, zAxis);
+    orientationHandle->orientation *= tempOrientation;
+}
+
+void UserInputSystem::update(entityx::EntityManager &entities,
+                             entityx::EventManager &events,
+                             double dt,
+                             UserInput *legacyUserInput,
+                             entityx::Entity myShip,
+                             GLFWwindow *window,
+                             Camera *pCamera)
+{
+    auto selectableEntity = linePick(entities, window, pCamera);
+    
+    updateMouseSelection(selectableEntity);
+    
+
+    double mx, my;
+    static double prevMX = 0, prevMY = 0;
+    glfwGetCursorPos(window, &mx, &my);     //consider consolidating this line w/ the one in linePick();
+    double _x = mx - prevMX;
+    double _y = my - prevMY;
+    prevMX = mx;
+    prevMY = my;
+    double mouseScale = .1;
+
+    if (legacyUserInput->rmbPressed) {
+        pCamera->rotate(_y*mouseScale, _x*mouseScale);
+    } else if (legacyUserInput->lmbPressed && not selectableEntity.valid()) {
+        //rotate mySHip
+//        sShip[0].rotate(-_x*mouseScale, _y*mouseScale, 0.0f);
+        assert(myShip.valid());
+        auto orientationHandle = myShip.component<Orientation>();
+        rotate(orientationHandle, -_x*mouseScale, _y*mouseScale, 0.0f);
+    }
+
+    //scroll behavior
+    pCamera->offsetPos(glm::vec3(0,0, -legacyUserInput->yScroll));
+    legacyUserInput->yScroll = 0;
+}
+
 
 /**
  *  only gets called when mouse overs an entity
  */
-void UserInputSystem::receive(const PotentialSelectEvent& e)
+void UserInputSystem::updateMouseSelection(Entity selectableEntity)
 {
-    potentiallySelectedEntity = e.entity;
-    assert(potentiallySelectedEntity.valid());
-    
     //assuming select one thing at a time
     auto cameraRotateMode = legacyUserInput->rmbPressed;
     auto selectionMode = legacyUserInput->lmbPressed and not cameraRotateMode;
     
     //FIXME: ideally, MB callback will signal event to trigger this function too
-    //          in order to detect when a user has clicked a place that
+    //          in order to detect when a user has clicked anywhere (including nothing)
     //OR don't put any of this in the receive, leave it in linePick, so much easier that way!
     //OR give the MB call back access to selectedEntities as well so it can update dynamically as well (but now we have multiple locations that writes to the same set of structures... :( easy for bugs to creep out!
     auto enableMultiSelection = false;
@@ -45,25 +97,75 @@ void UserInputSystem::receive(const PotentialSelectEvent& e)
         mouseOverEntities.clear();
     }
     
+    //placed after clear()'s to allow deselection by mousing over nothing
+    if (not selectableEntity.valid()) {
+        return;
+    }
+    
     if (selectionMode) {
-        selectedEntities.emplace_back(potentiallySelectedEntity);
-        std::cout << "selected: " << potentiallySelectedEntity.id() << std::endl;
+        selectedEntities.emplace_back(selectableEntity);
+        std::cout << "selected: " << selectableEntity.id() << std::endl;
         
     } else { //else mouseOverMode
-        mouseOverEntities.emplace_back(potentiallySelectedEntity);
-        std::cout << "mouseOver: " << potentiallySelectedEntity.id() << std::endl;
+        mouseOverEntities.emplace_back(selectableEntity);
+        std::cout << "mouseOver: " << selectableEntity.id() << std::endl;
     }
 
     //what happens when the cursor moves? is that called in a callback??
 }
 
 
-void UserInputSystem::update(entityx::EntityManager &entities,
-                             entityx::EventManager &events,
-                             double dt,
-                             UserInput *legacyUserInput,
-                             entityx::Entity myShip)
-
+entityx::Entity UserInputSystem::linePick(EntityManager & entities,
+                           GLFWwindow *pWindow,
+                           Camera *pCamera)
+{
+    //construct mouse/cursor casted ray
+    double mouseX, mouseY;
+    int screenWidth, screenHeight;
+    glfwGetCursorPos(pWindow, &mouseX, &mouseY);
+    glfwGetWindowSize(pWindow, &screenWidth, &screenHeight);
+    
+    //convert coordinate system from [0,1] to [-1, 1] for both x and y
+    mouseY = screenHeight - mouseY; //for some reason, mouseY is flipped from tutorial
+    auto mouseX_NDC = ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f;
+    auto mouseY_NDC = ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f;
+    auto mouse_NDC = glm::vec2(mouseX_NDC * screenWidth, mouseY_NDC * screenHeight);
+    
+    //for each entity, check if it is within the threshold of clickability,
+    //pick the closest entity as a selectable entity
+    //emits an event when there is a selectable entity,
+    //and on state change from valid to invalid selection
+    Position::Handle position;
+    float shortestDistance = INFINITY;  //distance between entity and camera
+    Entity selectableEntity;
+    for (Entity entity : entities.entities_with_components(position))
+    {
+        
+        //convert entity position from 3D to screen NDC space
+        auto posNDC = pCamera->matrix() * world * glm::vec4(position->pos, 1.0);
+        posNDC /= posNDC.w;
+        auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
+        auto onScreenDistance = glm::length(mouse_NDC - screenPosNDC);
+        
+        auto distanceFromCamera = glm::length(position->pos - pCamera->position);
+        
+        //FIXME: threshold also depends on aparent size of object
+        const int thresholdInPixels = 40;
+        
+        //pick a clickable entity that is also the closest
+        if (onScreenDistance < thresholdInPixels
+            && distanceFromCamera < shortestDistance) {
+            shortestDistance = distanceFromCamera;
+            selectableEntity = entity;
+        }
+    }
+    
+    //emit event for clickability
+    std::cout << "can select entity " << selectableEntity.id() << std::endl;
+    return selectableEntity;
+}
+/*
+void UserInputSystem::processAction(
 {
     glm::vec3 forwardVector;
     for (auto &action : legacyUserInput->actionList )
@@ -139,3 +241,4 @@ void UserInputSystem::update(entityx::EntityManager &entities,
     }
     legacyUserInput->actionList.clear();
 }
+*/

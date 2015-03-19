@@ -163,7 +163,7 @@ void GameLogic::userInteraction()
 
 void GameLogic::update(float dt)
 {
-    userInteraction();
+//    userInteraction();
 
     float gameDT = dt * timeWarp;
 

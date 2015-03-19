@@ -194,8 +194,8 @@ GameSingleton::GameSingleton(std::string filename) {
 //        systems.add<MovementSystem>();
 //        systems.add<CollisionSystem>();
     
-    load(filename);
-    
+//    load(filename);
+//    assert(myShip.valid());
 //        for (auto e : entity_data()) {
 //            entityx::Entity entity = entities.create();
 //            entity.assign<Position>(e.component<Position>());
@@ -240,6 +240,7 @@ void GameSingleton::createEntity(glm::vec3 pos,
                (BodyType)type);
     
     if (type == BodyType::MISSILE and not selectedEntities.empty()) {
+        assert(myShip.valid());
         newShip.assign<MissileLogic>(myShip, selectedEntities.front());
     }
 }
@@ -264,7 +265,6 @@ void GameSingleton::createShip(
 
 void GameSingleton::load(std::string filename)
 {
-    return;
     //FIXME: this is because InsertToSys creates new entities directly
     double m = 7e12;
     double G = 6.673e-11;
@@ -289,6 +289,7 @@ void GameSingleton::load(std::string filename)
     gm = m * G;
     
     myShip = entities.create();
+    
     loadEntity(myShip,
                {110,0,0},
                {0,0,2.3},
@@ -298,6 +299,7 @@ void GameSingleton::load(std::string filename)
                mainGrav.id(),
                BodyType::SHIP
                );
+    assert(myShip.valid());
 }
 
 void createRandomShip()
@@ -341,7 +343,7 @@ void GameSingleton::init(UserInput *ui, TextRenderer *text)
     //FIXME: remove UI asap
     legacyUserInput = ui;
     
-    systems.add<LinePickSystem>();
+//    systems.add<LinePickSystem>();
     systems.add<UserInputSystem>(ui, selectedEntities, mouseOverEntities);
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();
@@ -353,8 +355,15 @@ void GameSingleton::init(UserInput *ui, TextRenderer *text)
 
 void GameSingleton::update(double dt)
 {
-    systems.system<LinePickSystem>()->update(entities, events, dt, pWindow, pCamera);
-    systems.system<UserInputSystem>()->update(entities, events, dt, legacyUserInput, myShip);
+    //requires timeWarp declared in this class
+    //requires tighter integration w/ userInput, it needs access to timeWarp variable
+//    dt *= timeWarpFactor;
+//    systems.system<LinePickSystem>()->update(entities, events, dt,
+//                                             pWindow, pCamera);
+    assert(myShip.valid());
+    systems.system<UserInputSystem>()->update(entities, events, dt,
+                                              legacyUserInput, myShip,
+                                             pWindow, pCamera);
     systems.update<MissileSystem>(dt);
     systems.update<OrbitalPhysicsSystem>(dt);
     systems.update<CollisionSystem>(dt);

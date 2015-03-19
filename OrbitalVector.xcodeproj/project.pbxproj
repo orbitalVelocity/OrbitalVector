@@ -50,6 +50,7 @@
 		F1B68A2E19FADF970094CC41 /* composite.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1B68A2D19FADF8F0094CC41 /* composite.fs */; };
 		F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BB301019C1DB9200E349FE /* rk547m.cpp */; };
 		F1BFB92C1ABA7AB30066574E /* orbitalPhysicsSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BFB92A1ABA7AB30066574E /* orbitalPhysicsSystem.cpp */; };
+		F1BFB92F1ABA8CC10066574E /* cameraSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BFB92D1ABA8CC10066574E /* cameraSystem.cpp */; };
 		F1C8EFBB19CD2CA3008CCC90 /* shipVertex.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */; };
 		F1C8EFBC19CD2CA3008CCC90 /* shipFragment.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */; };
 		F1C8EFBD19CD2CAA008CCC90 /* jet.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFBA19CD2C86008CCC90 /* jet.obj */; };
@@ -188,6 +189,8 @@
 		F1BB301119C1DB9200E349FE /* rk547m.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rk547m.h; sourceTree = "<group>"; };
 		F1BFB92A1ABA7AB30066574E /* orbitalPhysicsSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = orbitalPhysicsSystem.cpp; path = Systems/orbitalPhysicsSystem.cpp; sourceTree = "<group>"; };
 		F1BFB92B1ABA7AB30066574E /* orbitalPhysicsSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = orbitalPhysicsSystem.h; path = Systems/orbitalPhysicsSystem.h; sourceTree = "<group>"; };
+		F1BFB92D1ABA8CC10066574E /* cameraSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cameraSystem.cpp; path = Systems/cameraSystem.cpp; sourceTree = "<group>"; };
+		F1BFB92E1ABA8CC10066574E /* cameraSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cameraSystem.h; path = Systems/cameraSystem.h; sourceTree = "<group>"; };
 		F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = shipVertex.glsl; path = glsl/shipVertex.glsl; sourceTree = "<group>"; };
 		F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = shipFragment.glsl; path = glsl/shipFragment.glsl; sourceTree = "<group>"; };
 		F1C8EFBA19CD2C86008CCC90 /* jet.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jet.obj; sourceTree = "<group>"; };
@@ -283,6 +286,8 @@
 		F17416F81AB5F2C100D2269F /* Systems */ = {
 			isa = PBXGroup;
 			children = (
+				F1BFB92D1ABA8CC10066574E /* cameraSystem.cpp */,
+				F1BFB92E1ABA8CC10066574E /* cameraSystem.h */,
 				F1A9BD6B1AB7C29100EF92B7 /* collisionSystem.cpp */,
 				F1A9BD6C1AB7C29100EF92B7 /* collisionSystem.h */,
 				F1A9BD6E1AB7EA1E00EF92B7 /* debugTextSystem.cpp */,
@@ -505,6 +510,7 @@
 				F1A9BD661AB6480800EF92B7 /* userInputSystem.cpp in Sources */,
 				F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */,
 				F1D4680E1AA511CB00869C62 /* grid.cpp in Sources */,
+				F1BFB92F1ABA8CC10066574E /* cameraSystem.cpp in Sources */,
 				F15D70DE19CFD303008F6573 /* spatial.cpp in Sources */,
 				F1C8EFC019CE1B26008CCC90 /* tiny_obj_loader.cc in Sources */,
 				F17416FB1AB5F33600D2269F /* linePickSystem.cpp in Sources */,

@@ -114,7 +114,7 @@ void initPhysics()
                        nullptr,
                        BodyType::GRAV
                        );
-    InsertToSys(planet, BodyType::GRAV);
+//    InsertToSys(planet, BodyType::GRAV);
 #endif
     glm::vec3 rad(110, 0, 0);
     glm::vec3 vel(0, 0, 2.3);
@@ -136,7 +136,7 @@ void initPhysics()
                        nullptr,
                        BodyType::SHIP
                      );
-    InsertToSys(ship, BodyType::SHIP);
+//    InsertToSys(ship, BodyType::SHIP);
 #endif
     const int numTerms = 8;
     ks.resize(numTerms);
@@ -389,6 +389,11 @@ int main(int argc, const char * argv[])
     // Calculate pixel ratio for hi-dpi devices.
     auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
     
+    //FIXME: for refactoring only
+    myGameSingleton.load("test");
+    assert(myGameSingleton.myShip.valid());
+    updateOrbitalPhysics(.001, ks, true);
+
     initFontStash();
     initPhysics();
     UserInput inputObject;
@@ -421,6 +426,8 @@ int main(int argc, const char * argv[])
     perfMon.tPrevFrame = glfwGetTime();
     
     //FIXME: for refactoring only
+//    myGameSingleton.load("test");
+//    assert(myGameSingleton.myShip.valid());
     myGameSingleton.pWindow = ws.pWindow;
     myGameSingleton.pCamera = &scene.camera;
     myGameSingleton.init(&inputObject, &textObj);

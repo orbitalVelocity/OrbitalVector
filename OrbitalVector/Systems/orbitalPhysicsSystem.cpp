@@ -20,9 +20,11 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
     ComponentHandle<Position> position;
     ComponentHandle<Velocity> velocity;
     ComponentHandle<GM> gm;
-    
+   
+#if 1
+    //legacy crap
     updateOrbitalPhysics(dt, ks, false);
-    
+#else
     for (Entity entity: entities.entities_with_components(position, gm, velocity))
     {
         auto parentPosition = entity.component<Position>();
@@ -35,4 +37,5 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         //update orbital elements?
         //errors?
     }
+#endif
 }

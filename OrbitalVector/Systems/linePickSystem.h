@@ -24,6 +24,8 @@
  */
 class LinePickSystem : public entityx::System<LinePickSystem>
 {
+private:
+    entityx::Entity previousSelectableEntity;
 public:
     
     LinePickSystem();

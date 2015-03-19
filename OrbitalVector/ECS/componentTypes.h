@@ -96,6 +96,7 @@ COMPONENT(Orientation)
     Orientation (glm::mat4 o) : orientation(o) {}
     
     glm::mat4 orientation;
+    float x=0, y=90;
 };
 
 COMPONENT(Radius)
@@ -104,5 +105,18 @@ COMPONENT(Radius)
     Radius (float r) : radius(r) {}
     
     float radius;
+};
+
+COMPONENT(CameraComponent)
+{
+    CameraComponent () {}
+
+    glm::vec3 position;
+    glm::vec3 focus;
+    
+    float fov;
+    float hAngle, vAngle;
+    float nearPlane, farPlane;
+    float ratio;
 };
 #endif

@@ -169,6 +169,12 @@ void orbitPhysicsUpdate(GLfloat &delta,
             printVec3(sys[i].sn.vel);
         }
 #endif
+    
+    const int numTerms = 8;
+    ks.resize(numTerms);
+    for (auto &k : ks)
+        k.resize(sys.size());
+    
     RK45Int(delta, absTol, relTol,
             ks, sys, changeDT);
     

@@ -32,7 +32,16 @@ public:
                 double dt);
     
 private:
+    struct expiringMessage{
+//        expiringMessage(double t, string m) : expirationTime(t), message(m) {}
+        
+        double expirationTime;
+        string message;
+    };
     TextRenderer *debugTextPtr = nullptr;
+    std::vector<expiringMessage> messages;
+    double currentTime = 0.0;
+    double lifeTime = 3;
 };
 
 #endif /* defined(__OrbitalVector__debugTextSystem__) */

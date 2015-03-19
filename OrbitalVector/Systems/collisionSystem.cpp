@@ -45,7 +45,6 @@ void CollisionSystem::update(EntityManager & entities,
                     << " r2: " << right_radius->radius << std::endl;
                 events.emit<DebugEvent>(text.str());
                 
-                
                 addCollision(left_entity);
                 addCollision(right_entity);
             }
@@ -64,7 +63,7 @@ void CollisionSystem::update(EntityManager & entities,
 //????
 //FIXME: should have a destructability component
 void CollisionSystem::addCollision(Entity entity){
-    if (entity.component<OrbitalBodyType>() not_eq BodyType::GRAV) {
+    if (entity.component<OrbitalBodyType>()->orbitalBodyType not_eq BodyType::GRAV) {
         
         //set collision to occur in the past so it's processed immediately
         MyPair temp(currentTime, entity);
@@ -74,7 +73,7 @@ void CollisionSystem::addCollision(Entity entity){
 void CollisionSystem::processCollisions()
 {
     //process all past and present collisions
-    while (not collided.empty() && collided.top().time < currentTime)
+    while (not collided.empty() && collided.top().time <= currentTime)
     {
         auto myPair = collided.top();
         myPair.entity.destroy();

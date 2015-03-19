@@ -515,6 +515,10 @@ void Renderer::forwardRender()
     {
         for (auto selected : entities)
         {
+            if (not selected.valid()) {
+                continue;
+                
+            }
             auto positionHandle = selected.component<Position>();
             
             auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));//sys[i].sn.pos, 1.0));

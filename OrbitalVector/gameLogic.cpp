@@ -30,7 +30,6 @@ GameLogic::GameLogic(GLFWwindow *w, Scene &s, UserInput &i)
 void GameLogic::linePick()
 {
     //FIXME: testing
-    myGameSingleton.update(0);
     //line pick
     //code taken from
     //http://www.opengl-tutorial.org/miscellaneous/clicking-on-objects/picking-with-custom-ray-obb-function/

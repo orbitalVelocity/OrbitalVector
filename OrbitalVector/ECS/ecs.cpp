@@ -278,7 +278,7 @@ void GameSingleton::load(std::string filename)
                glm::vec3(0,0,-.1),
                {},
                gm,
-               10,
+               32,
                nullEntity.id(),
                BodyType::GRAV
                );

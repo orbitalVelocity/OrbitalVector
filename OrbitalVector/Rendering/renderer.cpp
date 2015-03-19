@@ -494,16 +494,16 @@ void Renderer::forwardRender()
     }
     
     glUseProgram(sprite.shaderProgram);
-    auto drawSelector = [&](int i, glm::vec3 color)
-    {
-        if (i < 1 || i >= getNumberOfEntities()) {//sys.size()) {
-            return;
-        }
-        auto centralPos = glm::vec3(world * glm::vec4(getEntityPosition(i), 1.0));//sys[i].sn.pos, 1.0));
-        auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
-        glUniform3fv(loc, 1, glm::value_ptr(centralPos));
-        sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
-    };
+//    auto drawSelector = [&](int i, glm::vec3 color)
+//    {
+//        if (i < 1 || i >= getNumberOfEntities()) {//sys.size()) {
+//            return;
+//        }
+//        auto centralPos = glm::vec3(world * glm::vec4(getEntityPosition(i), 1.0));//sys[i].sn.pos, 1.0));
+//        auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
+//        glUniform3fv(loc, 1, glm::value_ptr(centralPos));
+//        sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
+//    };
     
 #if 1
     //old way

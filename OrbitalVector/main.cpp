@@ -114,7 +114,7 @@ void initPhysics()
                        nullptr,
                        BodyType::GRAV
                        );
-//    InsertToSys(planet, BodyType::GRAV);
+    InsertToSys(planet, BodyType::GRAV);
 #endif
     glm::vec3 rad(110, 0, 0);
     glm::vec3 vel(0, 0, 2.3);
@@ -136,7 +136,7 @@ void initPhysics()
                        nullptr,
                        BodyType::SHIP
                      );
-//    InsertToSys(ship, BodyType::SHIP);
+    InsertToSys(ship, BodyType::SHIP);
 #endif
     const int numTerms = 8;
     ks.resize(numTerms);
@@ -393,9 +393,9 @@ int main(int argc, const char * argv[])
     myGameSingleton.load("test");
     assert(myGameSingleton.myShip.valid());
     updateOrbitalPhysics(.001, ks, true);
+//    initPhysics();
 
     initFontStash();
-    initPhysics();
     UserInput inputObject;
     Scene scene;
     GameLogic gameLogic(ws.pWindow, scene, inputObject);

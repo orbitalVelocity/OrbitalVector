@@ -220,6 +220,13 @@ void GameSingleton::loadEntity(entityx::Entity entity,
     entity.assign<OrbitalBodyType>(bt);
     entity.assign<Orientation>(orientation);
     entity.assign<Radius>(r);
+    
+    body body(state(pos, vel),
+              _gm,
+              r,
+              nullptr,
+              bt);
+    InsertToSys(body, bt);
 }
 
 void GameSingleton::createEntity(glm::vec3 pos,
@@ -360,7 +367,7 @@ void GameSingleton::update(double dt)
 //    dt *= timeWarpFactor;
 //    systems.system<LinePickSystem>()->update(entities, events, dt,
 //                                             pWindow, pCamera);
-    assert(myShip.valid());
+//    assert(myShip.valid());
     systems.system<UserInputSystem>()->update(entities, events, dt,
                                               legacyUserInput, myShip,
                                              pWindow, pCamera);

@@ -113,29 +113,6 @@ void GameLogic::missileLogic(float dt)
     }
 }
 
-void GameLogic::userInteraction()
-{
-    linePick();
-    
-    double mx, my;
-    static double prevMX = 0, prevMY = 0;
-    glfwGetCursorPos(window, &mx, &my);     //consider consolidating this line w/ the one in linePick();
-    double _x = mx - prevMX;
-    double _y = my - prevMY;
-    prevMX = mx;
-    prevMY = my;
-    double mouseScale = .1;
-    
-    if (userInput.rmbPressed) {
-        scene.camera.rotate(_y*mouseScale, _x*mouseScale);
-    } else if (userInput.lmbPressed) {
-        sShip[0].rotate(-_x*mouseScale, _y*mouseScale, 0.0f);
-    }
-    
-    //scroll behavior
-    scene.camera.offsetPos(glm::vec3(0,0, -userInput.yScroll));
-    userInput.yScroll = 0;
-}
 
 void GameLogic::handleCollision()
 {
@@ -160,16 +137,40 @@ void GameLogic::handleCollision()
  
 }
 
+void GameLogic::userInteraction()
+{
+//    linePick();
+    
+    double mx, my;
+    static double prevMX = 0, prevMY = 0;
+    glfwGetCursorPos(window, &mx, &my);     //consider consolidating this line w/ the one in linePick();
+    double _x = mx - prevMX;
+    double _y = my - prevMY;
+    prevMX = mx;
+    prevMY = my;
+    double mouseScale = .1;
+    
+    if (userInput.rmbPressed) {
+        scene.camera.rotate(_y*mouseScale, _x*mouseScale);
+    } else if (userInput.lmbPressed) {
+        sShip[0].rotate(-_x*mouseScale, _y*mouseScale, 0.0f);
+    }
+    
+    //scroll behavior
+    scene.camera.offsetPos(glm::vec3(0,0, -userInput.yScroll));
+    userInput.yScroll = 0;
+}
+
 void GameLogic::update(float dt)
 {
     userInteraction();
 
     float gameDT = dt * timeWarp;
 
-    missileLogic(gameDT);
+//    missileLogic(gameDT);
     
     //calculate new position/velocity
-    updateOrbitalPhysics(dt, ks, false);
+//    updateOrbitalPhysics(dt, ks, false);
     
     //calculate trajectories every 30 frames
     static int orbitCount = 0;
@@ -177,17 +178,17 @@ void GameLogic::update(float dt)
         scene.orbit.update();
     }
     
-    handleCollision();
+//    handleCollision();
 
     //update positions
     //central planet
-    sGlobe[0].move(sys[0].sn.pos);
-    //UI
-    //prograde
-    auto progradeOffset = glm::normalize(getMyShipVel());//sys[1].sn.vel);
-    sGlobe[1].move(getMyShipPos()+progradeOffset);
-    //retrograde
-    sGlobe[2].move(getMyShipPos()-progradeOffset);
+//    sGlobe[0].move(sys[0].sn.pos);
+//    //UI
+//    //prograde
+//    auto progradeOffset = glm::normalize(getMyShipVel());//sys[1].sn.vel);
+//    sGlobe[1].move(getMyShipPos()+progradeOffset);
+//    //retrograde
+//    sGlobe[2].move(getMyShipPos()-progradeOffset);
   
     //center the world around player ship
     world = glm::translate(glm::mat4(), -getMyShipPos());//sys[1].sn.pos);
@@ -262,7 +263,7 @@ void GameLogic::processActionList(std::vector<ActionType> &actionList)
             auto vel = sys[1].sn.vel
             + glm::normalize(shipVector)
             * 3.0f;
-            body bullet(state(pos, vel), 10, gm, nullptr, BodyType::SHIP);
+            body bullet(state(pos, vel), 12, gm, nullptr, BodyType::SHIP);
 //            addSatellite(bullet);
             InsertToSys(bullet, BodyType::MISSILE);
 //            newEntity(bullet, BodyType::MISSILE);

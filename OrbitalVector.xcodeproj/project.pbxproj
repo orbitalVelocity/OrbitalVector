@@ -49,6 +49,7 @@
 		F1B3C68518D93A5C00971791 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F1B3C68418D93A5C00971791 /* QuartzCore.framework */; };
 		F1B68A2E19FADF970094CC41 /* composite.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1B68A2D19FADF8F0094CC41 /* composite.fs */; };
 		F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BB301019C1DB9200E349FE /* rk547m.cpp */; };
+		F1BFB92C1ABA7AB30066574E /* orbitalPhysicsSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1BFB92A1ABA7AB30066574E /* orbitalPhysicsSystem.cpp */; };
 		F1C8EFBB19CD2CA3008CCC90 /* shipVertex.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */; };
 		F1C8EFBC19CD2CA3008CCC90 /* shipFragment.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */; };
 		F1C8EFBD19CD2CAA008CCC90 /* jet.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFBA19CD2C86008CCC90 /* jet.obj */; };
@@ -185,6 +186,8 @@
 		F1B68A2D19FADF8F0094CC41 /* composite.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = composite.fs; path = glsl/composite.fs; sourceTree = "<group>"; };
 		F1BB301019C1DB9200E349FE /* rk547m.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rk547m.cpp; sourceTree = "<group>"; };
 		F1BB301119C1DB9200E349FE /* rk547m.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rk547m.h; sourceTree = "<group>"; };
+		F1BFB92A1ABA7AB30066574E /* orbitalPhysicsSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = orbitalPhysicsSystem.cpp; path = Systems/orbitalPhysicsSystem.cpp; sourceTree = "<group>"; };
+		F1BFB92B1ABA7AB30066574E /* orbitalPhysicsSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = orbitalPhysicsSystem.h; path = Systems/orbitalPhysicsSystem.h; sourceTree = "<group>"; };
 		F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = shipVertex.glsl; path = glsl/shipVertex.glsl; sourceTree = "<group>"; };
 		F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = shipFragment.glsl; path = glsl/shipFragment.glsl; sourceTree = "<group>"; };
 		F1C8EFBA19CD2C86008CCC90 /* jet.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jet.obj; sourceTree = "<group>"; };
@@ -288,6 +291,8 @@
 				F17416FA1AB5F33600D2269F /* linePickSystem.h */,
 				F1A9BD681AB7BB1B00EF92B7 /* missileSystem.cpp */,
 				F1A9BD691AB7BB1B00EF92B7 /* missileSystem.h */,
+				F1BFB92A1ABA7AB30066574E /* orbitalPhysicsSystem.cpp */,
+				F1BFB92B1ABA7AB30066574E /* orbitalPhysicsSystem.h */,
 				F1A9BD641AB6480800EF92B7 /* userInputSystem.cpp */,
 				F1A9BD651AB6480800EF92B7 /* userInputSystem.h */,
 			);
@@ -495,6 +500,7 @@
 				F111F26E19D9E94200DD4439 /* input.cpp in Sources */,
 				F1EAC34C1A0B1DDB006B29CB /* unit.cpp in Sources */,
 				F1BB301219C1DB9200E349FE /* rk547m.cpp in Sources */,
+				F1BFB92C1ABA7AB30066574E /* orbitalPhysicsSystem.cpp in Sources */,
 				F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */,
 				F1A9BD661AB6480800EF92B7 /* userInputSystem.cpp in Sources */,
 				F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */,

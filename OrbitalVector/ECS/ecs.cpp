@@ -13,6 +13,7 @@
 #include "missileSystem.h"
 #include "collisionSystem.h"
 #include "debugTextSystem.h"
+#include "orbitalPhysicsSystem.h"
 
 GameSingleton myGameSingleton("testMap");
 
@@ -278,7 +279,7 @@ void GameSingleton::load(std::string filename)
                glm::vec3(0,0,-.1),
                {},
                gm,
-               32,
+               50,
                nullEntity.id(),
                BodyType::GRAV
                );
@@ -345,6 +346,7 @@ void GameSingleton::init(UserInput *ui, TextRenderer *text)
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();
     systems.add<DebugTextSystem>(text);
+    systems.add<OrbitalPhysicsSystem>();
     systems.configure();
     
 }
@@ -354,10 +356,9 @@ void GameSingleton::update(double dt)
     systems.system<LinePickSystem>()->update(entities, events, dt, pWindow, pCamera);
     systems.system<UserInputSystem>()->update(entities, events, dt, legacyUserInput, myShip);
     systems.update<MissileSystem>(dt);
-//        systems.update<MovementSystem>(dt);
+    systems.update<OrbitalPhysicsSystem>(dt);
     systems.update<CollisionSystem>(dt);
     systems.update<DebugTextSystem>(dt); //this does nothing right now
-//        systems.update<CollisionSystem>(dt);
     
 }
 

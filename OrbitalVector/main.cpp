@@ -110,7 +110,7 @@ void initPhysics()
 #else
     auto planet = body(state(glm::vec3(), glm::vec3(0, 0, -.1)),
                        gm,
-                       10,
+                       32,
                        nullptr,
                        BodyType::GRAV
                        );
@@ -443,7 +443,7 @@ int main(int argc, const char * argv[])
         renderer.update();
 
         getText(textObj, perfMon, ws);
-        getLinePick(textObj, gameLogic);
+//        getLinePick(textObj, gameLogic);
         UITextSetup();
        
         renderer.render();

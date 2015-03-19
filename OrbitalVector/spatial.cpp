@@ -34,7 +34,7 @@ Spatial::Spatial(float r) : x(0), y(90) {
     gm = m * G;
     auto tmp = body(state(rad, vel),
                     gm,
-                    1,
+                    20,
                     nullptr,
                     BodyType::SHIP
                     );

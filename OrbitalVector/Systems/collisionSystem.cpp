@@ -41,8 +41,9 @@ void CollisionSystem::update(EntityManager & entities,
             if (distance < minimumDistance)
             {
                 std::stringstream text;
-                text << "collision: distance: " << distance << " r1: " << left_radius->radius
-                    << " r2: " << right_radius->radius << std::endl;
+                text << "collision: distance: " << distance << " r1: "
+                    << left_entity.component<OrbitalBodyType>()->orbitalBodyType << " : " << left_radius->radius
+                    << " r2: " << right_entity.component<OrbitalBodyType>()->orbitalBodyType << " : " << right_radius->radius << std::endl;
                 events.emit<DebugEvent>(text.str());
                 
                 addCollision(left_entity);

@@ -87,62 +87,6 @@ GLFWwindow* initGraphics(int width, int height)
     return window;
 }
 
-/**
- * initializes entities in the scene
- * Refactor Goal: move to scene class, but data driven (from save file, preferably)
- */
-void initPhysics()
-{
-    //hardcoded, need to go into object creation code
-    double m = 7e12;
-    double G = 6.673e-11;
-    double gm = m * G;
-    
-#define oldway 0
-#if oldway
-    sys.push_back(body(state(glm::vec3(), glm::vec3(0, 0, -.1)),
-                       gm,
-                       10,
-                       nullptr,
-                       BodyType::GRAV
-                       )
-                  );
-#else
-    auto planet = body(state(glm::vec3(), glm::vec3(0, 0, -.1)),
-                       gm,
-                       32,
-                       nullptr,
-                       BodyType::GRAV
-                       );
-    InsertToSys(planet, BodyType::GRAV);
-#endif
-    glm::vec3 rad(110, 0, 0);
-    glm::vec3 vel(0, 0, 2.3);
-    m = 1e5;
-    gm = m * G;
-
-#if oldway
-    sys.push_back(body(state(rad, vel),
-                       gm,
-                       1,
-                       nullptr,
-                       BodyType::SHIP
-                       )
-                  );
-#else
-    auto ship = body(state(rad, vel),
-                       gm,
-                       1,
-                       nullptr,
-                       BodyType::SHIP
-                     );
-    InsertToSys(ship, BodyType::SHIP);
-#endif
-    const int numTerms = 8;
-    ks.resize(numTerms);
-    for (auto &k : ks)
-        k.resize(sys.size());
-}
 
 /*
  * prints to console all vertices, indices, and normals of a mesh
@@ -372,13 +316,8 @@ void getLinePick(TextRenderer &textObj, GameLogic &gameLogic)
 
 int main(int argc, const char * argv[])
 {
-//    int width = 1280, height = 720;
     int width = 960, height = 540;
-//    int width = 1440*2, height = 900*2;
-//    int width = 1440*1, height = 900*1;
-//    int width = 1920, height = 1080;
-//    GLFWwindow* window = initGraphics(width, height);
-    
+
     WindowStates ws;
     ws.pWindow = initGraphics(width, height);
     glfwGetWindowSize(ws.pWindow, &ws.winWidth, &ws.winHeight);
@@ -393,7 +332,6 @@ int main(int argc, const char * argv[])
     myGameSingleton.load("test", width, height);
     assert(myGameSingleton.myShip.valid());
     updateOrbitalPhysics(.001, ks, true);
-//    initPhysics();
 
     initFontStash();
     UserInput inputObject;
@@ -407,17 +345,17 @@ int main(int argc, const char * argv[])
     // creating vector of string
     TextRenderer textObj(pxRatio, ws.fbWidth, ws.fbHeight);
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
-    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, std::to_string(scene.orbit.apo)));
-    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, std::to_string(scene.orbit.peri)));
+//    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, std::to_string(scene.orbit.apo)));
+//    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, std::to_string(scene.orbit.peri)));
 
     auto UITextSetup = [&](){
         auto vp = myGameSingleton.camera.matrix() * world;
         textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
-        textObj.guiText[1].pos = getVec2(vp, scene.orbit.apoPos);
-        textObj.guiText[2].pos = getVec2(vp, scene.orbit.periPos);
-        
-        textObj.guiText[1].text = std::to_string(scene.orbit.apo);
-        textObj.guiText[2].text = std::to_string(scene.orbit.peri);
+//        textObj.guiText[1].pos = getVec2(vp, scene.orbit.apoPos);
+//        textObj.guiText[2].pos = getVec2(vp, scene.orbit.periPos);
+//        
+//        textObj.guiText[1].text = std::to_string(scene.orbit.apo);
+//        textObj.guiText[2].text = std::to_string(scene.orbit.peri);
     };
     
     // performance measurement
@@ -425,11 +363,7 @@ int main(int argc, const char * argv[])
     PerfMon perfMon;
     perfMon.tPrevFrame = glfwGetTime();
     
-    //FIXME: for refactoring only
-//    myGameSingleton.load("test");
-//    assert(myGameSingleton.myShip.valid());
     myGameSingleton.pWindow = ws.pWindow;
-//    myGameSingleton.pCamera = &scene.camera;
     myGameSingleton.init(&inputObject, &textObj);
     
     while (!glfwWindowShouldClose(ws.pWindow))
@@ -450,7 +384,6 @@ int main(int argc, const char * argv[])
         renderer.update();
 
         getText(textObj, perfMon, ws);
-//        getLinePick(textObj, gameLogic);
         UITextSetup();
        
         renderer.render();

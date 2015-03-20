@@ -20,16 +20,8 @@ public:
     RenderableOrbit(GLenum _drawType);
     
     void init() override;
-    void loadPath();
     void update();
-//    bool nextMesh();
-    void calcTrajectory(int &pathSteps);
     void draw(glm::mat4 &camera, glm::vec3 color);
-public:
     
-    vector<vector<float> > paths;
-    float x,y;
-    float apo, peri;
-    glm::vec3 apoPos, periPos;
 };
 #endif /* defined(__GLFW3_test__orbit__) */

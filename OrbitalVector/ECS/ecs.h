@@ -17,6 +17,9 @@
 #include <GLFW/glfw3.h>
 #include "input.h"
 #include "text.h"
+#include "orbit.h"
+#include "scene.h"
+#include "renderer.h"
 
 #define OLDECS true
 
@@ -53,6 +56,11 @@ public:
     UserInput *legacyUserInput;
     std::vector<entityx::Entity> selectedEntities;
     std::vector<entityx::Entity> mouseOverEntities;
+    glm::vec3 lightPos;
+    
+//    UserInput userInput;
+//    Scene scene;
+//    Renderer renderer;
 public:
     explicit GameSingleton(std::string filename);
 
@@ -99,7 +107,7 @@ public:
 //    std::vector<entityx::Entity> entity_data();
     
     void update(double dt);
-    
+
 };
 
 extern GameSingleton myGameSingleton;

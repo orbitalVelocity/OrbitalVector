@@ -32,7 +32,7 @@ extern std::vector<tinyobj::material_t> materials;
 class Scene {
 public:
     Scene() :
-    orbit(GL_LINES)
+    orbit(GL_LINES)  //if rendering line strip, can't render disconnected paths (multiple orbit paths)
         {
         };
     void init(int, int);
@@ -43,8 +43,8 @@ public:
     
     //orbit is a type of entity, yes?
     RenderableOrbit orbit;
-    
-    glm::vec3 lightPos; //lights are entities with self emitters
+
+    //lights are entities with self emitters
         //brightness,           type: cone/bulbs/area/cubic
         //range (rendering optimization) in meters
         //falloff (inverse)     linear, square

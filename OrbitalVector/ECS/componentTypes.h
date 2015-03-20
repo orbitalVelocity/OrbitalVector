@@ -119,4 +119,15 @@ COMPONENT(CameraComponent)
     float nearPlane, farPlane;
     float ratio;
 };
+
+COMPONENT(OrbitPath)
+{
+    OrbitPath() {}
+    
+    vector<float> path;
+};
+
+
+
+
 #endif

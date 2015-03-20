@@ -10,7 +10,7 @@
 #define __GLFW3_test__spatial__
 
 #include "includes.h"
-
+#include "rk547m.h"
 /*
  * container for size and orientation, along with convenient functions
  * Refactor Goal: get rid of this, 
@@ -37,6 +37,7 @@ public:
     glm::mat4 size;
     glm::mat4 orientation;
     
+    body m_body;
     float x, y;
     glm::vec3 xAxis, yAxis, zAxis;
 };

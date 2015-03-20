@@ -7,7 +7,6 @@
 //
 
 #include "spatial.h"
-#include "rk547m.h"
 #include "stdlib.h"
 #include "time.h"
 
@@ -32,14 +31,14 @@ Spatial::Spatial(float r) : x(0), y(90) {
     cout << "new ship: r: " << r << ", v: " << v << endl;
     m = 1e1;
     gm = m * G;
-    auto tmp = body(state(rad, vel),
+    m_body = body(state(rad, vel),
                     gm,
                     20,
                     nullptr,
                     BodyType::SHIP
                     );
 
-    InsertToSys(tmp, BodyType::SHIP);
+//    InsertToSys(tmp, BodyType::SHIP);
 
 }
 

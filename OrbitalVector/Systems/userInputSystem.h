@@ -53,7 +53,9 @@ public:
     void updateMouseSelection(entityx::Entity selectableEntity);
     
     void updateCamera();
-    
+
+void processAction();
+
 private:
     GLFWwindow *pWindow;
     UserInput* legacyUserInput = nullptr;   //get rid of this when userInput is absorbed into this class

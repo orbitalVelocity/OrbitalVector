@@ -227,6 +227,10 @@ void GameSingleton::loadEntity(entityx::Entity entity,
               nullptr,
               bt);
     InsertToSys(body, bt);
+    if (bt == BodyType::MISSILE or bt == BodyType::SHIP)
+    {
+        entity.assign<OrbitPath>();
+    }
 }
 
 void GameSingleton::createEntity(glm::vec3 pos,

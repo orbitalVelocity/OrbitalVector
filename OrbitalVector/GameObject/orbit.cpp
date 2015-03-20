@@ -9,6 +9,8 @@
 #include "orbit.h"
 #include "OGLShader.h"
 #include "rk547m.h"
+#include "ecs.h"
+#include "componentTypes.h"
 
 using namespace std;
 
@@ -41,7 +43,7 @@ void RenderableOrbit::calcTrajectory(int &pathSteps)
     paths.clear();
     paths.resize(sys.size()-1);//# of grav wells, maybe not even that!
     paths[0].reserve(pathSteps);
-    int count = 0;
+    int count = 0; //skips 0 (the planet)
     for (auto &path : paths)
     {
         path.resize(3);
@@ -143,14 +145,10 @@ void RenderableOrbit::loadPath()
     string vertFilename = "lineVertex.glsl";
     string fragFilename = "lineFragment.glsl";
     loadShaders(vertFilename, fragFilename);
-
    
     generateVertexBuffer(GL_ARRAY_BUFFER);
     
     setAttribute("position");
-    
-    //compute mesh of orbit
-    update();
     
     //unbinds vao, prevents subsequent GL calls from modifying this object
     glBindVertexArray(0);
@@ -160,36 +158,66 @@ void RenderableOrbit::loadPath()
 
 void RenderableOrbit::update()
 {
-    static int count = 0;
-    int pathSteps = 980;
-
     float  *pathGL;
+
+#if 0
+    int pathSteps = 0;
     calcTrajectory(pathSteps);
-    
-    pathSteps = 0;
-    for (auto &p : paths) {
+    for (auto &p : paths)
+    {
         pathSteps += p.size();
     }
     int totalPathSize = (int)(pathSteps * sizeof(float));
-
+    
+//    glBindBuffer(GL_ARRAY_BUFFER, vbo[vboIdx]);
+//    check_gl_error();
+//    glBufferData(GL_ARRAY_BUFFER, totalPathSize, nullptr, GL_STREAM_DRAW);
+//    check_gl_error();
+//    pathGL = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+//    
+//    int pathOffset = 0;
+//    for (auto &path : paths)
+//    {
+//        memcpy(&pathGL[pathOffset], path.data(), sizeof(float)*path.size());
+//        pathOffset += path.size();
+//    }
+//    drawCount = (int)(pathSteps)/3;
+// 
+//    check_gl_error();
+//    glUnmapBuffer(GL_ARRAY_BUFFER);
+//    check_gl_error();
+#else
+    using namespace entityx;
+    int pathSteps2 = 0;
+    ComponentHandle<OrbitPath> orbit;
+    for (Entity entity : myGameSingleton.entities.entities_with_components(orbit))
+    {
+        pathSteps2 += (int) orbit->path.size();
+    }
+    int totalPathSize2 = (int)(pathSteps2 * sizeof(float));
+    
+    std::cout << "path steps: " << pathSteps2 << std::endl;
     glBindBuffer(GL_ARRAY_BUFFER, vbo[vboIdx]);
     check_gl_error();
-    glBufferData(GL_ARRAY_BUFFER, totalPathSize, nullptr, GL_STREAM_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, totalPathSize2, nullptr, GL_STREAM_DRAW);
     check_gl_error();
     pathGL = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    
+    check_gl_error();
+       
     int pathOffset = 0;
-    for (auto &path : paths)
+    for (Entity entity : myGameSingleton.entities.entities_with_components(orbit))
     {
+        auto &path = orbit->path;
         memcpy(&pathGL[pathOffset], path.data(), sizeof(float)*path.size());
         pathOffset += path.size();
     }
-    drawCount = (int)(pathSteps)/3;
+    
+    drawCount = (int)(pathSteps2)/3;
  
     check_gl_error();
     glUnmapBuffer(GL_ARRAY_BUFFER);
     check_gl_error();
-    count++;
+#endif
 }
 
 //what was this for??

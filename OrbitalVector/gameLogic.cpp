@@ -173,7 +173,7 @@ void GameLogic::update(float dt)
 //    updateOrbitalPhysics(dt, ks, false);
     
     //calculate trajectories every 30 frames
-    static int orbitCount = 0;
+    static int orbitCount = 1;
     if (orbitCount++ % 30 == 0) {
         scene.orbit.update();
     }
@@ -246,9 +246,10 @@ void GameLogic::processActionList(std::vector<ActionType> &actionList)
         
         if (action == ActionType::newShip)
         {
-            sShip.push_back(Spatial(200.0));    //Spatial constructor inserts body into sys already! and creates a ship in ECS
+            auto newthing = Spatial(200.0);
+            sShip.push_back(newthing);
             sShip.back().scale(glm::vec3(1));
-            //FIXME: can't call body right now cause temp body is created inside Spatial constructor
+            newEntity(newthing.m_body, BodyType::SHIP);
         }
         if (action == ActionType::fireGun)
         {
@@ -263,10 +264,9 @@ void GameLogic::processActionList(std::vector<ActionType> &actionList)
             auto vel = sys[1].sn.vel
             + glm::normalize(shipVector)
             * 3.0f;
-            body bullet(state(pos, vel), 12, gm, nullptr, BodyType::SHIP);
-//            addSatellite(bullet);
-            InsertToSys(bullet, BodyType::MISSILE);
-//            newEntity(bullet, BodyType::MISSILE);
+            body bullet(state(pos, vel), 12, gm, nullptr, BodyType::MISSILE);
+//            InsertToSys(bullet, BodyType::MISSILE);
+            newEntity(bullet, BodyType::MISSILE);
         }
 
     }

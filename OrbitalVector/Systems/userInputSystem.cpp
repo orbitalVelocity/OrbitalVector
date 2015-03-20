@@ -8,7 +8,7 @@
 
 #include "userInputSystem.h"
 #include "componentTypes.h"
-
+#include "ecs.h"
 using namespace entityx;
 
 UserInputSystem::UserInputSystem(UserInput *ui, std::vector<Entity> &s, std::vector<Entity> &h) : legacyUserInput(ui), selectedEntities(s), mouseOverEntities(h)
@@ -165,7 +165,10 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     return selectableEntity;
 }
 /*
-void UserInputSystem::processAction(
+ * process list of actions form legacyUserInput
+ * future refactor: actionlist should be a standalone thing that both user and AI populate
+ */
+void UserInputSystem::processAction()
 {
     glm::vec3 forwardVector;
     for (auto &action : legacyUserInput->actionList )
@@ -217,10 +220,36 @@ void UserInputSystem::processAction(
         {
 //            sShip.push_back(Spatial(200.0));    //Spatial constructor inserts body into sys already! and creates a ship in ECS
 //            sShip.back().scale(glm::vec3(1));
+//            {
+//                double m = 7e12;
+//                double G = 6.673e-11;
+//                double gm = m * G;
+//                
+//                srand ((unsigned int)time(NULL));
+//                
+//                r = (rand() / 1000) % 300;
+//                if (r < 50) {
+//                    r = 50;
+//                }
+//                float v = std::sqrt(gm/r);
+//                glm::vec3 rad(r, 0, 0);
+//                glm::vec3 vel(0, 0, v);
+//                cout << "new ship: r: " << r << ", v: " << v << endl;
+//                m = 1e1;
+//                gm = m * G;
+//                auto tmp = body(state(rad, vel),
+//                                gm,
+//                                20,
+//                                nullptr,
+//                                BodyType::SHIP
+//                                );
+//               myGameSingleton.createEntity(rad, <#glm::vec3 vel#>, <#glm::mat4 orientation#>, <#double gm#>, <#float r#>, <#int type#>)
+//                
+//            }
         }
         if (action == ActionType::fireGun)
         {
-            events.emit<FireWeaponEvent>(myShip);
+//            events.emit<FireWeaponEvent>(myShip);
 //            double m = 0.0;
 //            double G = 6.673e-11;
 //            double gm = m * G;
@@ -241,4 +270,3 @@ void UserInputSystem::processAction(
     }
     legacyUserInput->actionList.clear();
 }
-*/

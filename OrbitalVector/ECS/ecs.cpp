@@ -254,6 +254,14 @@ void GameSingleton::createEntity(glm::vec3 pos,
         assert(myShip.valid());
         newShip.assign<MissileLogic>(myShip, selectedEntities.front());
     }
+    if (type == BodyType::MISSILE)
+    {
+        newShip.assign<Missile>();
+    }
+    if (type == BodyType::SHIP)
+    {
+        newShip.assign<Ship>();
+    }
 }
 
 void GameSingleton::createShip(
@@ -390,6 +398,7 @@ void GameSingleton::update(double dt)
     systems.update<CollisionSystem>(dt);
     systems.update<DebugTextSystem>(dt); //this does nothing right now
     
+    world = glm::translate(glm::mat4(), myShip.component<Position>()->pos);//-getMyShipPos());//sys[1].sn.pos);
 }
 
 

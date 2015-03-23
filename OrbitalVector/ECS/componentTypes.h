@@ -31,6 +31,21 @@ COMPONENT(PlayerControl)
     PlayerControl() {}
 };
 
+COMPONENT(Ship)
+{
+    Ship() {}
+    
+    int meshID;
+};
+
+COMPONENT(Missile)
+{
+    Missile() {}
+    
+    int meshID;
+};
+
+
 COMPONENT(Weapon)
 {
     Weapon() {}

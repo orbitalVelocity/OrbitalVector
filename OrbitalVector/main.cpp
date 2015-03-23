@@ -336,9 +336,9 @@ int main(int argc, const char * argv[])
     initFontStash();
     UserInput inputObject;
     Scene scene;
-    GameLogic gameLogic(ws.pWindow, scene, inputObject);
+//    GameLogic gameLogic(ws.pWindow, scene, inputObject);
     scene.init(ws.fbWidth, ws.fbHeight);
-    Renderer renderer(scene, gameLogic, inputObject, myGameSingleton.camera);
+    Renderer renderer(scene, inputObject, myGameSingleton.camera);
     renderer.init(ws.fbWidth, ws.fbHeight);
         check_gl_error();
     
@@ -378,15 +378,15 @@ int main(int argc, const char * argv[])
         textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
 		
         textObj.debugTexts.clear();
-        gameLogic.processActionList(inputObject.actionList);
+//        gameLogic.processActionList(inputObject.actionList);
         myGameSingleton.update(dt);
-        gameLogic.update(dt);
+//        gameLogic.update(dt);
         renderer.update();
 
         getText(textObj, perfMon, ws);
         UITextSetup();
        
-        renderer.render();
+        renderer.render(myGameSingleton.entities);
         textObj.render();
        
         perfMon.frameEnd(glfwGetTime());

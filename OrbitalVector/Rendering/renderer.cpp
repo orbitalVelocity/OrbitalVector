@@ -279,10 +279,10 @@ void Renderer::render(entityx::EntityManager &entities)
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glUseProgram(shadowMap.shaderProgram);
             
-            depthMVP = depthProjectionMatrix * depthViewMatrix *
+            depthMVP = depthProjectionMatrix * depthViewMatrix;// *
 //                gameLogic.sShip[shipIdx].orientation
 //                * gameLogic.sShip[shipIdx].size;
-            myGameSingleton.myShip.component<Orientation>()->orientation;
+            //myGameSingleton.myShip.component<Orientation>()->orientation;
             shadowMap.drawIndexed(world, camera, depthMVP, shapes[shipIdx].mesh.indices.data());
         }
         //TODO: fix glViewPort toggle in stages too!
@@ -480,15 +480,16 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     entityx::ComponentHandle<Ship> shipComponent;
     entityx::ComponentHandle<Orientation> orientation;
     for (entityx::Entity entity : entities.entities_with_components(shipComponent, position, orientation))
+//    for (int i=0; i < shipNum; i++)
     {
-//    for (int i=0; i < shipNum; i++) {
         auto mvp =
         world *
-//        translate(mat4(), sys[i+shipOffset].sn.pos) *
-        glm::translate(glm::mat4(), position->pos) * //getShipPos(i)) *
-//        gameLogic.sShip[i].orientation
-        orientation->orientation;
-//        * gameLogic.sShip[i].size;
+//        glm::translate(glm::mat4(), getShipPos(i))
+        glm::translate(glm::mat4(), position->pos)// * //getShipPos(i))
+//        * gameLogic.sShip[i].orientation
+//        orientation->orientation;
+//        * gameLogic.sShip[i].size
+        ;
         
         auto loc = glGetUniformLocation(ship.shaderProgram, "shadowMap");
         glUniform1i(loc, 0);
@@ -542,11 +543,11 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
 #endif
     
     glUseProgram(globe.shaderProgram);
-//    for (auto &s : gameLogic.sGlobe) {
 //    for (entityx::Entity entity : entities.entities_with_components(position, planet))
-    
-    {
-        auto mvp = _camera * world * glm::mat4();//position->pos);
+//    {
+    for (auto &s : gameLogic.sGlobe) {
+//        auto mvp = _camera * world * glm::mat4();//position->pos);
+        auto mvp = _camera * world * s.transform();
         globe.draw(mvp, planetColor);
         check_gl_error();
     }

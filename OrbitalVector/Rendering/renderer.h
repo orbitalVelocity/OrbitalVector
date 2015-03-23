@@ -25,7 +25,7 @@
 
 #include "orbit.h"
 #include "camera.h"
-//#include "gameLogic.h"
+#include "gameLogic.h"
 #include "scene.h"
 #include "grid.h"
 #include "globe.h"
@@ -63,8 +63,8 @@ public:
 //invokes game logic
 class Renderer {
 public:
-    Renderer(Scene &s, UserInput &i, Camera &c)
-    : scene(s), //gameLogic(g),
+    Renderer(Scene &s, GameLogic &g, UserInput &i, Camera &c)
+    : scene(s), gameLogic(g),
     userInput(i), camera(c),
     globe(GL_TRIANGLES),
     grid(GL_LINEAR_ATTENUATION),
@@ -106,9 +106,9 @@ public:
     RenderableGrid grid;
     RenderableGlobe globe;
     glm::vec3 lightPos;
-//    friend class GameLogic;
+    friend class GameLogic;
     friend class UserInput;
-//    GameLogic &gameLogic;
+    GameLogic &gameLogic;
     UserInput &userInput;
     Scene &scene;
     

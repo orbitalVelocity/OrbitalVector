@@ -231,6 +231,14 @@ void GameSingleton::loadEntity(entityx::Entity entity,
     {
         entity.assign<OrbitPath>();
     }
+    if (bt == BodyType::MISSILE)
+    {
+        entity.assign<Missile>();
+    }
+    if (bt == BodyType::SHIP)
+    {
+        entity.assign<Ship>();
+    }
 }
 
 void GameSingleton::createEntity(glm::vec3 pos,
@@ -254,14 +262,7 @@ void GameSingleton::createEntity(glm::vec3 pos,
         assert(myShip.valid());
         newShip.assign<MissileLogic>(myShip, selectedEntities.front());
     }
-    if (type == BodyType::MISSILE)
-    {
-        newShip.assign<Missile>();
-    }
-    if (type == BodyType::SHIP)
-    {
-        newShip.assign<Ship>();
-    }
+
 }
 
 void GameSingleton::createShip(
@@ -318,7 +319,6 @@ void GameSingleton::load(std::string, int width, int height )
     gm = m * G;
     
     myShip = entities.create();
-    
     loadEntity(myShip,
                {110,0,0},
                {0,0,2.3},

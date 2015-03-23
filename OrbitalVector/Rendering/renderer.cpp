@@ -279,9 +279,7 @@ void Renderer::render(entityx::EntityManager &entities)
             glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
             glUseProgram(shadowMap.shaderProgram);
             
-            depthMVP = depthProjectionMatrix * depthViewMatrix;// *
-//                gameLogic.sShip[shipIdx].orientation
-//                * gameLogic.sShip[shipIdx].size;
+            depthMVP = depthProjectionMatrix * depthViewMatrix;
             //myGameSingleton.myShip.component<Orientation>()->orientation;
             shadowMap.drawIndexed(world, camera, depthMVP, shapes[shipIdx].mesh.indices.data());
         }
@@ -471,22 +469,14 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
                     );
     
     glUseProgram(ship.shaderProgram);
-    int shipOffset = sysIndexOffset[BodyType::SHIP];
-    int shipNum = numBodyPerType[BodyType::SHIP];
-    //int shipNum = gameLogic.sShip.size();
-    
-    //draw each ship
     entityx::ComponentHandle<Position> position;
     entityx::ComponentHandle<Ship> shipComponent;
     entityx::ComponentHandle<Orientation> orientation;
     for (entityx::Entity entity : entities.entities_with_components(shipComponent, position, orientation))
-//    for (int i=0; i < shipNum; i++)
     {
         auto mvp =
         world *
-//        glm::translate(glm::mat4(), getShipPos(i))
         glm::translate(glm::mat4(), position->pos)// * //getShipPos(i))
-//        * gameLogic.sShip[i].orientation
 //        orientation->orientation;
 //        * gameLogic.sShip[i].size
         ;
@@ -502,24 +492,8 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
         //break;
     }
     
-    glUseProgram(sprite.shaderProgram);
-//    auto drawSelector = [&](int i, glm::vec3 color)
-//    {
-//        if (i < 1 || i >= getNumberOfEntities()) {//sys.size()) {
-//            return;
-//        }
-//        auto centralPos = glm::vec3(world * glm::vec4(getEntityPosition(i), 1.0));//sys[i].sn.pos, 1.0));
-//        auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
-//        glUniform3fv(loc, 1, glm::value_ptr(centralPos));
-//        sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
-//    };
     
-#if 1
-    //old way
-//    drawSelector(gameLogic.selected, shipOrbitColor);
-//    drawSelector(gameLogic.mouseHover, gridColor);
-
-    //new way of drawing from ECS
+    glUseProgram(sprite.shaderProgram);
     auto drawSelectorNew = [&](vector<entityx::Entity> entities, glm::vec3 color)
     {
         for (auto selected : entities)
@@ -540,7 +514,6 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     drawSelectorNew(myGameSingleton.selectedEntities, shipOrbitColor);
     drawSelectorNew(myGameSingleton.mouseOverEntities, gridColor);
     
-#endif
     
     glUseProgram(globe.shaderProgram);
 //    for (entityx::Entity entity : entities.entities_with_components(position, planet))
@@ -564,8 +537,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     {
         auto mvp =
             world
-//        * lookAt(sys[i].sn.vel, vec3(0), vec3(0,1,0))
-        * glm::translate(glm::mat4(), position->pos);//getMissilePos(i));//sys[i].sn.pos);
+        * glm::translate(glm::mat4(), position->pos);
         
         missile.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
 

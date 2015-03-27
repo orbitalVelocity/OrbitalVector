@@ -31,34 +31,22 @@ extern std::vector<tinyobj::material_t> materials;
  */
 class Scene {
 public:
-    Scene() :
-    orbit(GL_LINES)  //if rendering line strip, can't render disconnected paths (multiple orbit paths)
-        {
-        };
-    void init(int, int);
+    void init();
     void update();
     
 public:
-    //entity manager goes here
     
-    //orbit is a type of entity, yes?
-    RenderableOrbit orbit;
 
     //lights are entities with self emitters
         //brightness,           type: cone/bulbs/area/cubic
         //range (rendering optimization) in meters
         //falloff (inverse)     linear, square
     
-    Camera camera;      //keep it, only 1 camera planned for now
     
     //no need for these classes! get rid of them!
-    friend class GameLogic;
     friend class UserInput;
     friend class Renderer;
     
-    bool debug;
-    glm::vec3 rayStart, rayEnd;
-    glm::vec3 obj;
 };
 
 

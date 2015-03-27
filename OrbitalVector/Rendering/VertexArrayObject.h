@@ -33,7 +33,7 @@ public:
     }
     
     template<typename T>
-    void setupBuffer(GLuint bufferType, GLuint drawHint, vector<T> &array)
+    void setupBuffer(GLuint bufferType, GLuint drawHint, std::vector<T> &array)
     {
         //must bind VAO first, else VBO won't be linked to VAO
         glBindVertexArray(vao);
@@ -48,7 +48,7 @@ public:
     
 public:
     GLuint vao, elementBuffer;
-    vector<GLuint> vbo;
+    std::vector<GLuint> vbo;
     int vboIdx;
     GLenum drawType;
     int drawCount;

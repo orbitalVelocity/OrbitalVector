@@ -38,9 +38,9 @@ int getNumberOfShips();
 int getNumberOfMissiles();
 int getNumberOfEntities();
 
-std::vector<body> getAllOrbitalObjects();
-void setAllOrbitalObjects(std::vector<body>);
-void updateOrbitalPhysics(float dt, std::vector<std::vector<state> > &ks, bool variableDT);
+std::vector<body> getAllOrbitalObjects(entityx::EntityManager& entities);
+void setAllOrbitalObjects(entityx::EntityManager& entities, std::vector<body>);
+void updateOrbitalPhysics(entityx::EntityManager& entities, float dt, std::vector<std::vector<state> > &ks, bool variableDT);
 
 void createRandomShip();
 
@@ -54,17 +54,18 @@ public:
     Camera camera;
     GLFWwindow *pWindow;
     UserInput *legacyUserInput;
-    std::vector<entityx::Entity> selectedEntities;
-    std::vector<entityx::Entity> mouseOverEntities;
+//    std::vector<entityx::Entity> selectedEntities;
+//    std::vector<entityx::Entity> mouseOverEntities;
     glm::vec3 lightPos;
     
-//    UserInput userInput;
-//    Scene scene;
-//    Renderer renderer;
+    TextRenderer textObj;
+    UserInput userInput;
+    Scene scene;
+    Renderer renderer;
 public:
     explicit GameSingleton(std::string filename);
 
-    void init(UserInput *ui, TextRenderer *text);
+    void init();//UserInput *ui, TextRenderer *text);
     void load(std::string filename, int width, int height);
     void initCamera(int width, int height);
    
@@ -110,5 +111,5 @@ public:
 
 };
 
-extern GameSingleton myGameSingleton;
+//extern GameSingleton myGameSingleton;
 #endif

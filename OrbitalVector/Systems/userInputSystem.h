@@ -31,8 +31,8 @@ class UserInputSystem : public entityx::System<UserInputSystem>
 //                        public entityx::Receiver<PotentialSelectEvent>
 {
 public:
-    UserInputSystem(UserInput *ui, std::vector<entityx::Entity> &selected,
-                    std::vector<entityx::Entity> &hover);
+    UserInputSystem(UserInput *ui);
+    
     void configure(entityx::EventManager& eventManager);
 //    void receive(const PotentialSelectEvent &e);
     
@@ -50,7 +50,7 @@ public:
     entityx::Entity linePick(entityx::EntityManager & entities,
                   GLFWwindow *w, Camera &c);
 
-    void updateMouseSelection(entityx::Entity selectableEntity);
+void updateMouseSelection(entityx::EntityManager &entities, entityx::Entity selectableEntity);
     
     void updateCamera();
 
@@ -59,12 +59,5 @@ public:
 private:
     GLFWwindow *pWindow;
     UserInput* legacyUserInput = nullptr;   //get rid of this when userInput is absorbed into this class
-    
-    entityx::Entity selectableEntity;
-    entityx::Entity mouseOverEntity;
-    
-    std::vector<entityx::Entity> &mouseOverEntities;
-    std::vector<entityx::Entity> &selectedEntities;
-    
 };
 #endif /* defined(__OrbitalVector__userInputSystem__) */

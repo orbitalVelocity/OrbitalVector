@@ -17,8 +17,16 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
                              EventManager &events,
                              double dt)
 {
-#if 1
-    //OLD!! Just using this to make sure it all works w/ the old system before I integrate the new one
+    /**
+     *  Refactor goal: update only based on events
+     *      such as new entity event,
+     *          detection event, 
+     *          velocity change events,
+     *          periodic events
+     */
+    /*
+     *  All of this just to compute orbital paths using this system
+     */
     ComponentHandle<OrbitPath> orbit;
     ComponentHandle<Position> position;
     ComponentHandle<Velocity> velocity;
@@ -54,10 +62,11 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         orbitPath.clear();
         orbitPath.reserve(orbitPathSteps*3*2);
         
-//        glm::vec3 initialPos = newSys[1].sn.pos;
-            orbitPath.push_back(newSys[1].sn.pos.x);
-            orbitPath.push_back(newSys[1].sn.pos.y);
-            orbitPath.push_back(newSys[1].sn.pos.z);
+        //extra push_back and erase to produce line segments
+        //two points per, resulting in redundant vertices in the middle
+        orbitPath.push_back(newSys[1].sn.pos.x);
+        orbitPath.push_back(newSys[1].sn.pos.y);
+        orbitPath.push_back(newSys[1].sn.pos.z);
         
         auto origin = newSys[0].sn.pos;
         for (int i = 0; i < orbitPathSteps; i++) {
@@ -82,8 +91,5 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
 
     //calculate the next step for all objects
     //legacy crap for all objects
-    updateOrbitalPhysics(dt, ks, false);
-
-#else
-#endif
+    updateOrbitalPhysics(entities, dt, ks, false);
 }

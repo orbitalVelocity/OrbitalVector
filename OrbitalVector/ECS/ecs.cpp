@@ -15,7 +15,7 @@
 #include "debugTextSystem.h"
 #include "orbitalPhysicsSystem.h"
 
-GameSingleton myGameSingleton("testMap");
+//GameSingleton myGameSingleton("testMap");
 
 glm::vec3 getShipPos(int index)
 {
@@ -84,14 +84,14 @@ int getNumberOfEntities()
 }
 
 
-std::vector<body> getAllOrbitalObjects()
+std::vector<body> getAllOrbitalObjects(entityx::EntityManager &entities)
 {
     entityx::ComponentHandle<Position> position;
     entityx::ComponentHandle<Velocity> velocity;
     //TODO: use auto & instead for optimizatioN?
     auto numEntities = 0;
     std::vector<body> newSys;
-    for (auto entity : myGameSingleton.entities.entities_with_components(position, velocity))
+    for (auto entity : entities.entities_with_components(position, velocity))
     {
         numEntities++;
         auto pos = entity.component<Position>();
@@ -117,12 +117,12 @@ std::vector<body> getAllOrbitalObjects()
  *  backwards compatibility is acheived by updating sys as well
  *  Caveat: adding/removing units must be done via ECS
  */
-void updateOrbitalPhysics(float dt, vector<vector<state> > &ks, bool adaptive)
+void updateOrbitalPhysics(entityx::EntityManager &entities, float dt, vector<vector<state> > &ks, bool adaptive)
 {
 #if OLDECS
 //    orbitPhysicsUpdate(dt, ks, sys, adaptive);
 //#else
-    auto sys2 = getAllOrbitalObjects();
+    auto sys2 = getAllOrbitalObjects(entities);
     
     //check if sys and sys2 match up
     //all sys and sys2 should be exactly the same!
@@ -139,14 +139,14 @@ void updateOrbitalPhysics(float dt, vector<vector<state> > &ks, bool adaptive)
 
     orbitPhysicsUpdate(dt, ks, sys2, adaptive);
     
-    setAllOrbitalObjects(sys2);
+    setAllOrbitalObjects(entities, sys2);
     //FIXME: super hacky get rid of this asap: when getting rid of sys in general
     sys = sys2;
     
 #endif
 }
 
-void setAllOrbitalObjects(std::vector<body> _sys)
+void setAllOrbitalObjects(entityx::EntityManager &entities, std::vector<body> _sys)
 {
     entityx::ComponentHandle<Position> position;
     entityx::ComponentHandle<Velocity> velocity;
@@ -158,7 +158,7 @@ void setAllOrbitalObjects(std::vector<body> _sys)
     BodyType types[] = {BodyType::GRAV, BodyType::SHIP, BodyType::MISSILE};
     for (auto type : types)
     {
-        for( auto entity : myGameSingleton.entities.entities_with_components(position, velocity, gm, radius, parent, orbitalBodyType))
+        for( auto entity : entities.entities_with_components(position, velocity, gm, radius, parent, orbitalBodyType))
         {
             if (orbitalBodyType->orbitalBodyType == type) {
                 position->pos = _sys[index].sn.pos;
@@ -189,7 +189,9 @@ glm::vec3 getMyShipVel()
 }
 
 
-GameSingleton::GameSingleton(std::string filename) {
+GameSingleton::GameSingleton(std::string filename)
+    : renderer(userInput, camera)
+{
 //        systems.add<DebugSystem>();
 //        systems.add<MovementSystem>();
 //        systems.add<CollisionSystem>();
@@ -258,6 +260,7 @@ void GameSingleton::createEntity(glm::vec3 pos,
                mainGrav.id(),
                (BodyType)type);
     
+    auto &selectedEntities = myShip.component<PlayerControl>()->selectedEntities;
     if (type == BodyType::MISSILE and not selectedEntities.empty()) {
         assert(myShip.valid());
         newShip.assign<MissileLogic>(myShip, selectedEntities.front());
@@ -283,40 +286,6 @@ void GameSingleton::createShip(
                BodyType::SHIP);
 }
 
-void GameSingleton::createRandomShip()
-{
-    auto newShip = myGameSingleton.entities.create();
-    
-    double m = 7e12;
-    double G = 6.673e-11;
-    double gm = m * G;
-    
-    //FIXME: use std::rand instead
-    srand ((unsigned int)time(NULL));
-    
-    auto r = (rand() / 1000) % 300;
-    r += 100;
-    float v = std::sqrt(gm/r);
-    glm::vec3 rad(r, 0, 0);
-    glm::vec3 vel(0, 0, v);
-    cout << "new ship: r: " << r << ", v: " << v << endl;
-    m = 1e1;
-    gm = m * G;
-
-    myGameSingleton.loadEntity(newShip,
-                       rad,
-                       vel,
-                       {},
-                       gm,
-                       r,
-                       mainGrav.id(),
-                       BodyType::SHIP);
-}
-
-void createRandomShip()
-{
-    myGameSingleton.createRandomShip();
-}
 
 void GameSingleton::initCamera(int width, int height) {
     camera.setPosition(glm::vec3(0, 0, 10.0f));
@@ -363,20 +332,26 @@ void GameSingleton::load(std::string, int width, int height )
                mainGrav.id(),
                BodyType::SHIP
                );
+    myShip.assign<PlayerControl>();
     assert(myShip.valid());
 }
 
 //FIXME: merge back into constructor after getting rid of gamelogic and scene classes
-void GameSingleton::init(UserInput *ui, TextRenderer *text)
+void GameSingleton::init()
 {
+    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
+    
+    
+    
     //FIXME: remove UI asap
-    legacyUserInput = ui;
+    scene.init();
+    legacyUserInput = &userInput;
     
 //    systems.add<LinePickSystem>();
-    systems.add<UserInputSystem>(ui, selectedEntities, mouseOverEntities);
+    systems.add<UserInputSystem>(legacyUserInput);
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();
-    systems.add<DebugTextSystem>(text);
+    systems.add<DebugTextSystem>(&textObj);
     systems.add<OrbitalPhysicsSystem>();
     systems.configure();
     
@@ -400,6 +375,12 @@ void GameSingleton::update(double dt)
     
     //move the world in the OPPOSITE direction of the focus
     world = glm::translate(glm::mat4(), -myShip.component<Position>()->pos);//-getMyShipPos());//sys[1].sn.pos);
+    
+    auto UITextSetup = [&](){
+        auto vp = camera.matrix() * world;
+        textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
+    };
+    UITextSetup();
 }
 
 

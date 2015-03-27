@@ -119,7 +119,7 @@ void readBinObject(string _fileName)
 }
 
 
-void Scene::init(int width, int height)
+void Scene::init()
 {
 //    initCamera(camera, width, height);
     

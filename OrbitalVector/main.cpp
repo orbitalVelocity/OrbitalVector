@@ -15,13 +15,13 @@
 #include "OGLShader.h"
 #include <GLFW/glfw3.h>
 
+#include "ecs.h"
 #include "camera.h"
 #include "scene.h"
 #include "orbit.h"
 #include "tiny_obj_loader.h"
 #include "spatial.h"
 #include "text.h"
-#include "gameLogic.h"
 #include "renderer.h"
 #include "GPUTimer.h"
 #define CUSTOM_VSYNC 2
@@ -300,20 +300,6 @@ void getText(TextRenderer &textObj, PerfMon &perfMon, WindowStates &ws)
     textObj.pushBackDebug(textOut);
 }
 
-void getLinePick(TextRenderer &textObj, GameLogic &gameLogic)
-{
-    stringstream textOut;
-    for (int i=0; i < gameLogic.shortestDist.size(); i++)
-    {
-        textOut << "obj: " << i << " dist: " << gameLogic.shortestDist[i];
-        textObj.pushBackDebug(textOut);
-    }
-    textOut << "selected: " << gameLogic.selected;
-    textObj.pushBackDebug(textOut);
-    textOut << "mouseOver: " << gameLogic.mouseHover;
-    textObj.pushBackDebug(textOut);
-}
-
 int main(int argc, const char * argv[])
 {
     int width = 960, height = 540;
@@ -328,35 +314,23 @@ int main(int argc, const char * argv[])
     // Calculate pixel ratio for hi-dpi devices.
     auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
     
-    //FIXME: for refactoring only
+    GameSingleton myGameSingleton("testMap");
     myGameSingleton.load("test", width, height);
     assert(myGameSingleton.myShip.valid());
-    updateOrbitalPhysics(.001, ks, true);
+    updateOrbitalPhysics(myGameSingleton.entities, .001, ks, true);
 
     initFontStash();
-    UserInput inputObject;
-    Scene scene;
-//    GameLogic gameLogic(ws.pWindow, scene, inputObject);
-    scene.init(ws.fbWidth, ws.fbHeight);
-    Renderer renderer(scene, inputObject, myGameSingleton.camera);
-    renderer.init(ws.fbWidth, ws.fbHeight);
+//    UserInput inputObject;
+//    Scene scene;
+    //loads meshes
+//    scene.init();
+//    Renderer renderer(inputObject, myGameSingleton.camera);
+    myGameSingleton.renderer.init(ws.fbWidth, ws.fbHeight);
         check_gl_error();
     
     // creating vector of string
-    TextRenderer textObj(pxRatio, ws.fbWidth, ws.fbHeight);
-    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
-//    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, std::to_string(scene.orbit.apo)));
-//    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, std::to_string(scene.orbit.peri)));
-
-    auto UITextSetup = [&](){
-        auto vp = myGameSingleton.camera.matrix() * world;
-        textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
-//        textObj.guiText[1].pos = getVec2(vp, scene.orbit.apoPos);
-//        textObj.guiText[2].pos = getVec2(vp, scene.orbit.periPos);
-//        
-//        textObj.guiText[1].text = std::to_string(scene.orbit.apo);
-//        textObj.guiText[2].text = std::to_string(scene.orbit.peri);
-    };
+    myGameSingleton.textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
+    myGameSingleton.textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
     
     // performance measurement
     glfwSetTime(0);
@@ -364,7 +338,7 @@ int main(int argc, const char * argv[])
     perfMon.tPrevFrame = glfwGetTime();
     
     myGameSingleton.pWindow = ws.pWindow;
-    myGameSingleton.init(&inputObject, &textObj);
+//    myGameSingleton.init(&inputObject, &textObj);
     
     static int orbitCount = 1;
     while (!glfwWindowShouldClose(ws.pWindow))
@@ -376,28 +350,26 @@ int main(int argc, const char * argv[])
         
         // Calculate pixel ratio for hi-dpi devices.
         auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
-        textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
+        myGameSingleton.textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
 		
-        textObj.debugTexts.clear();
-//        gameLogic.processActionList(inputObject.actionList);
+        myGameSingleton.textObj.debugTexts.clear();
         myGameSingleton.update(dt);
-//        gameLogic.update(dt);
+        
         //calculate trajectories every 30 frames
         if (orbitCount++ % 30 == 0) {
-            scene.orbit.update();
+            myGameSingleton.renderer.orbit.update();
         }
-        renderer.update();
+        myGameSingleton.renderer.update();
 
-        getText(textObj, perfMon, ws);
-        UITextSetup();
+        getText(myGameSingleton.textObj, perfMon, ws);
        
-        renderer.render(myGameSingleton.entities);
-        textObj.render();
+        myGameSingleton.renderer.render(myGameSingleton.entities);
+        myGameSingleton.textObj.render();
        
         perfMon.frameEnd(glfwGetTime());
 
         glfwSwapBuffers(ws.pWindow);
-        renderer.postFrame();
+        myGameSingleton.renderer.postFrame();
         
         /* Poll for events (kb, mouse, joystick) and process them via glfw callbacks*/
         glfwPollEvents();

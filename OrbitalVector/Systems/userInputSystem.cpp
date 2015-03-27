@@ -11,7 +11,7 @@
 #include "ecs.h"
 using namespace entityx;
 
-UserInputSystem::UserInputSystem(UserInput *ui, std::vector<Entity> &s, std::vector<Entity> &h) : legacyUserInput(ui), selectedEntities(s), mouseOverEntities(h)
+UserInputSystem::UserInputSystem(UserInput *ui) : legacyUserInput(ui)
 {
     
 }
@@ -48,7 +48,7 @@ void UserInputSystem::update(entityx::EntityManager &entities,
 {
     auto selectableEntity = linePick(entities, window, camera);
     
-    updateMouseSelection(selectableEntity);
+    updateMouseSelection(entities, selectableEntity);
     
 
     double mx, my;
@@ -83,7 +83,7 @@ void UserInputSystem::update(entityx::EntityManager &entities,
 /**
  *  only gets called when mouse overs an entity
  */
-void UserInputSystem::updateMouseSelection(Entity selectableEntity)
+void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selectableEntity)
 {
     //assuming select one thing at a time
     auto cameraRotateMode = legacyUserInput->rmbPressed;
@@ -93,28 +93,35 @@ void UserInputSystem::updateMouseSelection(Entity selectableEntity)
     //          in order to detect when a user has clicked anywhere (including nothing)
     //OR don't put any of this in the receive, leave it in linePick, so much easier that way!
     //OR give the MB call back access to selectedEntities as well so it can update dynamically as well (but now we have multiple locations that writes to the same set of structures... :( easy for bugs to creep out!
-    auto enableMultiSelection = false;
-    if (not enableMultiSelection) {
-        if (selectionMode) {
-            selectedEntities.clear();
+    
+    PlayerControl::Handle player;
+    auto count = 0;
+    for (Entity entity : entities.entities_with_components(player)) {
+        auto &selectedEntities = player->selectedEntities;
+        auto &mouseOverEntities = player->mouseOverEntities;
+        auto enableMultiSelection = false;
+        if (not enableMultiSelection) {
+            if (selectionMode) {
+                selectedEntities.clear();
+            }
+            mouseOverEntities.clear();
         }
-        mouseOverEntities.clear();
-    }
-    
-    //placed after clear()'s to allow deselection by mousing over nothing
-    if (not selectableEntity.valid()) {
-        return;
-    }
-    
-    if (selectionMode) {
-        selectedEntities.emplace_back(selectableEntity);
-        std::cout << "selected: " << selectableEntity.id() << std::endl;
         
-    } else { //else mouseOverMode
-        mouseOverEntities.emplace_back(selectableEntity);
-        std::cout << "mouseOver: " << selectableEntity.id() << std::endl;
+        //placed after clear()'s to allow deselection by mousing over nothing
+        if (not selectableEntity.valid()) {
+            return;
+        }
+        
+        if (selectionMode) {
+            selectedEntities.emplace_back(selectableEntity);
+            std::cout << "selected: " << selectableEntity.id() << std::endl;
+            
+        } else { //else mouseOverMode
+            mouseOverEntities.emplace_back(selectableEntity);
+            std::cout << "mouseOver: " << selectableEntity.id() << std::endl;
+        }
+        assert(count++==0);
     }
-
     //what happens when the cursor moves? is that called in a callback??
 }
 
@@ -172,6 +179,17 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
  */
 void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::Entity myShip)
 {
+    PlayerControl::Handle player;
+    auto count = 0;
+    vector<Entity> *selectedEntities;
+    vector<Entity> *mouseOverEntities;
+    for (Entity entity : entities.entities_with_components(player)) {
+        selectedEntities = &(player->selectedEntities);
+        mouseOverEntities = &(player->mouseOverEntities);
+        count++;
+    }
+    assert(1 == count);
+    
     glm::vec3 forwardVector;
     for (auto &action : legacyUserInput->actionList )
     {
@@ -252,10 +270,10 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
         if (action == ActionType::fireGun)
         {
             Entity entity;
-            auto targetEntity = selectedEntities.front();
+            auto targetEntity = selectedEntities->front();
             if (targetEntity.valid() ) {//selectedEntities.front().valid()) {
                 entity = entities.create();
-                entity.assign<MissileLogic>(myShip, selectedEntities.front());
+                entity.assign<MissileLogic>(myShip, selectedEntities->front());
                 assert(entity.valid());
             } else {
                 break;

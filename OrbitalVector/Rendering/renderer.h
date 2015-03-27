@@ -12,7 +12,6 @@
 
 #include <iostream>
 #include "includes.h"
-#include "ecs.h"
 
 #include "VertexArrayObject.h"
 //shaders
@@ -25,11 +24,11 @@
 
 #include "orbit.h"
 #include "camera.h"
-#include "gameLogic.h"
 #include "scene.h"
 #include "grid.h"
 #include "globe.h"
-
+#include "input.h"
+#include "entityx/Entity.h"
 
 #define NOSHADER false
 enum SN {
@@ -63,11 +62,12 @@ public:
 //invokes game logic
 class Renderer {
 public:
-    Renderer(Scene &s, UserInput &i, Camera &c)
-    : scene(s), //gameLogic(g),
+    Renderer(UserInput &i, Camera &c)
+    :
     userInput(i), camera(c),
     globe(GL_TRIANGLES),
     grid(GL_LINEAR_ATTENUATION),
+    orbit(GL_LINES),
     ship(GL_TRIANGLES),
     sprite(GL_TRIANGLES),
     missile(GL_TRIANGLES),
@@ -86,8 +86,8 @@ public:
     debug(false)
     {
         rt.resize(maxStages);
-        selected = -1;
-        mouseHover = -1;
+//        selected = -1;
+//        mouseHover = -1;
     };
     void init(int, int);
     void render(entityx::EntityManager &entities);
@@ -95,7 +95,7 @@ public:
     void update();
     /*
      * perform actions between frames
-     * like reloading shaders
+     * like reloading shader(s)
      */
     void postFrame();
     
@@ -105,12 +105,10 @@ public:
     OGLShader ship, sprite, missile;
     RenderableGrid grid;
     RenderableGlobe globe;
+    RenderableOrbit orbit;
     glm::vec3 lightPos;
-//    friend class GameLogic;
     friend class UserInput;
-//    GameLogic &gameLogic;
     UserInput &userInput;
-    Scene &scene;
     
     //    RenderTarget rt, rtBloom, rtBloomV, rtShadowMap;
     vector<RenderTarget> rt;
@@ -130,7 +128,7 @@ public:
     
     bool debug;
     float downSizeFactor;
-    int selected, mouseHover;
+//    int selected, mouseHover;
     
     Camera &camera;
 };

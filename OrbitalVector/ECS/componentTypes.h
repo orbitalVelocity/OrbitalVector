@@ -29,6 +29,9 @@ COMPONENT(MissileLogic)
 COMPONENT(PlayerControl)
 {
     PlayerControl() {}
+    
+    std::vector<entityx::Entity> selectedEntities;
+    std::vector<entityx::Entity> mouseOverEntities;
 };
 
 COMPONENT(Ship)

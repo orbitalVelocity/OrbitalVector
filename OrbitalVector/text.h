@@ -28,7 +28,7 @@ public:
 
 class TextRenderer {
 public:
-    TextRenderer(int r, int w, int h) : pxRatio(r), fbWidth(w), fbHeight(h) {}
+    TextRenderer();
     void updateSettings(int, int, int);
     void render();
     void pushBackDebug(stringstream &ss);

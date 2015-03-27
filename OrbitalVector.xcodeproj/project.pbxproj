@@ -18,7 +18,6 @@
 		F111F26E19D9E94200DD4439 /* input.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F111F26C19D9E94200DD4439 /* input.cpp */; };
 		F144C6D519E2DA9200C848B9 /* terran_corvette.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F144C6D419E2DA8800C848B9 /* terran_corvette.obj */; };
 		F144C6D719E3636600C848B9 /* DroidSerif-Regular.ttf in CopyFiles */ = {isa = PBXBuildFile; fileRef = F144C6D619E3636100C848B9 /* DroidSerif-Regular.ttf */; };
-		F151168C19DE1FE50018635B /* gameLogic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F151168A19DE1FE50018635B /* gameLogic.cpp */; };
 		F151168F19E1A8080018635B /* passthrough.vs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F151168D19E17D690018635B /* passthrough.vs */; };
 		F151169019E1A8080018635B /* wobblyTexture.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F151168E19E17D690018635B /* wobblyTexture.fs */; };
 		F151169219E2292A0018635B /* bloom.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F151169119E228EC0018635B /* bloom.fs */; };
@@ -125,8 +124,6 @@
 		F111F26D19D9E94200DD4439 /* input.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = input.h; sourceTree = "<group>"; };
 		F144C6D419E2DA8800C848B9 /* terran_corvette.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = terran_corvette.obj; sourceTree = "<group>"; };
 		F144C6D619E3636100C848B9 /* DroidSerif-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DroidSerif-Regular.ttf"; sourceTree = "<group>"; };
-		F151168A19DE1FE50018635B /* gameLogic.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gameLogic.cpp; sourceTree = "<group>"; };
-		F151168B19DE1FE50018635B /* gameLogic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gameLogic.h; sourceTree = "<group>"; };
 		F151168D19E17D690018635B /* passthrough.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = passthrough.vs; path = glsl/passthrough.vs; sourceTree = "<group>"; };
 		F151168E19E17D690018635B /* wobblyTexture.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = wobblyTexture.fs; path = glsl/wobblyTexture.fs; sourceTree = "<group>"; };
 		F151169119E228EC0018635B /* bloom.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = bloom.fs; path = glsl/bloom.fs; sourceTree = "<group>"; };
@@ -358,8 +355,6 @@
 				F1B3C67318D935EC00971791 /* main.cpp */,
 				F1011C6519C68C6700602446 /* scene.cpp */,
 				F1011C6619C68C6700602446 /* scene.h */,
-				F151168B19DE1FE50018635B /* gameLogic.h */,
-				F151168A19DE1FE50018635B /* gameLogic.cpp */,
 				F17416F81AB5F2C100D2269F /* Systems */,
 				F19330BA1AABC6A4009B42B0 /* ECS */,
 				F1D4680B1AA5116C00869C62 /* GameObject */,
@@ -483,7 +478,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F151168C19DE1FE50018635B /* gameLogic.cpp in Sources */,
 				F1011C6719C68C6700602446 /* scene.cpp in Sources */,
 				F1A9BD6A1AB7BB1B00EF92B7 /* missileSystem.cpp in Sources */,
 				F15E8E9C19BD406B003E566C /* OGLShader.cpp in Sources */,

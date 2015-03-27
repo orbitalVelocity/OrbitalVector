@@ -11,6 +11,7 @@
 #include "glm/gtx/closest_point.hpp"
 #include "componentTypes.h"
 
+using namespace entityx;
 bool showDepth = false;
 
 
@@ -44,7 +45,7 @@ void Renderer::init(int width, int height)
     
     globe.init();
     check_gl_error();
-    scene.orbit.init();
+    orbit.init();
     check_gl_error();
     grid.init();
     check_gl_error();
@@ -451,8 +452,8 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
         glUseProgram(grid.shaderProgram);
         grid.draw(mvp, gridColor);
         check_gl_error();
-        glUseProgram(scene.orbit.shaderProgram);
-        scene.orbit.draw(mvp, shipOrbitColor);
+        glUseProgram(orbit.shaderProgram);
+        orbit.draw(mvp, shipOrbitColor);
         check_gl_error();
     }
     
@@ -506,8 +507,14 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
         }
     };
 
-    drawSelectorNew(myGameSingleton.selectedEntities, shipOrbitColor);
-    drawSelectorNew(myGameSingleton.mouseOverEntities, gridColor);
+    //assert(get number of entities with playerControl component == 1);
+    //need to put renderer in ecs
+    PlayerControl::Handle player;
+    for (Entity entity : entities.entities_with_components(player))
+    {
+        drawSelectorNew(player->selectedEntities, shipOrbitColor);
+        drawSelectorNew(player->mouseOverEntities, gridColor);
+    }
     
     glUseProgram(globe.shaderProgram);
 //    for (entityx::Entity entity : entities.entities_with_components(position, planet))

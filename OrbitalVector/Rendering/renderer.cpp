@@ -431,10 +431,7 @@ void Renderer::render(entityx::EntityManager &entities)
             
             return;
         }
-        
     }
-    
-    
 }
 
 void Renderer::forwardRender(entityx::EntityManager &entities)
@@ -474,10 +471,9 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     entityx::ComponentHandle<Orientation> orientation;
     for (entityx::Entity entity : entities.entities_with_components(shipComponent, position, orientation))
     {
-        auto mvp =
-        world *
-        glm::translate(glm::mat4(), position->pos)// * //getShipPos(i))
-//        orientation->orientation;
+        auto mvp = world
+        * glm::translate(glm::mat4(), position->pos)
+//        * orientation->orientation
 //        * gameLogic.sShip[i].size
         ;
         
@@ -489,7 +485,6 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
         ship.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
         check_gl_error();
-        //break;
     }
     
     
@@ -514,13 +509,10 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     drawSelectorNew(myGameSingleton.selectedEntities, shipOrbitColor);
     drawSelectorNew(myGameSingleton.mouseOverEntities, gridColor);
     
-    
     glUseProgram(globe.shaderProgram);
 //    for (entityx::Entity entity : entities.entities_with_components(position, planet))
-//    {
-    for (auto &s : gameLogic.sGlobe) {
-//        auto mvp = _camera * world * glm::mat4();//position->pos);
-        auto mvp = _camera * world * s.transform();
+    {
+        auto mvp = _camera * world * glm::scale(glm::mat4(), glm::vec3(30));
         globe.draw(mvp, planetColor);
         check_gl_error();
     }
@@ -529,15 +521,10 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     
     //draw projectile
     glUseProgram(missile.shaderProgram);
-//    int projectileOffset = sysIndexOffset[BodyType::MISSILE];
-//    for (int i=projectileOffset; i < sys.size(); i++)
-//    for (int i=0; i < getNumberOfMissiles(); i++)
     entityx::ComponentHandle<Missile> missileComponent;
     for (entityx::Entity entity : entities.entities_with_components(missileComponent, position, orientation))
     {
-        auto mvp =
-            world
-        * glm::translate(glm::mat4(), position->pos);
+        auto mvp = world * glm::translate(glm::mat4(), position->pos);
         
         missile.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
 

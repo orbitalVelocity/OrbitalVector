@@ -54,17 +54,17 @@ public:
     
     void updateCamera();
 
-void processAction();
+    void processAction(entityx::EntityManager &entities, entityx::Entity myShip);
 
 private:
     GLFWwindow *pWindow;
     UserInput* legacyUserInput = nullptr;   //get rid of this when userInput is absorbed into this class
-    entityx::Entity myShip;
     
     entityx::Entity selectableEntity;
     entityx::Entity mouseOverEntity;
     
     std::vector<entityx::Entity> &mouseOverEntities;
     std::vector<entityx::Entity> &selectedEntities;
+    
 };
 #endif /* defined(__OrbitalVector__userInputSystem__) */

@@ -48,7 +48,7 @@ void RenderableOrbit::update()
     }
     int totalPathSize2 = (int)(pathSteps2 * sizeof(float));
     
-    std::cout << "path steps: " << pathSteps2 << std::endl;
+//    std::cout << "path steps: " << pathSteps2 << std::endl;
     glBindBuffer(GL_ARRAY_BUFFER, vbo[vboIdx]);
     check_gl_error();
     glBufferData(GL_ARRAY_BUFFER, totalPathSize2, nullptr, GL_STREAM_DRAW);

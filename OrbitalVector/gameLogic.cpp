@@ -172,11 +172,7 @@ void GameLogic::update(float dt)
     //calculate new position/velocity
 //    updateOrbitalPhysics(dt, ks, false);
     
-    //calculate trajectories every 30 frames
-    static int orbitCount = 1;
-    if (orbitCount++ % 30 == 0) {
-        scene.orbit.update();
-    }
+    
     
 //    handleCollision();
 
@@ -191,7 +187,7 @@ void GameLogic::update(float dt)
 //    sGlobe[2].move(getMyShipPos()-progradeOffset);
   
     //center the world around player ship
-    world = glm::translate(glm::mat4(), -getMyShipPos());//sys[1].sn.pos);
+//    world = glm::translate(glm::mat4(), -getMyShipPos());//sys[1].sn.pos);
 }
 
 void GameLogic::processActionList(std::vector<ActionType> &actionList)

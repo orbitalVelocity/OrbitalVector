@@ -73,6 +73,10 @@ void UserInputSystem::update(entityx::EntityManager &entities,
     //scroll behavior
     camera.offsetPos(glm::vec3(0,0, -legacyUserInput->yScroll));
     legacyUserInput->yScroll = 0;
+    
+    //process actions
+    //refactor: make its own system, so AI can use it too
+    processAction(entities, myShip);
 }
 
 
@@ -160,15 +164,13 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
         }
     }
     
-    //emit event for clickability
-    std::cout << "can select entity " << selectableEntity.id() << std::endl;
     return selectableEntity;
 }
 /*
  * process list of actions form legacyUserInput
  * future refactor: actionlist should be a standalone thing that both user and AI populate
  */
-void UserInputSystem::processAction()
+void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::Entity myShip)
 {
     glm::vec3 forwardVector;
     for (auto &action : legacyUserInput->actionList )
@@ -205,66 +207,84 @@ void UserInputSystem::processAction()
                 break;
         }
         
-//        auto newEntity = [](body body, BodyType type)
-//        {
-//            myGameSingleton.createEntity(
-//                                         body.sn.pos,
-//                                         body.sn.vel,
-//                                         {},
-//                                         body.mu,
-//                                         body.radius,
-//                                         type);
-//        };
         
         if (action == ActionType::newShip)
         {
 //            sShip.push_back(Spatial(200.0));    //Spatial constructor inserts body into sys already! and creates a ship in ECS
 //            sShip.back().scale(glm::vec3(1));
-//            {
-//                double m = 7e12;
-//                double G = 6.673e-11;
-//                double gm = m * G;
-//                
-//                srand ((unsigned int)time(NULL));
-//                
-//                r = (rand() / 1000) % 300;
-//                if (r < 50) {
-//                    r = 50;
-//                }
-//                float v = std::sqrt(gm/r);
-//                glm::vec3 rad(r, 0, 0);
-//                glm::vec3 vel(0, 0, v);
-//                cout << "new ship: r: " << r << ", v: " << v << endl;
-//                m = 1e1;
-//                gm = m * G;
+            {
+                double m = 7e12;
+                double G = 6.673e-11;
+                double gm = m * G;
+                
+                srand ((unsigned int)time(NULL));
+                
+                auto r = (rand() / 1000) % 300;
+                if (r < 50) {
+                    r = 50;
+                }
+                float v = std::sqrt(gm/r);
+                glm::vec3 rad(r, 0, 0);
+                glm::vec3 vel(0, 0, v);
+                cout << "new ship: r: " << r << ", v: " << v << endl;
+                m = 1e1;
+                gm = m * G;
 //                auto tmp = body(state(rad, vel),
 //                                gm,
 //                                20,
 //                                nullptr,
 //                                BodyType::SHIP
 //                                );
-//               myGameSingleton.createEntity(rad, <#glm::vec3 vel#>, <#glm::mat4 orientation#>, <#double gm#>, <#float r#>, <#int type#>)
-//                
-//            }
+                auto entity = entities.create();
+                assert(entity.valid());
+                
+                entity.assign<Position>(rad);
+                entity.assign<Velocity>(vel);
+                entity.assign<GM>(gm);
+                entity.assign<Parent>(myShip.component<Parent>()->parent);
+                entity.assign<OrbitalBodyType>(BodyType::SHIP);
+                entity.assign<Orientation>();
+                entity.assign<Radius>(30);
+                entity.assign<Ship>();
+                entity.assign<OrbitPath>();
+            }
         }
         if (action == ActionType::fireGun)
         {
+            Entity entity;
+            auto targetEntity = selectedEntities.front();
+            if (targetEntity.valid() ) {//selectedEntities.front().valid()) {
+                entity = entities.create();
+                entity.assign<MissileLogic>(myShip, selectedEntities.front());
+                assert(entity.valid());
+            } else {
+                break;
+            }
 //            events.emit<FireWeaponEvent>(myShip);
-//            double m = 0.0;
-//            double G = 6.673e-11;
-//            double gm = m * G;
-//            auto shipVector = glm::vec3(sShip[activeShip].orientation * glm::vec4(0,0,1,1));
-//            cout << "ship orientation: " << printVec3(shipVector) << "\n";
-//            auto pos = sys[1].sn.pos
-//            + glm::normalize(shipVector)
-//            * 10.0f;
-//            auto vel = sys[1].sn.vel
-//            + glm::normalize(shipVector)
-//            * 3.0f;
+            double m = 0.0;
+            double G = 6.673e-11;
+            double gm = m * G;
+            auto shipVector = glm::normalize(targetEntity.component<Position>()->pos - myShip.component<Position>()->pos);
+            cout << "ship orientation: " << printVec3(shipVector) << "\n";
+            auto pos = myShip.component<Position>()->pos
+            + (shipVector)
+            * 10.0f;
+            auto vel = myShip.component<Velocity>()->vel
+            + (shipVector)
+            * 3.0f;
 //            body bullet(state(pos, vel), 10, gm, nullptr, BodyType::SHIP);
 //            //            addSatellite(bullet);
 //            InsertToSys(bullet, BodyType::MISSILE);
 //            //            newEntity(bullet, BodyType::MISSILE);
+            entity.assign<Position>(pos);
+            entity.assign<Velocity>(vel);
+            entity.assign<GM>(gm);
+            entity.assign<Parent>(myShip.component<Parent>()->parent);
+            entity.assign<OrbitalBodyType>(BodyType::SHIP);
+            entity.assign<Orientation>();
+            entity.assign<Radius>(1);
+            entity.assign<Missile>();
+            entity.assign<OrbitPath>();
         }
         
     }

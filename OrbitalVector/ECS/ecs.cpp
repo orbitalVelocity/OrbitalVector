@@ -283,59 +283,6 @@ void GameSingleton::createShip(
                BodyType::SHIP);
 }
 
-void GameSingleton::initCamera(int width, int height) {
-    camera.setPosition(glm::vec3(0, 0, 10.0f));
-    camera.setFocus(glm::vec3(0,3.0f,0));
-    camera.setClip(0.01f, 2000.0f);
-    camera.setFOV(45.0f);
-    camera.setAspectRatio((float)width/(float)height);
-}
-
-void GameSingleton::load(std::string, int width, int height )
-{
-    initCamera(width, height);
-    
-    //FIXME: this is because InsertToSys creates new entities directly
-    double m = 7e12;
-    double G = 6.673e-11;
-    double gm = m * G;
-    
-    //load json and create entities
-    auto nullEntity = entities.create();
-    nullEntity.invalidate();
-    mainGrav = entities.create();
-    loadEntity(mainGrav,
-               {},
-               glm::vec3(0,0,-.1),
-               {},
-               gm,
-               50,
-               nullEntity.id(),
-               BodyType::GRAV
-               );
-    
-    
-    m = 1e5;
-    gm = m * G;
-    
-    myShip = entities.create();
-    loadEntity(myShip,
-               {110,0,0},
-               {0,0,2.3},
-               {},
-               gm,
-               10,
-               mainGrav.id(),
-               BodyType::SHIP
-               );
-    assert(myShip.valid());
-}
-
-void createRandomShip()
-{
-    myGameSingleton.createRandomShip();
-}
-
 void GameSingleton::createRandomShip()
 {
     auto newShip = myGameSingleton.entities.create();
@@ -364,6 +311,59 @@ void GameSingleton::createRandomShip()
                        r,
                        mainGrav.id(),
                        BodyType::SHIP);
+}
+
+void createRandomShip()
+{
+    myGameSingleton.createRandomShip();
+}
+
+void GameSingleton::initCamera(int width, int height) {
+    camera.setPosition(glm::vec3(0, 0, 10.0f));
+    camera.setFocus(glm::vec3(0,3.0f,0));
+    camera.setClip(0.01f, 2000.0f);
+    camera.setFOV(45.0f);
+    camera.setAspectRatio((float)width/(float)height);
+}
+
+void GameSingleton::load(std::string, int width, int height )
+{
+    initCamera(width, height);
+    
+    //FIXME: this is because InsertToSys creates new entities directly
+    double m = 7e12;
+    double G = 6.673e-11;
+    double gm = m * G;
+    
+    //load json and create entities
+    auto nullEntity = entities.create();
+    nullEntity.invalidate();
+    mainGrav = entities.create();
+    loadEntity(mainGrav,
+               {},
+               glm::vec3(0,0,-.1),
+               {},
+               gm,
+               30,
+               nullEntity.id(),
+               BodyType::GRAV
+               );
+    
+    
+    m = 1e5;
+    gm = m * G;
+    
+    myShip = entities.create();
+    loadEntity(myShip,
+               {110,0,0},
+               {0,0,2.3},
+               {},
+               gm,
+               1,
+               mainGrav.id(),
+               BodyType::SHIP
+               );
+    assert(myShip.valid());
 }
 
 //FIXME: merge back into constructor after getting rid of gamelogic and scene classes
@@ -398,7 +398,8 @@ void GameSingleton::update(double dt)
     systems.update<CollisionSystem>(dt);
     systems.update<DebugTextSystem>(dt); //this does nothing right now
     
-    world = glm::translate(glm::mat4(), myShip.component<Position>()->pos);//-getMyShipPos());//sys[1].sn.pos);
+    //move the world in the OPPOSITE direction of the focus
+    world = glm::translate(glm::mat4(), -myShip.component<Position>()->pos);//-getMyShipPos());//sys[1].sn.pos);
 }
 
 

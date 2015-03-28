@@ -381,6 +381,12 @@ void GameSingleton::update(double dt)
         textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
     };
     UITextSetup();
+    
+    //calculate trajectories every 30 frames
+    static int orbitCount = 1;
+    if (orbitCount++ % 30 == 0) {
+        renderer.orbit.update(entities);
+    }
 }
 
 

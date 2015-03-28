@@ -28,7 +28,7 @@ public:
 
 class TextRenderer {
 public:
-    TextRenderer();
+//    TextRenderer() {}
     void updateSettings(int, int, int);
     void render();
     void pushBackDebug(stringstream &ss);

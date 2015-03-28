@@ -36,13 +36,13 @@ void RenderableOrbit::init()
 
 
 
-void RenderableOrbit::update()
+void RenderableOrbit::update(entityx::EntityManager &entities)
 {
     float  *pathGL;
     using namespace entityx;
     int pathSteps2 = 0;
     ComponentHandle<OrbitPath> orbit;
-    for (Entity entity : myGameSingleton.entities.entities_with_components(orbit))
+    for (Entity entity : entities.entities_with_components(orbit))
     {
         pathSteps2 += (int) orbit->path.size();
     }
@@ -57,7 +57,7 @@ void RenderableOrbit::update()
     check_gl_error();
        
     int pathOffset = 0;
-    for (Entity entity : myGameSingleton.entities.entities_with_components(orbit))
+    for (Entity entity : entities.entities_with_components(orbit))
     {
         auto &path = orbit->path;
         memcpy(&pathGL[pathOffset], path.data(), sizeof(float)*path.size());

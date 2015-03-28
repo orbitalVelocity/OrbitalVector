@@ -325,6 +325,7 @@ int main(int argc, const char * argv[])
     //loads meshes
 //    scene.init();
 //    Renderer renderer(inputObject, myGameSingleton.camera);
+    myGameSingleton.init();
     myGameSingleton.renderer.init(ws.fbWidth, ws.fbHeight);
         check_gl_error();
     
@@ -340,7 +341,6 @@ int main(int argc, const char * argv[])
     myGameSingleton.pWindow = ws.pWindow;
 //    myGameSingleton.init(&inputObject, &textObj);
     
-    static int orbitCount = 1;
     while (!glfwWindowShouldClose(ws.pWindow))
     {
         perfMon.update(glfwGetTime());
@@ -355,10 +355,7 @@ int main(int argc, const char * argv[])
         myGameSingleton.textObj.debugTexts.clear();
         myGameSingleton.update(dt);
         
-        //calculate trajectories every 30 frames
-        if (orbitCount++ % 30 == 0) {
-            myGameSingleton.renderer.orbit.update();
-        }
+        
         myGameSingleton.renderer.update();
 
         getText(myGameSingleton.textObj, perfMon, ws);

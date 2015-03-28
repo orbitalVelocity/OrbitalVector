@@ -11,6 +11,7 @@
 
 #include "OGLShader.h"
 #include "rk547m.h"
+#include "entityx/Entity.h"
 #include <iostream>
 #include <set>
 
@@ -20,7 +21,7 @@ public:
     RenderableOrbit(GLenum _drawType);
     
     void init() override;
-    void update();
+    void update(entityx::EntityManager &);
     void draw(glm::mat4 &camera, glm::vec3 color);
     
 };

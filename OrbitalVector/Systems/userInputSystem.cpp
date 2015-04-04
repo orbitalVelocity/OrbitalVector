@@ -190,35 +190,36 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
     }
     assert(1 == count);
     
-//    glm::vec3 forwardVector;
-//    auto hv = myShip.component<Velocity>();
+    float deltaMove = 2;
+    glm::vec3 forwardVector;
+    auto hv = myShip.component<Velocity>();
 //    auto hp = myShip.component<Position>();
-//    auto ho = myShip.component<Orientation>();
+    auto ho = myShip.component<Orientation>();
     for (auto &action : legacyUserInput->actionList )
     {
         switch (action) {
             case ActionType::transForward:
                 //events.emit<EngineBurnEvent>(myShip, thrust);
-//                forwardVector = glm::vec3(ho->orientation * glm::vec4(0, 0, 1, 1));
-//                hv->vel += glm::normalize(forwardVector) * (float).1;
+                forwardVector = glm::vec3(ho->orientation * glm::vec4(0, 0, 1, 1));
+                hv->vel += glm::normalize(forwardVector) * (float).1;
                 break;
             case ActionType::yawLeft:
-//                sShip[activeShip].rotate(deltaMove, 0, 0);
+                ho->orientation = glm::rotate(ho->orientation, deltaMove, glm::vec3(0, 1, 0));
                 break;
             case ActionType::yawRight:
-//                sShip[activeShip].rotate(-deltaMove, 0, 0);
+                ho->orientation = glm::rotate(ho->orientation, -deltaMove, glm::vec3(0, 1, 0));
                 break;
             case ActionType::pitchDown:
-//                sShip[activeShip].rotate(0, -deltaMove, 0);
+                ho->orientation = glm::rotate(ho->orientation, -deltaMove, glm::vec3(1, 0, 0));
                 break;
             case ActionType::pitchUp:
-//                sShip[activeShip].rotate(0, deltaMove, 0);
+                ho->orientation = glm::rotate(ho->orientation, deltaMove, glm::vec3(1, 0, 0));
                 break;
             case ActionType::rollCCW:
-//                sShip[activeShip].rotate(0, 0, -deltaMove);
+                ho->orientation = glm::rotate(ho->orientation, -deltaMove, glm::vec3(0, 0, 1));
                 break;
             case ActionType::rollCW:
-//                sShip[activeShip].rotate(0, 0, deltaMove);
+                ho->orientation = glm::rotate(ho->orientation, deltaMove, glm::vec3(0, 0, 1));
                 break;
             case ActionType::timeWarpMore:
 //                timeWarp *= 2;

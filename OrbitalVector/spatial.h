@@ -20,7 +20,7 @@
 class Spatial
 {
 public:
-    Spatial() : x(0), y(90) {
+    Spatial() : x(0), y(00) {
         yAxis = glm::vec3(1.0f, 0, 0);
         xAxis = glm::vec3(0, 1.0f, 0);
         zAxis = glm::vec3(0, 0, 1.0f);

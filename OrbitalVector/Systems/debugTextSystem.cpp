@@ -24,8 +24,8 @@ void DebugTextSystem::receive(const DebugEvent &e)
     assert(nullptr not_eq debugTextPtr);
     
     debugTextPtr->debugTexts.push_back(e.message);
-    std::cout << "got debug message " << e.message << "\n";
-    messages.push_back({currentTime+lifeTime, e.message});
+//    std::cout << "got debug message " << e.message << "\n";
+    messages.push_back({currentTime, e.message});
 }
 
 
@@ -44,7 +44,7 @@ void DebugTextSystem::update(EntityManager & entities,
     //delete top messages
     for (auto it = messages.begin(); it != messages.end(); )
     {
-        if (it->expirationTime < currentTime) {
+        if (it->expirationTime <= currentTime) {
             messages.erase(it);
         } else {
             break;

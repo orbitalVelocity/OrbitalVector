@@ -474,7 +474,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     {
         auto mvp = world
         * glm::translate(glm::mat4(), position->pos)
-//        * orientation->orientation
+        * orientation->orientation
 //        * gameLogic.sShip[i].size
         ;
         

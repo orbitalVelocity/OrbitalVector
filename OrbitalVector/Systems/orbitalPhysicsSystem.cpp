@@ -95,30 +95,48 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
             entityStats[5] = velocity->vel.z;
             
             auto oe = rv2oe(parentGM->gm, entityStats);
-            std::cout << "oe: \n";
-            std::cout << oe.sma << "\n";
-            std::cout << oe.ecc << "\n";
-            std::cout << oe.inc << "\n";
-            std::cout << oe.lan << "\n";
-            std::cout << oe.aop << "\n";
-            std::cout << oe.tra << "\n";
+            string message;
+            message = "r: " + to_string(position->pos.x)
+            + " " + to_string(position->pos.y)
+            + " " + to_string(position->pos.z);
+            events.emit(DebugEvent(message));
+            
+            message = "v: " + to_string(velocity->vel.x)
+            + " " + to_string(velocity->vel.y)
+            + " " + to_string(velocity->vel.z);
+            events.emit(DebugEvent(message));
+            
+            message = "sma: " + to_string(oe.sma);
+            events.emit(DebugEvent(message));
+            message = "ecc: " + to_string(oe.ecc);
+            events.emit(DebugEvent(message));
+            message = "inc: " + to_string(oe.inc);
+            events.emit(DebugEvent(message));
+            message = "lan: " + to_string(oe.lan);
+            events.emit(DebugEvent(message));
+            message = "aop: " + to_string(oe.aop);
+            events.emit(DebugEvent(message));
+            message = "tra: " + to_string(oe.tra);
+            events.emit(DebugEvent(message));
             
             auto orbitPathSteps = 300;
             orbitPath.clear();
-            orbitPath.reserve(2*orbitPathSteps*3*2); //2 vertices (3 coord/vertex)
+            orbitPath.reserve(1*orbitPathSteps*3*2); //2 vertices (3 coord/vertex)
             
             //draw elipse
+#if 1
             auto smi = oe.sma * sqrt(1-oe.ecc*oe.ecc);   //semiminor axis
             auto focus = sqrt(pow(oe.sma, 2) - pow(smi, 2));
-            std::cout << "focus: " << focus << std::endl;
+//            std::cout << "focus: " << focus << std::endl;
             drawEllipse(360, orbitPath, oe.sma, smi);
             auto translate = glm::translate(glm::mat4(), glm::vec3(-focus, 0,0));
-            auto aop = glm::rotate(glm::mat4(), (float)oe.aop, glm::vec3(0, 1, 0));
-            auto inc = glm::rotate(glm::mat4(), (float)oe.inc, glm::vec3(1, 0, 0));
-            auto lan = glm::rotate(glm::mat4(), (float)oe.lan, glm::vec3(0, 1, 0));
+            auto aop = glm::rotate(glm::mat4(), (float)(oe.aop*180/M_PI), glm::vec3(0, 1, 0));
+            auto inc = glm::rotate(glm::mat4(), (float)((oe.inc*180)/M_PI), glm::vec3(1, 0, 0));
+            auto lan = glm::rotate(glm::mat4(), (float)(oe.lan*180/M_PI), glm::vec3(0, 1, 0));
+//            orbit->transform  = lan * inc * translate * aop;
             orbit->transform  = lan * inc * aop * translate;
             break;
-            
+#endif
             params[0] = parentPosition->pos.x;
             params[1] = parentPosition->pos.y;
             params[2] = parentPosition->pos.z;

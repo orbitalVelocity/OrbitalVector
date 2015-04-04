@@ -10,7 +10,7 @@
 #include "stdlib.h"
 #include "time.h"
 
-Spatial::Spatial(float r) : x(0), y(90) {
+Spatial::Spatial(float r) : x(0), y(00) {
     yAxis = glm::vec3(1.0f, 0, 0);
     xAxis = glm::vec3(0, 1.0f, 0);
     zAxis = glm::vec3(0, 0, 1.0f);
@@ -74,7 +74,7 @@ void Spatial::rotate(float dx, float dy, float dz)
 
 void Spatial::rotate(glm::mat4 &m)
 {
-    orientation = glm::rotate(m, -90.0f, glm::vec3(1, 0, 0));
+//    orientation = glm::rotate(m, 00., glm::vec3(1, 0, 0));
 }
 
 glm::mat4 Spatial::transform()

@@ -390,11 +390,11 @@
 		F1B3C67218D935EC00971791 /* OrbitalVector */ = {
 			isa = PBXGroup;
 			children = (
-				F18396FF1ACA00D200F941D5 /* orbitUtils_includes */,
-				F18396F91AC7B0D200F941D5 /* physics_includes */,
 				F1B3C67318D935EC00971791 /* main.cpp */,
 				F1011C6519C68C6700602446 /* scene.cpp */,
 				F1011C6619C68C6700602446 /* scene.h */,
+				F18396FF1ACA00D200F941D5 /* orbitUtils_includes */,
+				F18396F91AC7B0D200F941D5 /* physics_includes */,
 				F17416F81AB5F2C100D2269F /* Systems */,
 				F19330BA1AABC6A4009B42B0 /* ECS */,
 				F1D4680B1AA5116C00869C62 /* GameObject */,

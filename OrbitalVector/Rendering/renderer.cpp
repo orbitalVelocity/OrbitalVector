@@ -500,7 +500,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
             }
             auto positionHandle = selected.component<Position>();
             
-            auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));//sys[i].sn.pos, 1.0));
+            auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
             auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
             glUniform3fv(loc, 1, glm::value_ptr(centralPos));
             sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());

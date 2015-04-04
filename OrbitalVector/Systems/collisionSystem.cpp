@@ -64,7 +64,12 @@ void CollisionSystem::update(EntityManager & entities,
 //????
 //FIXME: should have a destructability component
 void CollisionSystem::addCollision(Entity entity){
-    if (entity.component<OrbitalBodyType>()->orbitalBodyType not_eq BodyType::GRAV) {
+    auto hasNotBeenAdded = [&](Entity::Id id)
+    {
+        auto ret = collidedSet.insert(id);
+        return ret.second;
+    };
+    if (entity.component<OrbitalBodyType>()->orbitalBodyType not_eq BodyType::GRAV and hasNotBeenAdded(entity.id())) {
         
         //set collision to occur in the past so it's processed immediately
         MyPair temp(currentTime, entity);
@@ -77,6 +82,7 @@ void CollisionSystem::processCollisions()
     while (not collided.empty() && collided.top().time <= currentTime)
     {
         auto myPair = collided.top();
+        assert(myPair.entity.valid());
         myPair.entity.destroy();
         //clear this pair from collided map
         collided.pop();

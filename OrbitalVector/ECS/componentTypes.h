@@ -143,6 +143,7 @@ COMPONENT(OrbitPath)
     OrbitPath() {}
     
     vector<float> path;
+    glm::mat4 transform;
 };
 
 

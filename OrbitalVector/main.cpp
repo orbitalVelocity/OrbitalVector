@@ -317,15 +317,8 @@ int main(int argc, const char * argv[])
     GameSingleton myGameSingleton("testMap");
     myGameSingleton.load("test", width, height);
     assert(myGameSingleton.myShip.valid());
-    updateOrbitalPhysics(myGameSingleton.entities, .001, ks, true);
 
     initFontStash();
-//    UserInput inputObject;
-//    Scene scene;
-    //loads meshes
-//    scene.init();
-//    Renderer renderer(inputObject, myGameSingleton.camera);
-    myGameSingleton.init();
     myGameSingleton.renderer.init(ws.fbWidth, ws.fbHeight);
         check_gl_error();
     
@@ -339,7 +332,6 @@ int main(int argc, const char * argv[])
     perfMon.tPrevFrame = glfwGetTime();
     
     myGameSingleton.pWindow = ws.pWindow;
-//    myGameSingleton.init(&inputObject, &textObj);
     
     while (!glfwWindowShouldClose(ws.pWindow))
     {

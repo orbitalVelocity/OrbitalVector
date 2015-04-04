@@ -45,6 +45,7 @@ void RenderableOrbit::update(entityx::EntityManager &entities)
     for (Entity entity : entities.entities_with_components(orbit))
     {
         pathSteps2 += (int) orbit->path.size();
+        transform = orbit->transform;
     }
     int totalPathSize2 = (int)(pathSteps2 * sizeof(float));
     
@@ -75,13 +76,14 @@ void RenderableOrbit::update(entityx::EntityManager &entities)
 
 void RenderableOrbit::draw(glm::mat4 &mvp, glm::vec3 color)
 {
+    auto newTransform = mvp * transform;
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
     check_gl_error();
     glUniform3fv(uColor, 1, glm::value_ptr(color));
     check_gl_error();
     GLint uTransform = glGetUniformLocation(shaderProgram, "model");
     //glm::mat4 mvp = camera * world;// * position * size * orientation;
-    glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(mvp));
+    glUniformMatrix4fv(uTransform, 1, GL_FALSE, glm::value_ptr(newTransform));
     check_gl_error();
     glBindVertexArray(vao);
     check_gl_error();

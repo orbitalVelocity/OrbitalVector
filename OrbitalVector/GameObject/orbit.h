@@ -14,9 +14,12 @@
 #include "entityx/Entity.h"
 #include <iostream>
 #include <set>
+#include "includes.h"
 
 class RenderableOrbit : public OGLShader
 {
+    //for each orbit
+    glm::mat4 transform;
 public:
     RenderableOrbit(GLenum _drawType);
     

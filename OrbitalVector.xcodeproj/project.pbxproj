@@ -33,6 +33,8 @@
 		F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB519BD47C9003E566C /* opengl_fontstashcallbacks.cpp */; };
 		F17416FB1AB5F33600D2269F /* linePickSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F17416F91AB5F33600D2269F /* linePickSystem.cpp */; };
 		F1764D8219ECDE2B0031443F /* simplePassThrough.vs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1764D8119ECDE250031443F /* simplePassThrough.vs */; };
+		F18396F81AC7B09D00F941D5 /* libphysics.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F18396F71AC7B09D00F941D5 /* libphysics.a */; };
+		F18396FE1ACA00BD00F941D5 /* liborbitutils.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F18396FD1ACA00BD00F941D5 /* liborbitutils.a */; };
 		F19330AC1AA552E3009B42B0 /* globe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330AA1AA552E3009B42B0 /* globe.cpp */; };
 		F19330AF1AA570EB009B42B0 /* orbit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330AD1AA570EB009B42B0 /* orbit.cpp */; };
 		F19330BD1AABE6A5009B42B0 /* ecs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F19330BC1AABE6A5009B42B0 /* ecs.cpp */; };
@@ -151,6 +153,15 @@
 		F17416F91AB5F33600D2269F /* linePickSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = linePickSystem.cpp; path = Systems/linePickSystem.cpp; sourceTree = "<group>"; };
 		F17416FA1AB5F33600D2269F /* linePickSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = linePickSystem.h; path = Systems/linePickSystem.h; sourceTree = "<group>"; };
 		F1764D8119ECDE250031443F /* simplePassThrough.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = simplePassThrough.vs; path = glsl/simplePassThrough.vs; sourceTree = "<group>"; };
+		F18396F71AC7B09D00F941D5 /* libphysics.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphysics.a; path = ../../../Documents/GameDev/physicsFromJay/Debug/libphysics.a; sourceTree = "<group>"; };
+		F18396FA1AC7B0D200F941D5 /* integration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = integration.h; sourceTree = "<group>"; };
+		F18396FB1AC7B0D200F941D5 /* twobody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = twobody.h; sourceTree = "<group>"; };
+		F18396FC1AC7B0D200F941D5 /* vectord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vectord.h; sourceTree = "<group>"; };
+		F18396FD1ACA00BD00F941D5 /* liborbitutils.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liborbitutils.a; path = ../../../Documents/GameDev/orbitutils/build/Debug/liborbitutils.a; sourceTree = "<group>"; };
+		F18397001ACA00D200F941D5 /* kepler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kepler.h; sourceTree = "<group>"; };
+		F18397011ACA00D200F941D5 /* lambert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = lambert.h; sourceTree = "<group>"; };
+		F18397021ACA00D200F941D5 /* oeconvert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = oeconvert.h; sourceTree = "<group>"; };
+		F18397031ACA00D200F941D5 /* orbitalelements.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = orbitalelements.h; sourceTree = "<group>"; };
 		F19330AA1AA552E3009B42B0 /* globe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = globe.cpp; path = GameObject/globe.cpp; sourceTree = "<group>"; };
 		F19330AB1AA552E3009B42B0 /* globe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = globe.h; path = GameObject/globe.h; sourceTree = "<group>"; };
 		F19330AD1AA570EB009B42B0 /* orbit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = orbit.cpp; path = GameObject/orbit.cpp; sourceTree = "<group>"; };
@@ -224,6 +235,8 @@
 				F1B3C68318D9398100971791 /* OpenGL.framework in Frameworks */,
 				F1B3C68118D9397B00971791 /* Cocoa.framework in Frameworks */,
 				F1B3C67F18D9397400971791 /* IOKit.framework in Frameworks */,
+				F18396FE1ACA00BD00F941D5 /* liborbitutils.a in Frameworks */,
+				F18396F81AC7B09D00F941D5 /* libphysics.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -301,6 +314,29 @@
 			name = Systems;
 			sourceTree = "<group>";
 		};
+		F18396F91AC7B0D200F941D5 /* physics_includes */ = {
+			isa = PBXGroup;
+			children = (
+				F18396FA1AC7B0D200F941D5 /* integration.h */,
+				F18396FB1AC7B0D200F941D5 /* twobody.h */,
+				F18396FC1AC7B0D200F941D5 /* vectord.h */,
+			);
+			name = physics_includes;
+			path = ../../../../Documents/GameDev/physicsFromJay/include;
+			sourceTree = "<group>";
+		};
+		F18396FF1ACA00D200F941D5 /* orbitUtils_includes */ = {
+			isa = PBXGroup;
+			children = (
+				F18397001ACA00D200F941D5 /* kepler.h */,
+				F18397011ACA00D200F941D5 /* lambert.h */,
+				F18397021ACA00D200F941D5 /* oeconvert.h */,
+				F18397031ACA00D200F941D5 /* orbitalelements.h */,
+			);
+			name = orbitUtils_includes;
+			path = ../../../../Documents/GameDev/orbitutils/include;
+			sourceTree = "<group>";
+		};
 		F19330B01AA7FD55009B42B0 /* Shaders */ = {
 			isa = PBXGroup;
 			children = (
@@ -332,6 +368,8 @@
 				F1B3C68018D9397B00971791 /* Cocoa.framework */,
 				F1B3C67E18D9397400971791 /* IOKit.framework */,
 				F1B3C67C18D9396300971791 /* libglfw3.a */,
+				F18396F71AC7B09D00F941D5 /* libphysics.a */,
+				F18396FD1ACA00BD00F941D5 /* liborbitutils.a */,
 				F1B3C67218D935EC00971791 /* OrbitalVector */,
 				F1011C6919C6933D00602446 /* glsl */,
 				F15E8E9E19BD4696003E566C /* rendertest */,
@@ -352,6 +390,8 @@
 		F1B3C67218D935EC00971791 /* OrbitalVector */ = {
 			isa = PBXGroup;
 			children = (
+				F18396FF1ACA00D200F941D5 /* orbitUtils_includes */,
+				F18396F91AC7B0D200F941D5 /* physics_includes */,
 				F1B3C67318D935EC00971791 /* main.cpp */,
 				F1011C6519C68C6700602446 /* scene.cpp */,
 				F1011C6619C68C6700602446 /* scene.h */,
@@ -604,6 +644,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib/,
 					/usr/local/Cellar/glew/1.11.0/lib,
+					/Users/omikun/Documents/GameDev/physicsFromJay/Debug,
+					/Users/omikun/Documents/GameDev/orbitutils/build/Debug,
 				);
 				OTHER_CFLAGS = "-O0";
 				OTHER_LDFLAGS = (
@@ -634,6 +676,8 @@
 				LIBRARY_SEARCH_PATHS = (
 					/usr/local/lib/,
 					/usr/local/Cellar/glew/1.11.0/lib,
+					/Users/omikun/Documents/GameDev/physicsFromJay/Debug,
+					/Users/omikun/Documents/GameDev/orbitutils/build/Debug,
 				);
 				OTHER_CFLAGS = "-O0";
 				OTHER_LDFLAGS = (

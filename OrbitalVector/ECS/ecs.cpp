@@ -120,27 +120,11 @@ std::vector<body> getAllOrbitalObjects(entityx::EntityManager &entities)
 void updateOrbitalPhysics(entityx::EntityManager &entities, float dt, vector<vector<state> > &ks, bool adaptive)
 {
 #if OLDECS
-//    orbitPhysicsUpdate(dt, ks, sys, adaptive);
-//#else
     auto sys2 = getAllOrbitalObjects(entities);
-    
-    //check if sys and sys2 match up
-    //all sys and sys2 should be exactly the same!
-//    assert(sys.size() == sys2.size());
-//    for (int i=0; i < sys.size(); i++)
-//    {
-//        const auto syspos = sys[i].sn.pos;
-//        const auto sys2pos = sys2[i].sn.pos;
-//        const auto sysvel = sys[i].sn.vel;
-//        const auto sys2vel = sys2[i].sn.vel;
-//        assert(syspos == sys2pos);
-//        assert(sysvel == sys2vel);
-//    }
 
     orbitPhysicsUpdate(dt, ks, sys2, adaptive);
     
     setAllOrbitalObjects(entities, sys2);
-    //FIXME: super hacky get rid of this asap: when getting rid of sys in general
     sys = sys2;
     
 #endif
@@ -189,21 +173,7 @@ glm::vec3 getMyShipVel()
 }
 
 
-GameSingleton::GameSingleton(std::string filename)
-    : renderer(userInput, camera)
-{
-//        systems.add<DebugSystem>();
-//        systems.add<MovementSystem>();
-//        systems.add<CollisionSystem>();
-    
-//    load(filename);
-//    assert(myShip.valid());
-//        for (auto e : entity_data()) {
-//            entityx::Entity entity = entities.create();
-//            entity.assign<Position>(e.component<Position>());
-//            entity.assign<Velocity>(e.component<Velocity>());
-//        }
-}
+
 
 void GameSingleton::loadEntity(entityx::Entity entity,
                     glm::vec3 pos,
@@ -336,25 +306,21 @@ void GameSingleton::load(std::string, int width, int height )
     assert(myShip.valid());
 }
 
-//FIXME: merge back into constructor after getting rid of gamelogic and scene classes
-void GameSingleton::init()
+GameSingleton::GameSingleton(std::string filename)
+    : renderer(userInput, camera)
 {
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
-    
-    
     
     //FIXME: remove UI asap
     scene.init();
     legacyUserInput = &userInput;
     
-//    systems.add<LinePickSystem>();
     systems.add<UserInputSystem>(legacyUserInput);
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();
     systems.add<DebugTextSystem>(&textObj);
     systems.add<OrbitalPhysicsSystem>();
     systems.configure();
-    
 }
 
 void GameSingleton::update(double dt)
@@ -362,9 +328,7 @@ void GameSingleton::update(double dt)
     //requires timeWarp declared in this class
     //requires tighter integration w/ userInput, it needs access to timeWarp variable
 //    dt *= timeWarpFactor;
-//    systems.system<LinePickSystem>()->update(entities, events, dt,
-//                                             pWindow, pCamera);
-//    assert(myShip.valid());
+    assert(myShip.valid());
     systems.system<UserInputSystem>()->update(entities, events, dt,
                                               legacyUserInput, myShip,
                                              pWindow, camera);
@@ -374,7 +338,7 @@ void GameSingleton::update(double dt)
     systems.update<DebugTextSystem>(dt); //this does nothing right now
     
     //move the world in the OPPOSITE direction of the focus
-    world = glm::translate(glm::mat4(), -myShip.component<Position>()->pos);//-getMyShipPos());//sys[1].sn.pos);
+    world = glm::translate(glm::mat4(), -myShip.component<Position>()->pos);
     
     auto UITextSetup = [&](){
         auto vp = camera.matrix() * world;

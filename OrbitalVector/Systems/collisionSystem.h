@@ -58,5 +58,6 @@ private:
                         std::deque<MyPair>,
                         std::greater<MyPair> >
         collided;
+    std::set<entityx::Entity::Id> collidedSet;
 };
 #endif /* defined(__OrbitalVector__collisionSystem__) */

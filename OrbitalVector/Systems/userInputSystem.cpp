@@ -190,12 +190,17 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
     }
     assert(1 == count);
     
-    glm::vec3 forwardVector;
+//    glm::vec3 forwardVector;
+//    auto hv = myShip.component<Velocity>();
+//    auto hp = myShip.component<Position>();
+//    auto ho = myShip.component<Orientation>();
     for (auto &action : legacyUserInput->actionList )
     {
         switch (action) {
             case ActionType::transForward:
                 //events.emit<EngineBurnEvent>(myShip, thrust);
+//                forwardVector = glm::vec3(ho->orientation * glm::vec4(0, 0, 1, 1));
+//                hv->vel += glm::normalize(forwardVector) * (float).1;
                 break;
             case ActionType::yawLeft:
 //                sShip[activeShip].rotate(deltaMove, 0, 0);
@@ -228,8 +233,6 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
         
         if (action == ActionType::newShip)
         {
-//            sShip.push_back(Spatial(200.0));    //Spatial constructor inserts body into sys already! and creates a ship in ECS
-//            sShip.back().scale(glm::vec3(1));
             {
                 double m = 7e12;
                 double G = 6.673e-11;
@@ -255,7 +258,7 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
 //                                );
                 auto entity = entities.create();
                 assert(entity.valid());
-                
+                assert(not entity.has_component<Position>() && "shouldn't have this component already");
                 entity.assign<Position>(rad);
                 entity.assign<Velocity>(vel);
                 entity.assign<GM>(gm);
@@ -270,6 +273,10 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
         if (action == ActionType::fireGun)
         {
             Entity entity;
+            if (selectedEntities->empty()) {
+                std::cout << "no target selected\n";
+                break;
+            }
             auto targetEntity = selectedEntities->front();
             if (targetEntity.valid() ) {//selectedEntities.front().valid()) {
                 entity = entities.create();
@@ -294,6 +301,8 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
 //            //            addSatellite(bullet);
 //            InsertToSys(bullet, BodyType::MISSILE);
 //            //            newEntity(bullet, BodyType::MISSILE);
+            assert(entity.valid());
+                assert(not entity.has_component<Position>() && "shouldn't have this component already");
             entity.assign<Position>(pos);
             entity.assign<Velocity>(vel);
             entity.assign<GM>(gm);

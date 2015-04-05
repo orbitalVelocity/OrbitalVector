@@ -15,6 +15,10 @@ UserInput::UserInput()
 {
     setEventHandling();
     globalReload = false;
+    yScroll = 0;
+    xScroll = 0;
+    rmbPressed = false;
+    lmbPressed = false;
 }
 
 void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int mods)

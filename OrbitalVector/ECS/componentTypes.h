@@ -140,10 +140,20 @@ COMPONENT(CameraComponent)
 
 COMPONENT(OrbitPath)
 {
-    OrbitPath() {}
+    OrbitPath() {
+        glGenVertexArrays(1, &vao);
+        glGenBuffers(1, &vbo);
+    }
+    
+    ~OrbitPath() {
+        glDeleteBuffers(1, &vbo);
+        glDeleteVertexArrays(1, &vao);
+    }
     
     vector<float> path;
     glm::mat4 transform;
+    GLuint vao;
+    GLuint vbo;
 };
 
 

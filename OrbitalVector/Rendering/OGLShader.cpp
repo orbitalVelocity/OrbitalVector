@@ -126,6 +126,11 @@ void OGLShader::loadShaders(string vs, string fs, bool useProg)
 
 void OGLShader::generateVertexBuffer(GLuint bufferType)
 {
+    generateVertexBuffer(vao, bufferType);
+}
+
+void OGLShader::generateVertexBuffer(GLuint vao, GLuint bufferType)
+{
     //must bind VAO first, else VBO won't be linked to VAO
     glBindVertexArray(vao);
     vbo.resize(vboIdx+1);           //vbo only used in this funciton
@@ -150,10 +155,15 @@ void OGLShader::setAttribute(string attribName)
 //single data type per attrib
 void OGLShader::loadAttribute(string attribName, vector<float> &path, GLuint drawHint, GLuint bufferType)
 {
+    loadAttribute(vao, attribName, path, drawHint, bufferType);
+}
+
+void OGLShader::loadAttribute(GLuint vao, string attribName, vector<float> &path, GLuint drawHint, GLuint bufferType)
+{
     //transfer position data
     glBindVertexArray(vao);
 
-    generateVertexBuffer(bufferType);
+    generateVertexBuffer(vao, bufferType);
     
     glBufferData(bufferType, sizeof(float)*path.size(), path.data(), drawHint);
         check_gl_error();

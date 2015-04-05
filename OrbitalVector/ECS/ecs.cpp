@@ -258,8 +258,8 @@ void GameSingleton::createShip(
 
 
 void GameSingleton::initCamera(int width, int height) {
-    camera.setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
-    camera.setFocus(glm::vec3(0,0, 0.0f));
+    camera.setPosition(glm::vec3(0.0f, 0.0f, 20.0f));
+    camera.setFocus(glm::vec3(0, 0, 0.0f));
     camera.setClip(0.01f, 2000.0f);
     camera.setFOV(45.0f);
     camera.setAspectRatio((float)width/(float)height);

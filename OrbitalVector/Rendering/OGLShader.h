@@ -28,13 +28,14 @@ public:
     
     
     void generateVertexBuffer(GLuint bufferType);
+    void generateVertexBuffer(GLuint vao, GLuint bufferType);
     
     template<typename T>
     void setupBuffer(GLuint bufferType, GLuint drawType, std::vector<T> &array)
     {
         //must bind VAO first, else VBO won't be linked to VAO
         glBindVertexArray(vao);
-        generateVertexBuffer(bufferType);
+        generateVertexBuffer(vao, bufferType);
         glBufferData(bufferType,
                      array.size() * sizeof(T),
                      array.data(),
@@ -45,6 +46,8 @@ public:
     
     void setAttribute(std::string name);
     void loadAttribute(std::string name, std::vector<float> &input,
+                    GLuint hint, GLuint type=GL_ARRAY_BUFFER);
+    void loadAttribute(GLuint vao, std::string name, std::vector<float> &input,
                     GLuint hint, GLuint type=GL_ARRAY_BUFFER);
     void update();
     void drawIndexed(glm::mat4 &model,

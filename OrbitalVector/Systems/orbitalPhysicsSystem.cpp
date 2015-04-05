@@ -155,7 +155,7 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         //            orbit->transform = inc * aop * translate;
         orbit->transform  = lan * inc * aop * translate;
         //            orbit->transform  = lan * inc * translate * aop;
-//        break;
+        break;
 #endif
 
         

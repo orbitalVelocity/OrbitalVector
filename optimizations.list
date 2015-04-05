@@ -1,0 +1,8 @@
+Collision detection system:
+	n^2 loop that could be n^2/2
+	convert to oct-tree if too many entities
+
+RenderableOrbit
+	only update orbits when the velocity changes
+
+

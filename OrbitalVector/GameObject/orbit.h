@@ -18,7 +18,7 @@
 
 class RenderableOrbit : public OGLShader
 {
-    //for each orbit
+    //FIXME: delete when refactored
     glm::mat4 transform;
 public:
     RenderableOrbit(GLenum _drawType);

@@ -240,22 +240,17 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                 
                 srand ((unsigned int)time(NULL));
                 
-                auto r = (rand() / 1000) % 300;
-                if (r < 50) {
-                    r = 50;
+                auto r = (rand() / 1000) % 400;
+                if (r < 150) {
+                    r = 150;
                 }
                 float v = std::sqrt(gm/r);
-                glm::vec3 rad(r, 0, 0);
-                glm::vec3 vel(0, v, 0);
+                glm::vec3 rad(r, 0.0, -0.5);
+                glm::vec3 vel(0, v, 0.9);
                 cout << "new ship: r: " << r << ", v: " << v << endl;
-                m = 1e1;
+                m = 1e5;
                 gm = m * G;
-//                auto tmp = body(state(rad, vel),
-//                                gm,
-//                                20,
-//                                nullptr,
-//                                BodyType::SHIP
-//                                );
+
                 auto entity = entities.create();
                 assert(entity.valid());
                 assert(not entity.has_component<Position>() && "shouldn't have this component already");
@@ -265,7 +260,7 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                 entity.assign<Parent>(myShip.component<Parent>()->parent);
                 entity.assign<OrbitalBodyType>(BodyType::SHIP);
                 entity.assign<Orientation>();
-                entity.assign<Radius>(30);
+                entity.assign<Radius>(10);
                 entity.assign<Ship>();
                 entity.assign<OrbitPath>();
             }

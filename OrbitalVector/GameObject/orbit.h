@@ -26,6 +26,7 @@ public:
     void init() override;
     void update(entityx::EntityManager &);
     void draw(glm::mat4 &camera, glm::vec3 color);
+    void draw(GLuint vao, int drawCount, glm::mat4 &camera, glm::vec3 color);
     
 };
 #endif /* defined(__GLFW3_test__orbit__) */

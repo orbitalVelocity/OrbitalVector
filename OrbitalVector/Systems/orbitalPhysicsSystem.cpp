@@ -64,7 +64,7 @@ VectorD convertToParams (glm::vec3 pos, double gm)
     return params;
 }
 
-std::vector<double> posVelVector(glm::vec3 pos, glm::vec3 vel)
+std::vector<double> toPosVelVector(glm::vec3 pos, glm::vec3 vel)
 {
     std::vector<double> entityStats(6);
     //            VectorD entityStats(6);
@@ -95,11 +95,9 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
     ComponentHandle<OrbitPath> orbit;
     ComponentHandle<Position> position;
     ComponentHandle<Velocity> velocity;
-    ComponentHandle<GM> gm;
    
-    static double overallTime = 0;
-    
-    for (Entity entity: entities.entities_with_components(orbit, position, gm, velocity))
+    auto orbitCount = 0;
+    for (Entity entity: entities.entities_with_components(orbit, position, velocity))
     {
         auto parentEntityID = entity.component<Parent>()->parent;
         auto parentEntity = entities.get(parentEntityID);
@@ -107,22 +105,55 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         auto parentVelocity = parentEntity.component<Velocity>();
         auto parentGM = parentEntity.component<GM>();
         auto &orbitPath = orbit->path;
-       
-        std::vector<double> entityStats = posVelVector(position->pos, velocity->vel);
+        auto orbitPathSteps = 360;
         
-        auto oe = rv2oe(parentGM->gm, entityStats);
+        orbitPath.clear();
+        orbitPath.reserve(1*orbitPathSteps*3*2); //2 vertices/line segment (3 coord/vertex)
+        
+        //draw a flat elipse
+        std::vector<double> posVel = toPosVelVector(position->pos, velocity->vel);
+        auto oe = rv2oe(parentGM->gm, posVel);
+        assert(oe.lan == oe.lan);
+//        assert(oe.aop == oe.aop);
+        
+        auto smi = oe.sma * sqrt(1-oe.ecc*oe.ecc);   //semiminor axis
+        drawEllipse(orbitPathSteps, orbitPath, oe.sma, smi);
+        
+        //FIXME: hacks used: negative inc axis, lan+180 offset
+        //setup rotational/translation transform for elipse
+        auto focus = sqrt(pow(oe.sma, 2) - pow(smi, 2));
+        auto translate = glm::translate(glm::mat4(), glm::vec3(focus, 0,0));
+        auto aop = glm::rotate(glm::mat4(), (float)(oe.aop*180/M_PI), glm::vec3(0, 0, 1));
+        auto inc = glm::rotate(glm::mat4(), (float)((oe.inc*180)/M_PI), glm::vec3(-1, 0, 0));
+        auto lan = glm::rotate(glm::mat4(), (float)(oe.lan*180/M_PI+180), glm::vec3(0, 0, 1));
+        orbit->transform  = lan * inc * aop * translate;
+        
+        //calculate next position/velocity for this object
+        VectorD params = convertToParams(parentPosition->pos, parentGM->gm);
+        
+        t_integrator integrator = &rungeKutta4;
+        t_dynamics dynamics = &twobody_perturbed;
+        posVel = integrator(dynamics, 0, dt, posVel, params);
+        position->pos = glm::vec3(posVel[0],
+                                  posVel[1],
+                                  posVel[2]);
+        velocity->vel = glm::vec3(posVel[3],
+                                  posVel[4],
+                                  posVel[5]);
+        assert(not orbit->path.empty());
         
 ////////DEBUG/////////////////////////////////////
         string message;
-        message = "r: " + to_string(position->pos.x)
-        + " " + to_string(position->pos.y)
-        + " " + to_string(position->pos.z);
-        events.emit(DebugEvent(message));
-        
-        message = "v: " + to_string(velocity->vel.x)
-        + " " + to_string(velocity->vel.y)
-        + " " + to_string(velocity->vel.z);
-        events.emit(DebugEvent(message));
+#if 1
+//        message = "r: " + to_string(position->pos.x)
+//        + " " + to_string(position->pos.y)
+//        + " " + to_string(position->pos.z);
+//        events.emit(DebugEvent(message));
+//        
+//        message = "v: " + to_string(velocity->vel.x)
+//        + " " + to_string(velocity->vel.y)
+//        + " " + to_string(velocity->vel.z);
+//        events.emit(DebugEvent(message));
         
         message = "sma: " + to_string(oe.sma);
         events.emit(DebugEvent(message));
@@ -134,62 +165,16 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         events.emit(DebugEvent(message));
         message = "aop: " + to_string(oe.aop);
         events.emit(DebugEvent(message));
-        message = "tra: " + to_string(oe.tra);
+//        message = "tra: " + to_string(oe.tra);
+//        events.emit(DebugEvent(message));
+#else
+        message = "orbits: " + to_string(orbitCount);
         events.emit(DebugEvent(message));
+#endif
 ////////DEBUG/////////////////////////////////////
         
-        auto orbitPathSteps = 300;
-        orbitPath.clear();
-        orbitPath.reserve(2*orbitPathSteps*3*2); //2 vertices (3 coord/vertex)
-        
-        //draw elipse
-#if 1
-        auto smi = oe.sma * sqrt(1-oe.ecc*oe.ecc);   //semiminor axis
-        auto focus = sqrt(pow(oe.sma, 2) - pow(smi, 2));
-        //            std::cout << "focus: " << focus << std::endl;
-        drawEllipse(360, orbitPath, oe.sma, smi);
-        auto translate = glm::translate(glm::mat4(), glm::vec3(focus, 0,0));
-        auto aop = glm::rotate(glm::mat4(), (float)(oe.aop*180/M_PI), glm::vec3(0, 0, 1));
-        auto inc = glm::rotate(glm::mat4(), (float)((oe.inc*180)/M_PI), glm::vec3(-1, 0, 0));
-        auto lan = glm::rotate(glm::mat4(), (float)(oe.lan*180/M_PI+180), glm::vec3(0, 0, 1));
-        //            orbit->transform = inc * aop * translate;
-        orbit->transform  = lan * inc * aop * translate;
-        //            orbit->transform  = lan * inc * translate * aop;
-        break;
-#endif
-
-        
-        VectorD params = convertToParams(parentPosition->pos, parentGM->gm);
-        
-        t_integrator integrator = &rungeKutta4;
-        t_dynamics dynamics = &twobody_perturbed;
-        
-        orbitPath.push_back(entityStats[0]);
-        orbitPath.push_back(entityStats[1]);
-        orbitPath.push_back(entityStats[2]);
-        
-        auto projectedTime = overallTime;
-        auto dt2 = dt * 100;
-        for (int i = 0; i < orbitPathSteps; i++) {
-            entityStats = integrator(dynamics, projectedTime, dt2, entityStats, params);
-            projectedTime += dt2;
-            orbitPath.push_back(entityStats[0]);
-            orbitPath.push_back(entityStats[1]);
-            orbitPath.push_back(entityStats[2]);
-            orbitPath.push_back(entityStats[0]);
-            orbitPath.push_back(entityStats[1]);
-            orbitPath.push_back(entityStats[2]);
-        }
-//
-            
-            
-        orbitPath.erase(orbitPath.end()-1);
-        orbitPath.erase(orbitPath.end()-1);
-        orbitPath.erase(orbitPath.end()-1);
-        assert(not orbit->path.empty());
+        if (orbitCount++ > 0)
+            std::cout << "updating more than one orbit!\n";
     }
 
-    //calculate the next step for all objects
-    //legacy crap for all objects
-    updateOrbitalPhysics(entities, dt, ks, false);
 }

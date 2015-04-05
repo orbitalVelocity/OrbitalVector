@@ -447,14 +447,20 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     glm::vec3 gridColor     (0.2, 0.21, 0.2);
     
     // orbit and grid
+    auto mvp = _camera * world;
+    glUseProgram(grid.shaderProgram);
+    grid.draw(mvp, gridColor);
+    check_gl_error();
+    glUseProgram(orbit.shaderProgram);
+    entityx::ComponentHandle<OrbitPath> orbitPath;
+    auto count = 0;
+    for (entityx::Entity entity : entities.entities_with_components(orbitPath))
     {
-        auto mvp = _camera * world;
-        glUseProgram(grid.shaderProgram);
-        grid.draw(mvp, gridColor);
+        auto newTransform = mvp * orbitPath->transform;
+        orbit.draw(orbitPath->vao, (int)orbitPath->path.size()/3, newTransform, shipOrbitColor);
         check_gl_error();
-        glUseProgram(orbit.shaderProgram);
-        orbit.draw(mvp, shipOrbitColor);
-        check_gl_error();
+        if(count++ > 0)
+            std::cout << "rendering more than 1 orbit!\n";
     }
     
     //ship
@@ -523,7 +529,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
         globe.draw(mvp, planetColor);
         check_gl_error();
     }
-    auto mvp = _camera * world;
+    mvp = _camera * world;
     globe.draw(mvp, planetColor);
     
     //draw projectile

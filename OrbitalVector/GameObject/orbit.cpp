@@ -44,6 +44,7 @@ void RenderableOrbit::update(entityx::EntityManager &entities)
     ComponentHandle<OrbitPath> orbit;
     
 #if 1
+    auto count = 0;
     for (Entity entity : entities.entities_with_components(orbit))
     {
         auto &path = orbit->path;
@@ -67,7 +68,7 @@ void RenderableOrbit::update(entityx::EntityManager &entities)
         check_gl_error();
         glUnmapBuffer(GL_ARRAY_BUFFER);
         check_gl_error();
-        break;
+        count++;
     }
     
 #else    
@@ -104,10 +105,15 @@ void RenderableOrbit::update(entityx::EntityManager &entities)
 }
 
 
-
 void RenderableOrbit::draw(glm::mat4 &mvp, glm::vec3 color)
 {
     auto newTransform = mvp * transform;
+    draw(vao, drawCount, newTransform, color);
+}
+
+void RenderableOrbit::draw(GLuint vao, int drawCount, glm::mat4 &mvp, glm::vec3 color)
+{
+    auto newTransform = mvp;
     GLint uColor = glGetUniformLocation(shaderProgram, "color");
     check_gl_error();
     glUniform3fv(uColor, 1, glm::value_ptr(color));
@@ -123,73 +129,3 @@ void RenderableOrbit::draw(glm::mat4 &mvp, glm::vec3 color)
     check_gl_error();
     
 }
-
-
-/*
- //legacy function for finding apoapsis/periapsis of orbit paths
- 
- //calculate future positions in while loop
- //find max/min distances at each iteration of loop
- auto origin = sys2[j].sn.pos;
- bool apoFound = false;
- bool periFound = false;
- float lastDistance = 0;
- float last2Distance = 0;
- float distance = 100;
- 
- auto loopCond = [&]() {
- return (!apoFound or !periFound) and paths[0].size() < 1000;
- };
- 
- while (loopCond())
- {
- orbitPhysicsUpdate(dt, ks2, sys2, true);
- 
- //check if apoapsis and periapsis has been reached
- distance = glm::length(sys2[j].sn.pos - sys2[0].sn.pos);
- if ((last2Distance > lastDistance && lastDistance < distance)
- || distance < 15.0)
- {
- periFound = true;
- peri      = distance;
- periPos   = sys2[j].sn.pos - sys2[0].sn.pos + initPos;
- }
- if ((last2Distance < lastDistance && lastDistance > distance
- && last2Distance != 0 && lastDistance != 0)
- || distance > 400)
- {
- apoFound = true;
- apo      = distance;
- apoPos   = sys2[j].sn.pos - sys2[0].sn.pos + initPos;
- }
- 
- if ((last2Distance == lastDistance || lastDistance == distance)
- && last2Distance != 0.0f && lastDistance != 0.0f)
- {
- cout << "same radius across 2 time points! gotta solve this\n";
- break;
- }
- 
- //collision detection
- vector<bool> markedForRemoval(sys2.size(), false);
- markForDeletion(sys2, markedForRemoval);
- 
- //remove all marked elements
- //FIXME: only works because first element never designed to be removed
- auto it = --sys2.end();
- auto itt = --ids.end();
- for (int i = (int)sys2.size()-1; i >= 0; --i, --it, --itt)
- {
- if (markedForRemoval[i]) {      //TODO: wrap sys2 and ids into 1 object
- sys2.erase(it);
- ids.erase(itt);
- }
- }
- 
- last2Distance = lastDistance;
- lastDistance = distance;
- 
- }
- }
- */
-

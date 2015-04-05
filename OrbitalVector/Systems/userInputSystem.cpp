@@ -199,9 +199,8 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
     {
         switch (action) {
             case ActionType::transForward:
-                //events.emit<EngineBurnEvent>(myShip, thrust);
                 forwardVector = glm::vec3(ho->orientation * glm::vec4(0, 0, 1, 1));
-                hv->vel += glm::normalize(forwardVector) * (float).1;
+                hv->vel += glm::normalize(forwardVector) * (float).01;
                 break;
             case ActionType::yawLeft:
                 ho->orientation = glm::rotate(ho->orientation, deltaMove, glm::vec3(0, 1, 0));
@@ -247,7 +246,7 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                 }
                 float v = std::sqrt(gm/r);
                 glm::vec3 rad(r, 0, 0);
-                glm::vec3 vel(0, 0, v);
+                glm::vec3 vel(0, v, 0);
                 cout << "new ship: r: " << r << ", v: " << v << endl;
                 m = 1e1;
                 gm = m * G;

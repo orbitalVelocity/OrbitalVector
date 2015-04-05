@@ -69,7 +69,9 @@ void CollisionSystem::addCollision(Entity entity){
         auto ret = collidedSet.insert(id);
         return ret.second;
     };
-    if (entity.component<OrbitalBodyType>()->orbitalBodyType not_eq BodyType::GRAV and hasNotBeenAdded(entity.id())) {
+    if (entity.component<OrbitalBodyType>()->orbitalBodyType not_eq BodyType::GRAV
+        and hasNotBeenAdded(entity.id())
+        and not entity.has_component<PlayerControl>()) {
         
         //set collision to occur in the past so it's processed immediately
         MyPair temp(currentTime, entity);

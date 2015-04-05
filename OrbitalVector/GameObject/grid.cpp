@@ -27,19 +27,19 @@ void RenderableGrid::loadAsset()
     float gridSize = 1024;
     for (int i=0; i < gridSize; i+=16) {
         path.push_back(i-gridSize/2);
-        path.push_back(0.0);
         path.push_back(gridSize/2);
-        path.push_back(i-gridSize/2);
         path.push_back(0.0);
+        path.push_back(i-gridSize/2);
         path.push_back(-gridSize/2);
+        path.push_back(0.0);
     }
     for (int i=0; i < gridSize; i+=16) {
         path.push_back(gridSize/2);
-        path.push_back(0.0);
         path.push_back(i-gridSize/2);
+        path.push_back(0.0);
         path.push_back(-gridSize/2);
-        path.push_back(0.0);
         path.push_back(i-gridSize/2);
+        path.push_back(0.0);
     }
     
     drawType = GL_LINES;

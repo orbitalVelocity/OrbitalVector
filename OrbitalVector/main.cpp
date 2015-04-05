@@ -20,7 +20,6 @@
 #include "scene.h"
 #include "orbit.h"
 #include "tiny_obj_loader.h"
-#include "spatial.h"
 #include "text.h"
 #include "renderer.h"
 #include "GPUTimer.h"

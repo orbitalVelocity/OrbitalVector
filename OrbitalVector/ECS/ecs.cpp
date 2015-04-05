@@ -258,8 +258,8 @@ void GameSingleton::createShip(
 
 
 void GameSingleton::initCamera(int width, int height) {
-    camera.setPosition(glm::vec3(0, 10.0f,0));
-    camera.setFocus(glm::vec3(0,0,3.0f));
+    camera.setPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+    camera.setFocus(glm::vec3(0,0, 0.0f));
     camera.setClip(0.01f, 2000.0f);
     camera.setFOV(45.0f);
     camera.setAspectRatio((float)width/(float)height);
@@ -280,7 +280,7 @@ void GameSingleton::load(std::string, int width, int height )
     mainGrav = entities.create();
     loadEntity(mainGrav,
                {},
-               glm::vec3(0,-.1,0),
+               glm::vec3(0,0,0),
                {},
                gm,
                30,
@@ -294,9 +294,9 @@ void GameSingleton::load(std::string, int width, int height )
     
     myShip = entities.create();
     loadEntity(myShip,
-               {110,0,0},
-               {0,2.3,0},
-               {},
+               {110,0.1,0},
+               {0,2.3,-0.1},
+               glm::rotate(glm::mat4(), 90.0f, glm::vec3(1, 0, 0)),
                gm,
                1,
                mainGrav.id(),

@@ -9,9 +9,9 @@
 #include "camera.h"
 
 Camera::Camera() :
-    position(0, 0.5, 1),
-    hAngle(0),
-    vAngle(0),
+    position(0, 10, 10),
+    hAngle(180),
+    vAngle(-90),
     nearPlane(10e-3f),
     farPlane(10e4f),
     ratio(16.0f/9.0f),
@@ -72,14 +72,14 @@ void Camera::rotate(float up, float right)
     hAngle += right;
     
     hAngle = (hAngle > 360) ? hAngle - 360 : hAngle;
-    vAngle = (vAngle > 90) ? 90 : vAngle;
-    vAngle = (vAngle < -90) ? -90 : vAngle;
+    vAngle = (vAngle > 0) ? 0 : vAngle;
+    vAngle = (vAngle < -180) ? -180 : vAngle;
 }
 
 glm::mat4 Camera::orientation() const {
     glm::mat4 orientation;
     orientation = glm::rotate(orientation, vAngle, glm::vec3(1,0,0));
-    orientation = glm::rotate(orientation, hAngle, glm::vec3(0,1,0));
+    orientation = glm::rotate(orientation, hAngle, glm::vec3(0,0,1));
     //rotate around forward vector
     //orientation = glm::rotate(orientation, rAngle, forward());
     return orientation;
@@ -96,7 +96,7 @@ glm::vec3 Camera::right() const {
 }
 
 glm::vec3 Camera::up() const {
-    glm::vec4 up = glm::inverse(orientation()) * glm::vec4(0,10,0,1);
+    glm::vec4 up = glm::inverse(orientation()) * glm::vec4(0,0,10,1);
     return glm::vec3(up);
 }
 

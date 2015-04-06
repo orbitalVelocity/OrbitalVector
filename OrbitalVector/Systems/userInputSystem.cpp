@@ -114,11 +114,11 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
         
         if (selectionMode) {
             selectedEntities.emplace_back(selectableEntity);
-            std::cout << "selected: " << selectableEntity.id() << std::endl;
+//            std::cout << "selected: " << selectableEntity.id() << std::endl;
             
         } else { //else mouseOverMode
             mouseOverEntities.emplace_back(selectableEntity);
-            std::cout << "mouseOver: " << selectableEntity.id() << std::endl;
+//            std::cout << "mouseOver: " << selectableEntity.id() << std::endl;
         }
         assert(count++==0);
     }

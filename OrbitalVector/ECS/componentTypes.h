@@ -23,6 +23,7 @@ COMPONENT(MissileLogic)
     
     entityx::Entity target;
     entityx::Entity parent;
+    bool done = false;
     
 };
 

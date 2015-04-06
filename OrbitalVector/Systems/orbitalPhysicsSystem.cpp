@@ -57,15 +57,16 @@ void drawOrbitalPath(int segments, vector<float> &path, GLdouble a, GLdouble e, 
     path.reserve(segments * 3 * 2 + 12);
     assert(path.empty());
     
+    tra = (tra >= M_PI) ? tra - 2*M_PI : tra;
     for(float theta = (a > 0) ? -M_PI : tra;
         theta < M_PI;
         theta += M_PI*2/segments)
     {
-        auto demoninator = (1.0f+e*cos(theta));
-        if (demoninator < 0) {
+        float denominator = (1.0f+e*cos(theta));
+        if (denominator < 0) {
             continue;
         }
-        auto r = a*(1.0f-e*e)/demoninator;
+        auto r = a*(1.0f-e*e)/denominator;
         auto x=r*cos(theta);
         auto y=r*sin(theta);
         path.push_back(x);
@@ -88,59 +89,20 @@ void drawOrbitalPath(int segments, vector<float> &path, GLdouble a, GLdouble e, 
         path.erase(path.begin());
     }
    
-    if (a >= 0)
-    {
-        //add center for debugging
-        for(int i=0; i<3; ++i)
-            path.push_back(path[i]);
-        for(int i=0; i<6; ++i)
-            path.push_back(0);
-        path.push_back(0);
-        path.push_back(0);
-        path.push_back(1e3);
-    }
+//    if (a >= 0)
+//    {
+//        //add center for debugging
+//        for(int i=0; i<3; ++i)
+//            path.push_back(path[i]);
+//        for(int i=0; i<6; ++i)
+//            path.push_back(0);
+//        path.push_back(0);
+//        path.push_back(0);
+//        path.push_back(1e3);
+//    }
     assert(not path.empty());
 }
-void drawHyperbola(int segments, vector<float> &path, GLdouble semiMajor, GLdouble semiMinor)
-{
-    float DEG2RAD = M_PI/180.0f;
-    for(int i=0;i<segments;i++)
-    {
-        GLdouble rad = i*DEG2RAD;
-        path.push_back(cos(rad)*semiMajor);
-        path.push_back(sin(rad)*semiMinor);
-        path.push_back(0);
-        path.push_back(cos(rad)*semiMajor);
-        path.push_back(sin(rad)*semiMinor);
-        path.push_back(0);
-    }
-}
-VectorD convertToParams (glm::vec3 pos, double gm)
-{
-    VectorD params(7);
-    params[0] = pos.x;
-    params[1] = pos.y;
-    params[2] = pos.z;
-    params[3] = gm;
-    params[4] = 0.0;
-    params[5] = 0.0;
-    params[6] = 0.0;
-    return params;
-}
 
-std::vector<double> toPosVelVector(glm::vec3 pos, glm::vec3 vel)
-{
-    std::vector<double> entityStats(6);
-    //            VectorD entityStats(6);
-    
-    entityStats[0] = pos.x;
-    entityStats[1] = pos.y;
-    entityStats[2] = pos.z;
-    entityStats[3] = vel.x;
-    entityStats[4] = vel.y;
-    entityStats[5] = vel.z;
-    return entityStats;
-}
 
 void OrbitalPhysicsSystem::update(EntityManager & entities,
                              EventManager &events,
@@ -174,7 +136,7 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         //draw a flat elipse
         std::vector<double> posVel = toPosVelVector(position->pos, velocity->vel);
         auto oe = rv2oe(parentGM->gm, posVel);
-        assert(oe.lan == oe.lan);
+//        assert(oe.lan == oe.lan);
 //        assert(oe.aop == oe.aop);
         
         drawOrbitalPath(orbitPathSteps, orbitPath, oe.sma, oe.ecc, oe.tra);
@@ -230,5 +192,17 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
 ////////DEBUG/////////////////////////////////////
         
     }
-
+    
+//    for (Entity entity: entities.entities_with_components(position, velocity))
+//    {
+//        auto parentEntityID = entity.component<Parent>()->parent;
+//        auto parentEntity = entities.get(parentEntityID);
+//        auto parentPosition = parentEntity.component<Position>();
+//        auto parentVelocity = parentEntity.component<Velocity>();
+//        auto parentGM = parentEntity.component<GM>();
+//        auto &orbitPath = orbit->path;
+//        auto orbitPathSteps = 360;
+//        
+//        //TODO: move the integration from the loop above to here (so all elements with position/velocity can still move about, only those w/ orbit components need to recompute orbits
+//    }
 }

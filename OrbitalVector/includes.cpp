@@ -65,6 +65,33 @@ glm::vec2 getVec2(glm::mat4 vp, glm::vec3 _pos)
     return glm::vec2(pos.x, pos.y);
 }
 
+VectorD convertToParams (glm::vec3 pos, double gm)
+{
+    VectorD params(7);
+    params[0] = pos.x;
+    params[1] = pos.y;
+    params[2] = pos.z;
+    params[3] = gm;
+    params[4] = 0.0;
+    params[5] = 0.0;
+    params[6] = 0.0;
+    return params;
+}
+
+std::vector<double> toPosVelVector(glm::vec3 pos, glm::vec3 vel)
+{
+    std::vector<double> entityStats(6);
+    //            VectorD entityStats(6);
+    
+    entityStats[0] = pos.x;
+    entityStats[1] = pos.y;
+    entityStats[2] = pos.z;
+    entityStats[3] = vel.x;
+    entityStats[4] = vel.y;
+    entityStats[5] = vel.z;
+    return entityStats;
+}
+
 /*
 void computeNormals(vector<glm::vec3> &normals,
                     vector<unsigned> &normCount,

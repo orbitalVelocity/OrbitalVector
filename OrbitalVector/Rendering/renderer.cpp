@@ -453,14 +453,11 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     check_gl_error();
     glUseProgram(orbit.shaderProgram);
     entityx::ComponentHandle<OrbitPath> orbitPath;
-    auto count = 0;
     for (entityx::Entity entity : entities.entities_with_components(orbitPath))
     {
         auto newTransform = mvp * orbitPath->transform;
         orbit.draw(orbitPath->vao, (int)orbitPath->path.size()/3, newTransform, shipOrbitColor);
         check_gl_error();
-        if(count++ > 0)
-            std::cout << "rendering more than 1 orbit!\n";
     }
     
     //ship

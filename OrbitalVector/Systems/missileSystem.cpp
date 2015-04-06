@@ -31,7 +31,7 @@ void MissileSystem::update(EntityManager & entities,
         
         //acceleration should depend on missile engine and mass components
         //probably need to call on Jay's linear dynamics instead of this hacky thing
-        float scale = 0.1;
+        float scale = 0.001;
         MissileVelocity->vel += targetVector * scale;
     }
 }

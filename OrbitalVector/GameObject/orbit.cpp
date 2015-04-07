@@ -41,7 +41,7 @@ void RenderableOrbit::update(entityx::EntityManager &entities)
     float  *pathGL;
     using namespace entityx;
     int pathSteps = 0;
-    ComponentHandle<OrbitPath> orbit;
+    OrbitPath::Handle orbit;
     
 #if 1
     auto count = 0;

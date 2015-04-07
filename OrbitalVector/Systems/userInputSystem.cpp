@@ -22,7 +22,7 @@ void UserInputSystem::configure(EventManager& eventManager)
 }
 
 
-void rotate(ComponentHandle<Orientation> orientationHandle,
+void rotate(Orientation::Handle orientationHandle,
             float dx, float dy, float dz)
 {
     auto yAxis = glm::vec3(1.0f, 0, 0);

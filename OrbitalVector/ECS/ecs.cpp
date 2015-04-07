@@ -49,7 +49,7 @@ glm::vec3* getMissileVelocityPointer(int index)
     int offset = sysIndexOffset[BodyType::MISSILE];
     return &(sys[index+offset].sn.vel);
 #else
-    entityx::ComponentHandle<Velocity> velocity = missile.component<Velocity>;
+    Velocity::Handle velocity = missile.component<Velocity>;
     myGameSingleton.entities.entities_with_components(position, velocity)
     return velocity->vel;
 #endif
@@ -86,8 +86,8 @@ int getNumberOfEntities()
 
 std::vector<body> getAllOrbitalObjects(entityx::EntityManager &entities)
 {
-    entityx::ComponentHandle<Position> position;
-    entityx::ComponentHandle<Velocity> velocity;
+    Position::Handle position;
+    Velocity::Handle velocity;
     //TODO: use auto & instead for optimizatioN?
     auto numEntities = 0;
     std::vector<body> newSys;
@@ -132,12 +132,12 @@ void updateOrbitalPhysics(entityx::EntityManager &entities, float dt, vector<vec
 
 void setAllOrbitalObjects(entityx::EntityManager &entities, std::vector<body> _sys)
 {
-    entityx::ComponentHandle<Position> position;
-    entityx::ComponentHandle<Velocity> velocity;
-    entityx::ComponentHandle<GM> gm;
-    entityx::ComponentHandle<Radius> radius;
-    entityx::ComponentHandle<Parent> parent;
-    entityx::ComponentHandle<OrbitalBodyType> orbitalBodyType;
+    Position::Handle position;
+    Velocity::Handle velocity;
+    GM::Handle gm;
+    Radius::Handle radius;
+    Parent::Handle parent;
+    OrbitalBodyType::Handle orbitalBodyType;
     auto index = 0;
     BodyType types[] = {BodyType::GRAV, BodyType::SHIP, BodyType::MISSILE};
     for (auto type : types)
@@ -342,9 +342,9 @@ void GameSingleton::update(double dt)
     world = glm::translate(glm::mat4(), -myShip.component<Position>()->pos);
     
     auto UITextSetup = [&](){
-        entityx::ComponentHandle<Ship> ship;
-        entityx::ComponentHandle<Missile> missile;
-        entityx::ComponentHandle<Position> position;
+        Ship::Handle ship;
+        Missile::Handle missile;
+        Position::Handle position;
         
         
         textObj.guiText.clear();
@@ -352,13 +352,13 @@ void GameSingleton::update(double dt)
         {
             auto vp = camera.matrix() * world;
             textObj.guiText.push_back({getVec2(vp, position->pos),
-                20.0f, ship->debugName});
+                10.0f, ship->debugName});
         }
         for (auto entity : entities.entities_with_components(missile, position))
         {
             auto vp = camera.matrix() * world;
             textObj.guiText.push_back({getVec2(vp, position->pos),
-                20.0f, missile->debugName});
+                10.0f, missile->debugName});
         }
     };
     UITextSetup();

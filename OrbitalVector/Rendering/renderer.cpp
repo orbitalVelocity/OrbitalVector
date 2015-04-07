@@ -454,7 +454,8 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     grid.draw(mvp, gridColor);
     check_gl_error();
     glUseProgram(orbit.shaderProgram);
-    entityx::ComponentHandle<OrbitPath> orbitPath;
+    OrbitPath::Handle orbitPath;
+    
     for (entityx::Entity entity : entities.entities_with_components(orbitPath))
     {
         auto newTransform = mvp * orbitPath->transform;
@@ -473,9 +474,9 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
                     );
     
     glUseProgram(ship.shaderProgram);
-    entityx::ComponentHandle<Position> position;
-    entityx::ComponentHandle<Ship> shipComponent;
-    entityx::ComponentHandle<Orientation> orientation;
+    Position::Handle position;
+    Ship::Handle shipComponent;
+    Orientation::Handle orientation;
     for (entityx::Entity entity : entities.entities_with_components(shipComponent, position, orientation))
     {
         auto mvp =
@@ -535,7 +536,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     
     //draw projectile
     glUseProgram(missile.shaderProgram);
-    entityx::ComponentHandle<Missile> missileComponent;
+    Missile::Handle missileComponent;
     for (entityx::Entity entity : entities.entities_with_components(missileComponent, position, orientation))
     {
         auto mvp = world * glm::translate(glm::mat4(), position->pos);

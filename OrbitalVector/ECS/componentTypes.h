@@ -35,8 +35,7 @@ COMPONENT(PlayerControl)
     std::vector<entityx::Entity> mouseOverEntities;
 };
 
-//COMPONENT(Ship) //deprecated
-struct Ship
+COMPONENT(Ship)
 {
     Ship()
     {

@@ -118,9 +118,9 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
     /*
      *  All of this just to compute orbital paths using this system
      */
-    ComponentHandle<OrbitPath> orbit;
-    ComponentHandle<Position> position;
-    ComponentHandle<Velocity> velocity;
+    OrbitPath::Handle orbit;
+    Position::Handle position;
+    Velocity::Handle velocity;
    
     for (Entity entity: entities.entities_with_components(orbit, position, velocity))
     {

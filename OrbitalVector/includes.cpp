@@ -55,6 +55,7 @@ string printVec3(glm::vec3 v)
     return out.str();
 }
 
+//flattens 3d coord according to some view projection
 glm::vec2 getVec2(glm::mat4 vp, glm::vec3 _pos)
 {
     glm::vec4 pos = vp * glm::vec4(_pos, 1.0f);
@@ -65,6 +66,7 @@ glm::vec2 getVec2(glm::mat4 vp, glm::vec3 _pos)
     return glm::vec2(pos.x, pos.y);
 }
 
+//for orbital utility
 VectorD convertToParams (glm::vec3 pos, double gm)
 {
     VectorD params(7);
@@ -78,6 +80,7 @@ VectorD convertToParams (glm::vec3 pos, double gm)
     return params;
 }
 
+//concatenates two vec3 into one vector
 std::vector<double> toPosVelVector(glm::vec3 pos, glm::vec3 vel)
 {
     std::vector<double> entityStats(6);

@@ -309,7 +309,7 @@ void GameSingleton::load(std::string, int width, int height )
 GameSingleton::GameSingleton(std::string filename)
     : renderer(userInput, camera)
 {
-    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
+//    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "asteroid"));
     
     //FIXME: remove UI asap
     scene.init();
@@ -323,6 +323,7 @@ GameSingleton::GameSingleton(std::string filename)
     systems.configure();
 }
 
+#include "componentTypes.h" //FIXME: hack, need to refactor
 void GameSingleton::update(double dt)
 {
     //requires timeWarp declared in this class
@@ -341,8 +342,24 @@ void GameSingleton::update(double dt)
     world = glm::translate(glm::mat4(), -myShip.component<Position>()->pos);
     
     auto UITextSetup = [&](){
-        auto vp = camera.matrix() * world;
-        textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
+        entityx::ComponentHandle<Ship> ship;
+        entityx::ComponentHandle<Missile> missile;
+        entityx::ComponentHandle<Position> position;
+        
+        
+        textObj.guiText.clear();
+        for (auto entity : entities.entities_with_components(ship, position))
+        {
+            auto vp = camera.matrix() * world;
+            textObj.guiText.push_back({getVec2(vp, position->pos),
+                20.0f, ship->debugName});
+        }
+        for (auto entity : entities.entities_with_components(missile, position))
+        {
+            auto vp = camera.matrix() * world;
+            textObj.guiText.push_back({getVec2(vp, position->pos),
+                20.0f, missile->debugName});
+        }
     };
     UITextSetup();
     

@@ -147,9 +147,10 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     //emits an event when there is a selectable entity,
     //and on state change from valid to invalid selection
     Position::Handle position;
+    Velocity::Handle velocity;
     float shortestDistance = INFINITY;  //distance between entity and camera
     Entity selectableEntity;
-    for (Entity entity : entities.entities_with_components(position))
+    for (Entity entity : entities.entities_with_components(velocity, position))
     {
         
         //convert entity position from 3D to screen NDC space

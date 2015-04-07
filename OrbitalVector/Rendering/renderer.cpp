@@ -41,7 +41,7 @@ void Renderer::init(int width, int height)
     fbWidth = width;
     fbHeight = height;
     auto shipIdx = 0;//gameLogic.activeShip;
-    lightPos = glm::vec3(0, 0, -1000);
+    lightPos = glm::vec3(0, 0, 1000);
     
     globe.init();
     check_gl_error();
@@ -267,6 +267,7 @@ void Renderer::render(entityx::EntityManager &entities)
     if (0 == renderStage) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(.3, 0, 0, 0);
         forwardRender(entities);
     } else {
         auto shipIdx = 0;//gameLogic.activeShip;
@@ -442,8 +443,9 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     auto _camera = camera.matrix();
     
     glm::vec3 planetColor   (0.4, 0.0, 0.0);
-    glm::vec3 shipColor     (0.9, 0.9, 0.9);
+    glm::vec3 shipColor     (0.7, 0.7, 0.8);
     glm::vec3 shipOrbitColor(0.4, 0.8, 0.0);
+    glm::vec3 missileOrbitColor(0.8, 0.4, 0.0);
     glm::vec3 gridColor     (0.2, 0.21, 0.2);
     
     // orbit and grid
@@ -456,7 +458,8 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     for (entityx::Entity entity : entities.entities_with_components(orbitPath))
     {
         auto newTransform = mvp * orbitPath->transform;
-        orbit.draw(orbitPath->vao, (int)orbitPath->path.size()/3, newTransform, shipOrbitColor);
+        auto orbitColor = (entity.has_component<Missile>()) ? missileOrbitColor : shipOrbitColor;
+        orbit.draw(orbitPath->vao, (int)orbitPath->path.size()/3, newTransform, orbitColor);
         check_gl_error();
     }
     
@@ -475,8 +478,9 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     entityx::ComponentHandle<Orientation> orientation;
     for (entityx::Entity entity : entities.entities_with_components(shipComponent, position, orientation))
     {
-        auto mvp = world
-        * glm::translate(glm::mat4(), position->pos)
+        auto mvp =
+        world * 
+        glm::translate(glm::mat4(), position->pos)
         * orientation->orientation
 //        * gameLogic.sShip[i].size
         ;
@@ -493,7 +497,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     
     
     glUseProgram(sprite.shaderProgram);
-    auto drawSelectorNew = [&](vector<entityx::Entity> entities, glm::vec3 color)
+    auto drawSelector = [&](vector<entityx::Entity> entities, glm::vec3 color)
     {
         for (auto selected : entities)
         {
@@ -515,8 +519,8 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     PlayerControl::Handle player;
     for (Entity entity : entities.entities_with_components(player))
     {
-        drawSelectorNew(player->selectedEntities, shipOrbitColor);
-        drawSelectorNew(player->mouseOverEntities, gridColor);
+        drawSelector(player->selectedEntities, shipOrbitColor);
+        drawSelector(player->mouseOverEntities, gridColor);
     }
     
     glUseProgram(globe.shaderProgram);

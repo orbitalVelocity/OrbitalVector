@@ -35,18 +35,31 @@ COMPONENT(PlayerControl)
     std::vector<entityx::Entity> mouseOverEntities;
 };
 
-COMPONENT(Ship)
+//COMPONENT(Ship) //deprecated
+struct Ship
 {
-    Ship() {}
+    Ship()
+    {
+        debugName = "ship " + std::to_string(instanceCount);
+        instanceCount++;
+    }
     
     int meshID;
+    string debugName;
+    static int instanceCount;
 };
+
 
 COMPONENT(Missile)
 {
-    Missile() {}
-    
+    Missile()
+    {
+        debugName = "missile" + std::to_string(instanceCount);
+        instanceCount++;
+    }
     int meshID;
+    string debugName;
+    static int instanceCount;
 };
 
 

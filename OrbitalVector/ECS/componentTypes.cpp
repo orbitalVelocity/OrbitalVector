@@ -1,0 +1,13 @@
+//
+//  componentTypes.cpp
+//  OrbitalVector
+//
+//  Created by Si Li on 4/7/15.
+//  Copyright (c) 2015 Si Li. All rights reserved.
+//
+
+#include <stdio.h>
+#include "componentTypes.h"
+
+int Ship::instanceCount(0);
+int Missile::instanceCount(0);

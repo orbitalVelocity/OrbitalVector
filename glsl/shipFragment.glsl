@@ -13,25 +13,29 @@ out vec4 outColor;
 uniform sampler2DShadow shadowMap;
 
 void main() {
-    vec3 light2 = vec3(0.3,0.5,0.4);
-    vec3 specularColor = vec3(0, 1, 1);
-    float intensity = 3.0f;
-    //specular lighting
-    light2 = vec3(world * vec4(light2, 1.0));
+    float intensity = 1.3f;
     vec3 _lightPos = vec3(world * vec4(lightPos, 1.0));
     vec3 _cameraPos = cameraPos;
-    vec3 normal = normalize(vec3(model * vec4(fragNormal, 1.0)));
-    vec3 surfacePos = vec3( model * vec4(fragVertex, 1.0));
+    mat3 normalMatrix = transpose(inverse(mat3(model)));
+    vec3 normal = normalize(normalMatrix * fragNormal);
+    vec3 surfacePos = vec3( world * model * vec4(fragVertex, 1.0));
     vec3 surfToLight = normalize(_lightPos - surfacePos);
     
-    vec3 incidentVector = surfToLight;
+    //specular lighting
+    vec3 lightPos2 = vec3(0,1000,0);
+    lightPos2 = vec3(vec4(lightPos2, 1.0));
+    vec3 specularColor = vec3(3, 2.8, 2.7);
+    
+    vec3 incidentVector = -normalize(lightPos2 - surfacePos);
     vec3 reflectionVector = reflect(incidentVector, normal);
     vec3 surfToCamera = normalize(_cameraPos - surfacePos);
     float cosAngle = max(0.0, dot(surfToCamera, reflectionVector));
     float specularCoefficient = pow(cosAngle, 12);
     
-    vec3 finalColor = color * max(0.0, dot(normal, -surfToLight) * intensity)
-    ;// + specularCoefficient * specularColor;
+    float defuse = max(0.0, dot(normal, surfToLight) * intensity);
+    vec3 finalColor = color * defuse
+//    ;
+     + specularCoefficient * specularColor;
 
 //    vec3 P =vec3(shadowCoord.x, shadowCoord.y, shadowCoord.z);///shadowCoord.w);
     float visibility = 1.0;

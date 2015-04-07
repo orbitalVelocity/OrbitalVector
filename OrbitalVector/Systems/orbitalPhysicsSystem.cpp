@@ -9,7 +9,8 @@
 #include "orbitalPhysicsSystem.h"
 #include "componentTypes.h"
 
-#include "ecs.h" //FIXME: get rid of ASAP!
+#include "entityX/entity.h"
+
 #include "vectord.h"
 #include "integration.h"
 #include "twobody.h"
@@ -173,8 +174,8 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
 //        + " " + to_string(velocity->vel.z);
 //        events.emit(DebugEvent(message));
         
-        message = "sma: " + to_string(oe.sma);
-        events.emit(DebugEvent(message));
+//        message = "sma: " + to_string(oe.sma);
+//        events.emit(DebugEvent(message));
 //        message = "ecc: " + to_string(oe.ecc);
 //        events.emit(DebugEvent(message));
 //        message = "inc: " + to_string(oe.inc);
@@ -183,8 +184,8 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
 //        events.emit(DebugEvent(message));
 //        message = "aop: " + to_string(oe.aop);
 //        events.emit(DebugEvent(message));
-        message = "tra: " + to_string(oe.tra);
-        events.emit(DebugEvent(message));
+//        message = "tra: " + to_string(oe.tra);
+//        events.emit(DebugEvent(message));
 #else
         message = "orbits: " + to_string(orbitCount);
         events.emit(DebugEvent(message));

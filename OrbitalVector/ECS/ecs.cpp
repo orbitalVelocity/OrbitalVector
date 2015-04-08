@@ -294,8 +294,8 @@ void GameSingleton::load(std::string, int width, int height )
     
     myShip = entities.create();
     loadEntity(myShip,
-               {110,0.1,0},
-               {0,2.3,-0.1},
+               glm::vec3(110,0.1,0),
+               glm::vec3(0,2.3,-0.1),
                glm::rotate(glm::mat4(), 90.0f, glm::vec3(1, 0, 0)),
                gm,
                1,
@@ -310,11 +310,11 @@ GameSingleton::GameSingleton(std::string filename)
     : renderer(userInput, camera)
 {
     textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
-    
+
     //FIXME: remove UI asap
     scene.init();
     legacyUserInput = &userInput;
-    
+
     systems.add<UserInputSystem>(legacyUserInput);
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();

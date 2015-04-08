@@ -10,7 +10,7 @@
 
 #define GLFW_INCLUDE_GLCOREARB
 //#include <OpenGL/glu.h>
-#include "includes.h" 
+#include "includes.h"
 #include "rk547m.h"
 #include "OGLShader.h"
 #include <GLFW/glfw3.h>
@@ -308,8 +308,7 @@ int main(int argc, const char * argv[])
     glfwGetWindowSize(ws.pWindow, &ws.winWidth, &ws.winHeight);
     glfwGetFramebufferSize(ws.pWindow, &ws.fbWidth, &ws.fbHeight);
     glViewport(0, 0, ws.fbWidth, ws.fbHeight);
-   
-    
+
     // Calculate pixel ratio for hi-dpi devices.
     auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
     
@@ -324,7 +323,7 @@ int main(int argc, const char * argv[])
     // creating vector of string
     myGameSingleton.textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
     myGameSingleton.textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
-    
+
     // performance measurement
     glfwSetTime(0);
     PerfMon perfMon;

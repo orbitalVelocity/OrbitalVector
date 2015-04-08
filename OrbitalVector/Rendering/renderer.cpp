@@ -283,7 +283,7 @@ void Renderer::render(entityx::EntityManager &entities)
             
             depthMVP = depthProjectionMatrix * depthViewMatrix;
             //myGameSingleton.myShip.component<Orientation>()->orientation;
-            shadowMap.drawIndexed(world, camera, depthMVP, shapes[shipIdx].mesh.indices.data());
+            shadowMap.drawIndexed(world, camera, depthMVP);
         }
         //TODO: fix glViewPort toggle in stages too!
         if (renderStage & stage2)  //regular forward rendering
@@ -492,7 +492,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
         
 		glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
-        ship.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
+        ship.drawIndexed(world, camera, lightPos, mvp, shipColor);
         check_gl_error();
     }
     
@@ -511,7 +511,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
             auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
             auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
             glUniform3fv(loc, 1, glm::value_ptr(centralPos));
-            sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
+            sprite.drawIndexed(_camera, color);
         }
     };
 
@@ -541,7 +541,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     {
         auto mvp = world * glm::translate(glm::mat4(), position->pos);
         
-        missile.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
+        missile.drawIndexed(world, camera, lightPos, mvp, shipColor);
 
         check_gl_error();
     }

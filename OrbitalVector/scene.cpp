@@ -27,23 +27,7 @@ TestLoadObj(
         std::cerr << err << std::endl;
         return false;
     }
-    glm::vec3 com;
-    auto &pos = shapes[0].mesh.positions;
-    for (int i=0; i< pos.size(); i+=3)
-    {
-        com += glm::vec3(pos[i+0],
-                         pos[i+1],
-                         pos[i+2]);
-    }
-    com /= pos.size();
-    for (int i=0; i< pos.size(); i+=3)
-    {
-        pos[i+0] -= com.x;
-        pos[i+1] -= 3*com.y;
-        pos[i+2] -= com.z;
-    }
-    cout << "center of mass in local coord is " << printVec3(com);
-    //PrintInfo(shapes, materials);
+
     return true;
 }
 
@@ -121,20 +105,22 @@ void readBinObject(string _fileName)
 
 void Scene::init()
 {
-//    initCamera(camera, width, height);
-    
-//    GameSingleton::lightPos = glm::vec3(0, 0, -1000);
 
     /* mesh loading */
 //    assert(true == TestLoadObj("cornell_box.obj"));
 //    assert(true == TestLoadObj("suzanne.obj"));
 //    assert(true == TestLoadObj("olympus_1mesh.obj"));
-//    assert(true == TestLoadObj("terran_corvette_small.obj"));
-//    assert(true == TestLoadObj("square_bracket2.obj"));
-
-//    assert(true == TestLoadObj("missile1.obj"));
-//    if (1) writeBinObject("terran_corvette_small");
-//    return;
+    
+#define SETUP true 
+#if SETUP
+    assert(true == TestLoadObj("terran_corvette_small.obj"));
+    writeBinObject("terran_corvette_small");
+    assert(true == TestLoadObj("square_bracket2.obj"));
+    writeBinObject("square_bracket2");
+    assert(true == TestLoadObj("missile1.obj"));
+    writeBinObject("missile1");
+    std::exit(0);
+#else
     char fileName[] = "terran_corvette_small";
     char fileName2[] = "square_bracket2";
     char fileName3[] = "missile1";
@@ -142,6 +128,7 @@ void Scene::init()
     if (1) readBinObject(fileName);
     if (1) readBinObject(fileName2);
     if (1) readBinObject(fileName3);
+#endif
   
 }
 

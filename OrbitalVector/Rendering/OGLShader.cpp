@@ -182,7 +182,7 @@ void OGLShader::update()
 
 
 void OGLShader::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
-                      glm::vec3 color, GLuint *indices)
+                      glm::vec3 color)
 {
     GLint uniformID;
     uniformID = glGetUniformLocation(shaderProgram, "color");
@@ -197,11 +197,11 @@ void OGLShader::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPo
     glUniform3fv(uniformID, 1, glm::value_ptr(lightPos));
     check_gl_error();
     
-    drawIndexed(world, _camera, model, indices);
+    drawIndexed(world, _camera, model);
     
 }
 
-void OGLShader::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model, GLuint *indices)
+void OGLShader::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model)
 {
     auto uniformID = glGetUniformLocation(shaderProgram, "camera");
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(_camera.matrix()));
@@ -221,7 +221,7 @@ void OGLShader::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model,
     
 }
 
-void OGLShader::drawIndexed(glm::mat4 &model, glm::vec3 &color, GLuint *indices)
+void OGLShader::drawIndexed(glm::mat4 &model, glm::vec3 &color)
 {
     auto uniformID = glGetUniformLocation(shaderProgram, "model");
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(model));

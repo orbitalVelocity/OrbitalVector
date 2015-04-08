@@ -111,7 +111,7 @@ void Scene::init()
 //    assert(true == TestLoadObj("suzanne.obj"));
 //    assert(true == TestLoadObj("olympus_1mesh.obj"));
     
-#define SETUP true 
+#define SETUP false
 #if SETUP
     assert(true == TestLoadObj("terran_corvette_small.obj"));
     writeBinObject("terran_corvette_small");
@@ -119,8 +119,9 @@ void Scene::init()
     writeBinObject("square_bracket2");
     assert(true == TestLoadObj("missile1.obj"));
     writeBinObject("missile1");
-    std::exit(0);
-#else
+#endif
+    
+    shapes.clear();
     char fileName[] = "terran_corvette_small";
     char fileName2[] = "square_bracket2";
     char fileName3[] = "missile1";
@@ -128,7 +129,6 @@ void Scene::init()
     if (1) readBinObject(fileName);
     if (1) readBinObject(fileName2);
     if (1) readBinObject(fileName3);
-#endif
   
 }
 

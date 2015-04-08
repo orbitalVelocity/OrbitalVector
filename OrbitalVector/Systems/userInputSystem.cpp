@@ -22,7 +22,7 @@ void UserInputSystem::configure(EventManager& eventManager)
 }
 
 
-void rotate(ComponentHandle<Orientation> orientationHandle,
+void rotate(Orientation::Handle orientationHandle,
             float dx, float dy, float dz)
 {
     auto yAxis = glm::vec3(1.0f, 0, 0);
@@ -114,11 +114,11 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
         
         if (selectionMode) {
             selectedEntities.emplace_back(selectableEntity);
-            std::cout << "selected: " << selectableEntity.id() << std::endl;
+//            std::cout << "selected: " << selectableEntity.id() << std::endl;
             
         } else { //else mouseOverMode
             mouseOverEntities.emplace_back(selectableEntity);
-            std::cout << "mouseOver: " << selectableEntity.id() << std::endl;
+//            std::cout << "mouseOver: " << selectableEntity.id() << std::endl;
         }
         assert(count++==0);
     }
@@ -147,9 +147,10 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     //emits an event when there is a selectable entity,
     //and on state change from valid to invalid selection
     Position::Handle position;
+    Velocity::Handle velocity;
     float shortestDistance = INFINITY;  //distance between entity and camera
     Entity selectableEntity;
-    for (Entity entity : entities.entities_with_components(position))
+    for (Entity entity : entities.entities_with_components(velocity, position))
     {
         
         //convert entity position from 3D to screen NDC space

@@ -31,6 +31,7 @@
 		F15E8EA619BD4696003E566C /* LoadShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EA219BD4696003E566C /* LoadShader.cpp */; };
 		F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB319BD47C9003E566C /* fontstash.cpp */; };
 		F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F15E8EB519BD47C9003E566C /* opengl_fontstashcallbacks.cpp */; };
+		F1648E361AD3F2F300051A9E /* componentTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1648E351AD3F2F300051A9E /* componentTypes.cpp */; };
 		F17416FB1AB5F33600D2269F /* linePickSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F17416F91AB5F33600D2269F /* linePickSystem.cpp */; };
 		F1764D8219ECDE2B0031443F /* simplePassThrough.vs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1764D8119ECDE250031443F /* simplePassThrough.vs */; };
 		F18396F81AC7B09D00F941D5 /* libphysics.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F18396F71AC7B09D00F941D5 /* libphysics.a */; };
@@ -59,6 +60,7 @@
 		F1CFAEE819FAC5F3007CB974 /* fxaa.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1D04FBE19FAC2A100B3520F /* fxaa.fs */; };
 		F1CFAEE919FAC5F3007CB974 /* passthrough.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1D04FBD19FAC26B00B3520F /* passthrough.fs */; };
 		F1D4680E1AA511CB00869C62 /* grid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1D4680C1AA511CB00869C62 /* grid.cpp */; };
+		F1D515371AD4B3C900F5074F /* menuCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1D515351AD4B3C900F5074F /* menuCircle.cpp */; };
 		F1DBBA1219F6758F0022F107 /* GPUTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */; };
 		F1EAC3411A07E124006B29CB /* square.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1EAC3401A07E110006B29CB /* square.obj */; };
 		F1EAC3431A07E55B006B29CB /* square_bracket.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1EAC3421A07E547006B29CB /* square_bracket.obj */; };
@@ -150,6 +152,7 @@
 		F15E8EB619BD47C9003E566C /* opengl_fontstashcallbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = opengl_fontstashcallbacks.h; sourceTree = "<group>"; };
 		F15E8EB719BD47C9003E566C /* stb_image_write.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
 		F15E8EB819BD47C9003E566C /* stb_truetype.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_truetype.h; sourceTree = "<group>"; };
+		F1648E351AD3F2F300051A9E /* componentTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = componentTypes.cpp; path = ECS/componentTypes.cpp; sourceTree = "<group>"; };
 		F17416F91AB5F33600D2269F /* linePickSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = linePickSystem.cpp; path = Systems/linePickSystem.cpp; sourceTree = "<group>"; };
 		F17416FA1AB5F33600D2269F /* linePickSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = linePickSystem.h; path = Systems/linePickSystem.h; sourceTree = "<group>"; };
 		F1764D8119ECDE250031443F /* simplePassThrough.vs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = simplePassThrough.vs; path = glsl/simplePassThrough.vs; sourceTree = "<group>"; };
@@ -208,6 +211,8 @@
 		F1D04FBE19FAC2A100B3520F /* fxaa.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = fxaa.fs; sourceTree = "<group>"; };
 		F1D4680C1AA511CB00869C62 /* grid.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = grid.cpp; path = GameObject/grid.cpp; sourceTree = "<group>"; };
 		F1D4680D1AA511CB00869C62 /* grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grid.h; path = GameObject/grid.h; sourceTree = "<group>"; };
+		F1D515351AD4B3C900F5074F /* menuCircle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = menuCircle.cpp; path = GameObject/menuCircle.cpp; sourceTree = "<group>"; };
+		F1D515361AD4B3C900F5074F /* menuCircle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = menuCircle.h; path = GameObject/menuCircle.h; sourceTree = "<group>"; };
 		F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GPUTimer.cpp; sourceTree = "<group>"; };
 		F1DBBA1119F6758F0022F107 /* GPUTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUTimer.h; sourceTree = "<group>"; };
 		F1EAC3401A07E110006B29CB /* square.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = square.obj; sourceTree = "<group>"; };
@@ -356,6 +361,7 @@
 				F19330BC1AABE6A5009B42B0 /* ecs.cpp */,
 				F1A9BD671AB664A300EF92B7 /* events.h */,
 				F19331151AABEEDC009B42B0 /* componentTypes.h */,
+				F1648E351AD3F2F300051A9E /* componentTypes.cpp */,
 			);
 			name = ECS;
 			sourceTree = "<group>";
@@ -463,6 +469,8 @@
 				F19330AB1AA552E3009B42B0 /* globe.h */,
 				F19330AD1AA570EB009B42B0 /* orbit.cpp */,
 				F19330AE1AA570EB009B42B0 /* orbit.h */,
+				F1D515351AD4B3C900F5074F /* menuCircle.cpp */,
+				F1D515361AD4B3C900F5074F /* menuCircle.h */,
 			);
 			name = GameObject;
 			sourceTree = "<group>";
@@ -524,6 +532,7 @@
 				F19330BD1AABE6A5009B42B0 /* ecs.cpp in Sources */,
 				F1A9BD6D1AB7C29100EF92B7 /* collisionSystem.cpp in Sources */,
 				F19330AC1AA552E3009B42B0 /* globe.cpp in Sources */,
+				F1D515371AD4B3C900F5074F /* menuCircle.cpp in Sources */,
 				F15E8EB919BD47C9003E566C /* fontstash.cpp in Sources */,
 				F1FDDCFA19BE68D4009CFEB0 /* GLError.cpp in Sources */,
 				F1011C7719C7F17200602446 /* includes.cpp in Sources */,
@@ -542,6 +551,7 @@
 				F1BFB92C1ABA7AB30066574E /* orbitalPhysicsSystem.cpp in Sources */,
 				F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */,
 				F1A9BD661AB6480800EF92B7 /* userInputSystem.cpp in Sources */,
+				F1648E361AD3F2F300051A9E /* componentTypes.cpp in Sources */,
 				F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */,
 				F1D4680E1AA511CB00869C62 /* grid.cpp in Sources */,
 				F1BFB92F1ABA8CC10066574E /* cameraSystem.cpp in Sources */,

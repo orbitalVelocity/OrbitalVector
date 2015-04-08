@@ -9,7 +9,8 @@
 #include "orbitalPhysicsSystem.h"
 #include "componentTypes.h"
 
-#include "ecs.h" //FIXME: get rid of ASAP!
+#include "entityX/entity.h"
+
 #include "vectord.h"
 #include "integration.h"
 #include "twobody.h"
@@ -19,7 +20,7 @@
 
 using namespace entityx;
 
-void drawEllipse(int segments, vector<float> &path, GLdouble radiusX, GLdouble radiusY)
+void drawEllipse(int segments, vector<float> &path, GLdouble semiMajor, GLdouble semiMinor)
 {
     float DEG2RAD = M_PI/180.0f;
     
@@ -27,11 +28,11 @@ void drawEllipse(int segments, vector<float> &path, GLdouble radiusX, GLdouble r
     for(int i=0;i<segments;i++)
     {
         GLdouble rad = i*DEG2RAD;
-        path.push_back(cos(rad)*radiusX);
-        path.push_back(sin(rad)*radiusY);
+        path.push_back(cos(rad)*semiMajor);
+        path.push_back(sin(rad)*semiMinor);
         path.push_back(0);
-        path.push_back(cos(rad)*radiusX);
-        path.push_back(sin(rad)*radiusY);
+        path.push_back(cos(rad)*semiMajor);
+        path.push_back(sin(rad)*semiMinor);
         path.push_back(0);
     }
     //pull the first vertex out and stuff it in the back
@@ -51,32 +52,58 @@ void drawEllipse(int segments, vector<float> &path, GLdouble radiusX, GLdouble r
     path.push_back(1e3);
 }
 
-VectorD convertToParams (glm::vec3 pos, double gm)
+void drawOrbitalPath(int segments, vector<float> &path, GLdouble a, GLdouble e, GLdouble tra)
 {
-    VectorD params(7);
-    params[0] = pos.x;
-    params[1] = pos.y;
-    params[2] = pos.z;
-    params[3] = gm;
-    params[4] = 0.0;
-    params[5] = 0.0;
-    params[6] = 0.0;
-    return params;
+    path.clear();
+    path.reserve(segments * 3 * 2 + 12);
+    assert(path.empty());
+    
+    tra = (tra >= M_PI) ? tra - 2*M_PI : tra;
+    for(float theta = (a > 0) ? -M_PI : tra;
+        theta < M_PI;
+        theta += M_PI*2/segments)
+    {
+        float denominator = (1.0f+e*cos(theta));
+        if (denominator < 0) {
+            continue;
+        }
+        auto r = a*(1.0f-e*e)/denominator;
+        auto x=r*cos(theta);
+        auto y=r*sin(theta);
+        path.push_back(x);
+        path.push_back(y);
+        path.push_back(0);
+        path.push_back(x);
+        path.push_back(y);
+        path.push_back(0);
+    }
+   
+    assert(not path.empty());
+        //pull the first vertex out and stuff it in the back
+    for(int i=0; i<3; ++i)
+    {
+        if (a < 0) {
+            path.erase(path.end()-1);
+        } else {
+            path.push_back(path.front());
+        }
+        path.erase(path.begin());
+    }
+   
+//    if (a >= 0)
+//    {
+//        //add center for debugging
+//        for(int i=0; i<3; ++i)
+//            path.push_back(path[i]);
+//        for(int i=0; i<6; ++i)
+//            path.push_back(0);
+//        path.push_back(0);
+//        path.push_back(0);
+//        path.push_back(1e3);
+//    }
+    assert(not path.empty());
 }
 
-std::vector<double> toPosVelVector(glm::vec3 pos, glm::vec3 vel)
-{
-    std::vector<double> entityStats(6);
-    //            VectorD entityStats(6);
-    
-    entityStats[0] = pos.x;
-    entityStats[1] = pos.y;
-    entityStats[2] = pos.z;
-    entityStats[3] = vel.x;
-    entityStats[4] = vel.y;
-    entityStats[5] = vel.z;
-    return entityStats;
-}
 
 void OrbitalPhysicsSystem::update(EntityManager & entities,
                              EventManager &events,
@@ -92,11 +119,10 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
     /*
      *  All of this just to compute orbital paths using this system
      */
-    ComponentHandle<OrbitPath> orbit;
-    ComponentHandle<Position> position;
-    ComponentHandle<Velocity> velocity;
+    OrbitPath::Handle orbit;
+    Position::Handle position;
+    Velocity::Handle velocity;
    
-    auto orbitCount = 0;
     for (Entity entity: entities.entities_with_components(orbit, position, velocity))
     {
         auto parentEntityID = entity.component<Parent>()->parent;
@@ -106,27 +132,20 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         auto parentGM = parentEntity.component<GM>();
         auto &orbitPath = orbit->path;
         auto orbitPathSteps = 360;
-        
-        orbitPath.clear();
-        orbitPath.reserve(1*orbitPathSteps*3*2); //2 vertices/line segment (3 coord/vertex)
+
         
         //draw a flat elipse
         std::vector<double> posVel = toPosVelVector(position->pos, velocity->vel);
         auto oe = rv2oe(parentGM->gm, posVel);
-        assert(oe.lan == oe.lan);
+//        assert(oe.lan == oe.lan);
 //        assert(oe.aop == oe.aop);
         
-        auto smi = oe.sma * sqrt(1-oe.ecc*oe.ecc);   //semiminor axis
-        drawEllipse(orbitPathSteps, orbitPath, oe.sma, smi);
+        drawOrbitalPath(orbitPathSteps, orbitPath, oe.sma, oe.ecc, oe.tra);
         
-        //FIXME: hacks used: negative inc axis, lan+180 offset
-        //setup rotational/translation transform for elipse
-        auto focus = sqrt(pow(oe.sma, 2) - pow(smi, 2));
-        auto translate = glm::translate(glm::mat4(), glm::vec3(focus, 0,0));
         auto aop = glm::rotate(glm::mat4(), (float)(oe.aop*180/M_PI), glm::vec3(0, 0, 1));
-        auto inc = glm::rotate(glm::mat4(), (float)((oe.inc*180)/M_PI), glm::vec3(-1, 0, 0));
-        auto lan = glm::rotate(glm::mat4(), (float)(oe.lan*180/M_PI+180), glm::vec3(0, 0, 1));
-        orbit->transform  = lan * inc * aop * translate;
+        auto inc = glm::rotate(glm::mat4(), (float)((oe.inc*180)/M_PI), glm::vec3(1, 0, 0));
+        auto lan = glm::rotate(glm::mat4(), (float)(oe.lan*180/M_PI), glm::vec3(0, 0, 1));
+        orbit->transform  = lan * inc * aop;
         
         //calculate next position/velocity for this object
         VectorD params = convertToParams(parentPosition->pos, parentGM->gm);
@@ -155,16 +174,16 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
 //        + " " + to_string(velocity->vel.z);
 //        events.emit(DebugEvent(message));
         
-        message = "sma: " + to_string(oe.sma);
-        events.emit(DebugEvent(message));
-        message = "ecc: " + to_string(oe.ecc);
-        events.emit(DebugEvent(message));
-        message = "inc: " + to_string(oe.inc);
-        events.emit(DebugEvent(message));
-        message = "lan: " + to_string(oe.lan);
-        events.emit(DebugEvent(message));
-        message = "aop: " + to_string(oe.aop);
-        events.emit(DebugEvent(message));
+//        message = "sma: " + to_string(oe.sma);
+//        events.emit(DebugEvent(message));
+//        message = "ecc: " + to_string(oe.ecc);
+//        events.emit(DebugEvent(message));
+//        message = "inc: " + to_string(oe.inc);
+//        events.emit(DebugEvent(message));
+//        message = "lan: " + to_string(oe.lan);
+//        events.emit(DebugEvent(message));
+//        message = "aop: " + to_string(oe.aop);
+//        events.emit(DebugEvent(message));
 //        message = "tra: " + to_string(oe.tra);
 //        events.emit(DebugEvent(message));
 #else
@@ -173,8 +192,18 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
 #endif
 ////////DEBUG/////////////////////////////////////
         
-        if (orbitCount++ > 0)
-            std::cout << "updating more than one orbit!\n";
     }
-
+    
+//    for (Entity entity: entities.entities_with_components(position, velocity))
+//    {
+//        auto parentEntityID = entity.component<Parent>()->parent;
+//        auto parentEntity = entities.get(parentEntityID);
+//        auto parentPosition = parentEntity.component<Position>();
+//        auto parentVelocity = parentEntity.component<Velocity>();
+//        auto parentGM = parentEntity.component<GM>();
+//        auto &orbitPath = orbit->path;
+//        auto orbitPathSteps = 360;
+//        
+//        //TODO: move the integration from the loop above to here (so all elements with position/velocity can still move about, only those w/ orbit components need to recompute orbits
+//    }
 }

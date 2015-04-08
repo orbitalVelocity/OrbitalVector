@@ -41,7 +41,7 @@ void Renderer::init(int width, int height)
     fbWidth = width;
     fbHeight = height;
     auto shipIdx = 0;//gameLogic.activeShip;
-    lightPos = glm::vec3(0, 0, -1000);
+    lightPos = glm::vec3(0, 0, 1000);
     
     globe.init();
     check_gl_error();
@@ -267,6 +267,7 @@ void Renderer::render(entityx::EntityManager &entities)
     if (0 == renderStage) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(.3, 0, 0, 0);
         forwardRender(entities);
     } else {
         auto shipIdx = 0;//gameLogic.activeShip;
@@ -282,7 +283,7 @@ void Renderer::render(entityx::EntityManager &entities)
             
             depthMVP = depthProjectionMatrix * depthViewMatrix;
             //myGameSingleton.myShip.component<Orientation>()->orientation;
-            shadowMap.drawIndexed(world, camera, depthMVP, shapes[shipIdx].mesh.indices.data());
+            shadowMap.drawIndexed(world, camera, depthMVP);
         }
         //TODO: fix glViewPort toggle in stages too!
         if (renderStage & stage2)  //regular forward rendering
@@ -442,8 +443,9 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     auto _camera = camera.matrix();
     
     glm::vec3 planetColor   (0.4, 0.0, 0.0);
-    glm::vec3 shipColor     (0.9, 0.9, 0.9);
+    glm::vec3 shipColor     (0.7, 0.7, 0.8);
     glm::vec3 shipOrbitColor(0.4, 0.8, 0.0);
+    glm::vec3 missileOrbitColor(0.8, 0.4, 0.0);
     glm::vec3 gridColor     (0.2, 0.21, 0.2);
     
     // orbit and grid
@@ -452,15 +454,14 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     grid.draw(mvp, gridColor);
     check_gl_error();
     glUseProgram(orbit.shaderProgram);
-    entityx::ComponentHandle<OrbitPath> orbitPath;
-    auto count = 0;
+    OrbitPath::Handle orbitPath;
+    
     for (entityx::Entity entity : entities.entities_with_components(orbitPath))
     {
         auto newTransform = mvp * orbitPath->transform;
-        orbit.draw(orbitPath->vao, (int)orbitPath->path.size()/3, newTransform, shipOrbitColor);
+        auto orbitColor = (entity.has_component<Missile>()) ? missileOrbitColor : shipOrbitColor;
+        orbit.draw(orbitPath->vao, (int)orbitPath->path.size()/3, newTransform, orbitColor);
         check_gl_error();
-        if(count++ > 0)
-            std::cout << "rendering more than 1 orbit!\n";
     }
     
     //ship
@@ -473,13 +474,14 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
                     );
     
     glUseProgram(ship.shaderProgram);
-    entityx::ComponentHandle<Position> position;
-    entityx::ComponentHandle<Ship> shipComponent;
-    entityx::ComponentHandle<Orientation> orientation;
+    Position::Handle position;
+    Ship::Handle shipComponent;
+    Orientation::Handle orientation;
     for (entityx::Entity entity : entities.entities_with_components(shipComponent, position, orientation))
     {
-        auto mvp = world
-        * glm::translate(glm::mat4(), position->pos)
+        auto mvp =
+        world * 
+        glm::translate(glm::mat4(), position->pos)
         * orientation->orientation
 //        * gameLogic.sShip[i].size
         ;
@@ -490,13 +492,13 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
         
 		glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
-        ship.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[shipIdx].mesh.indices.data());
+        ship.drawIndexed(world, camera, lightPos, mvp, shipColor);
         check_gl_error();
     }
     
     
     glUseProgram(sprite.shaderProgram);
-    auto drawSelectorNew = [&](vector<entityx::Entity> entities, glm::vec3 color)
+    auto drawSelector = [&](vector<entityx::Entity> entities, glm::vec3 color)
     {
         for (auto selected : entities)
         {
@@ -509,7 +511,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
             auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
             auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
             glUniform3fv(loc, 1, glm::value_ptr(centralPos));
-            sprite.drawIndexed(_camera, color, shapes[0].mesh.indices.data());
+            sprite.drawIndexed(_camera, color);
         }
     };
 
@@ -518,8 +520,8 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     PlayerControl::Handle player;
     for (Entity entity : entities.entities_with_components(player))
     {
-        drawSelectorNew(player->selectedEntities, shipOrbitColor);
-        drawSelectorNew(player->mouseOverEntities, gridColor);
+        drawSelector(player->selectedEntities, shipOrbitColor);
+        drawSelector(player->mouseOverEntities, gridColor);
     }
     
     glUseProgram(globe.shaderProgram);
@@ -534,12 +536,12 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     
     //draw projectile
     glUseProgram(missile.shaderProgram);
-    entityx::ComponentHandle<Missile> missileComponent;
+    Missile::Handle missileComponent;
     for (entityx::Entity entity : entities.entities_with_components(missileComponent, position, orientation))
     {
         auto mvp = world * glm::translate(glm::mat4(), position->pos);
         
-        missile.drawIndexed(world, camera, lightPos, mvp, shipColor, shapes[2].mesh.indices.data());
+        missile.drawIndexed(world, camera, lightPos, mvp, shipColor);
 
         check_gl_error();
     }

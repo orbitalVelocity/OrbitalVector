@@ -49,7 +49,7 @@ glm::vec3* getMissileVelocityPointer(int index)
     int offset = sysIndexOffset[BodyType::MISSILE];
     return &(sys[index+offset].sn.vel);
 #else
-    entityx::ComponentHandle<Velocity> velocity = missile.component<Velocity>;
+    Velocity::Handle velocity = missile.component<Velocity>;
     myGameSingleton.entities.entities_with_components(position, velocity)
     return velocity->vel;
 #endif
@@ -86,8 +86,8 @@ int getNumberOfEntities()
 
 std::vector<body> getAllOrbitalObjects(entityx::EntityManager &entities)
 {
-    entityx::ComponentHandle<Position> position;
-    entityx::ComponentHandle<Velocity> velocity;
+    Position::Handle position;
+    Velocity::Handle velocity;
     //TODO: use auto & instead for optimizatioN?
     auto numEntities = 0;
     std::vector<body> newSys;
@@ -132,12 +132,12 @@ void updateOrbitalPhysics(entityx::EntityManager &entities, float dt, vector<vec
 
 void setAllOrbitalObjects(entityx::EntityManager &entities, std::vector<body> _sys)
 {
-    entityx::ComponentHandle<Position> position;
-    entityx::ComponentHandle<Velocity> velocity;
-    entityx::ComponentHandle<GM> gm;
-    entityx::ComponentHandle<Radius> radius;
-    entityx::ComponentHandle<Parent> parent;
-    entityx::ComponentHandle<OrbitalBodyType> orbitalBodyType;
+    Position::Handle position;
+    Velocity::Handle velocity;
+    GM::Handle gm;
+    Radius::Handle radius;
+    Parent::Handle parent;
+    OrbitalBodyType::Handle orbitalBodyType;
     auto index = 0;
     BodyType types[] = {BodyType::GRAV, BodyType::SHIP, BodyType::MISSILE};
     for (auto type : types)
@@ -309,8 +309,8 @@ void GameSingleton::load(std::string, int width, int height )
 GameSingleton::GameSingleton(std::string filename)
     : renderer(userInput, camera)
 {
-    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
-
+//    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "asteroid"));
+    
     //FIXME: remove UI asap
     scene.init();
     legacyUserInput = &userInput;
@@ -321,6 +321,24 @@ GameSingleton::GameSingleton(std::string filename)
     systems.add<DebugTextSystem>(&textObj);
     systems.add<OrbitalPhysicsSystem>();
     systems.configure();
+}
+
+//TODO: all of this includes and template function just to print OE! must find a more elegant solution
+#include "vectord.h"
+#include "integration.h"
+#include "twobody.h"
+
+#include "orbitalelements.h"
+#include "oeconvert.h"
+
+#include "componentTypes.h" //FIXME: hack, need to refactor
+
+template <typename T>
+std::string to_string_with_precision(const T a_value, const int n = 6)
+{
+    std::ostringstream out;
+    out << std::setprecision(n) << a_value;
+    return out.str();
 }
 
 void GameSingleton::update(double dt)
@@ -340,15 +358,60 @@ void GameSingleton::update(double dt)
     //move the world in the OPPOSITE direction of the focus
     world = glm::translate(glm::mat4(), -myShip.component<Position>()->pos);
     
+    auto totalOffset = glm::vec2(0, 0.02);
+    auto offset = glm::vec2(0, 0.02);
+    auto vp = camera.matrix() * world;
+    auto printOE = [&](string name, float element, glm::vec3 pos)
+    {
+        auto orbitParamString = name + to_string_with_precision(element);
+        textObj.guiText.push_back({getVec2(vp, pos)+totalOffset, 15.0f, orbitParamString});
+        totalOffset += offset;
+    };
     auto UITextSetup = [&](){
-        auto vp = camera.matrix() * world;
-        textObj.guiText[0].pos = getVec2(vp, sys[0].sn.pos);
+        Ship::Handle ship;
+        Missile::Handle missile;
+        Position::Handle position;
+        Velocity::Handle velocity;
+        OrbitPath::Handle orbit;
+        
+        
+        textObj.guiText.clear();
+        for (auto entity : entities.entities_with_components(ship, position, velocity, orbit))
+        {
+            textObj.guiText.push_back({getVec2(vp, position->pos),
+                15.0f, ship->debugName})
+            ;
+            
+            //print out orbital elements
+            auto parentEntityID = entity.component<Parent>()->parent;
+            auto parentEntity = entities.get(parentEntityID);
+            auto parentPosition = parentEntity.component<Position>();
+            auto parentGM = parentEntity.component<GM>();
+            auto posVel = toPosVelVector(position->pos, velocity->vel);
+            auto oe = rv2oe(parentGM->gm, posVel);
+            
+            printOE("sma: ", oe.sma, position->pos);
+            printOE("ecc: ", oe.ecc, position->pos);
+            printOE("inc: ", oe.inc, position->pos);
+            printOE("aop: ", oe.aop, position->pos);
+            printOE("lan: ", oe.lan, position->pos);
+            printOE("tra: ", oe.tra, position->pos);
+            totalOffset = offset;
+            
+        }
+        for (auto entity : entities.entities_with_components(missile, position, orbit))
+        {
+            auto vp = camera.matrix() * world;
+            textObj.guiText.push_back({getVec2(vp, position->pos),
+                15.0f, missile->debugName});
+        }
     };
     UITextSetup();
     
     //calculate trajectories every 30 frames
-    static int orbitCount = 1;
-    if (orbitCount++ % 30 == 0) {
+//    static int orbitCount = 1;
+//    if (orbitCount++ % 1 == 0)
+    {
         renderer.orbit.update(entities);
     }
 }

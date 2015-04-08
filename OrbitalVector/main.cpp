@@ -321,9 +321,9 @@ int main(int argc, const char * argv[])
         check_gl_error();
     
     // creating vector of string
-    myGameSingleton.textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
-    myGameSingleton.textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "planet"));
-
+//    myGameSingleton.textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
+//    myGameSingleton.textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "my ship"));
+    
     // performance measurement
     glfwSetTime(0);
     PerfMon perfMon;

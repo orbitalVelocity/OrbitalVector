@@ -28,8 +28,12 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "GLError.h"
 
-//for convenience, refactor out later?
-
+//orbital utils related
+#include "vectord.h"
+#include "orbitalelements.h"
+#include "oeconvert.h"
+#include "kepler.h"
+#include "lambert.h"
 
 
 void _debug_cout(std::string msg, const char *file, int line);
@@ -44,6 +48,10 @@ extern const int stage1, stage2, stage3, stage4, stage5, stage6, stage7, stage8,
 std::string get_file_contents(std::string filename);
 std::string printVec3(glm::vec3 v);
 glm::vec2 getVec2(glm::mat4 vp, glm::vec3 _pos);
+
+//orbital stuff
+VectorD convertToParams (glm::vec3 pos, double gm);
+std::vector<double> toPosVelVector(glm::vec3 pos, glm::vec3 vel);
 
 template <class T>
 class RingBuffer{

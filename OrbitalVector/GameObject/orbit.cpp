@@ -41,9 +41,8 @@ void RenderableOrbit::update(entityx::EntityManager &entities)
     float  *pathGL;
     using namespace entityx;
     int pathSteps = 0;
-    ComponentHandle<OrbitPath> orbit;
+    OrbitPath::Handle orbit;
     
-#if 1
     auto count = 0;
     for (Entity entity : entities.entities_with_components(orbit))
     {
@@ -70,38 +69,6 @@ void RenderableOrbit::update(entityx::EntityManager &entities)
         check_gl_error();
         count++;
     }
-    
-#else    
-    for (Entity entity : entities.entities_with_components(orbit))
-    {
-        pathSteps += (int) orbit->path.size();
-    }
-    int totalPathSize = (int)(pathSteps * sizeof(float));
-    
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo[vboIdx]);
-    setAttribute("position");
-    check_gl_error();
-    glBufferData(GL_ARRAY_BUFFER, totalPathSize, nullptr, GL_STREAM_DRAW);
-    check_gl_error();
-    pathGL = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    check_gl_error();
-    
-    int pathOffset = 0;
-    for (Entity entity : entities.entities_with_components(orbit))
-    {
-        auto &path = orbit->path;
-        memcpy(&pathGL[pathOffset], path.data(), sizeof(float)*path.size());
-        pathOffset += path.size();
-        transform = orbit->transform;
-    }
-    
-    drawCount = (int)(pathSteps)/3;
-    
-    check_gl_error();
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-    check_gl_error();
-#endif
 }
 
 

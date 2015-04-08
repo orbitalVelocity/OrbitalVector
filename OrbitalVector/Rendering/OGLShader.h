@@ -51,16 +51,14 @@ public:
                     GLuint hint, GLuint type=GL_ARRAY_BUFFER);
     void update();
     void drawIndexed(glm::mat4 &model,
-                     glm::vec3 &color,
-                     GLuint* indices);
+                     glm::vec3 &colors);
     void drawIndexed(glm::mat4 &world,
                      Camera &camera,
-                     glm::mat4 &mvp,
-                     GLuint* indices);
+                     glm::mat4 &mvps);
     void drawIndexed(glm::mat4 &world,
                      Camera &camera,
                      glm::vec3 light, glm::mat4 &mvp,
-                     glm::vec3 color, GLuint* indices);
+                     glm::vec3 colors);
     void draw(glm::mat4 &camera, glm::vec3 color);
     void draw(glm::mat4 &camera);
 public:

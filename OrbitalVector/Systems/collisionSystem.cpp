@@ -23,8 +23,8 @@ void CollisionSystem::update(EntityManager & entities,
     currentTime += dt;
     
     //FIXME: need a continuous collision detection method
-    ComponentHandle<Position> left_position, right_position;
-    ComponentHandle<Radius> left_radius, right_radius;
+    Position::Handle left_position, right_position;
+    Radius::Handle left_radius, right_radius;
     
     for (Entity left_entity : entities.entities_with_components(left_position, left_radius)) {
     

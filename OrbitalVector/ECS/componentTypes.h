@@ -23,6 +23,7 @@ COMPONENT(MissileLogic)
     
     entityx::Entity target;
     entityx::Entity parent;
+    bool done = false;
     
 };
 
@@ -36,16 +37,28 @@ COMPONENT(PlayerControl)
 
 COMPONENT(Ship)
 {
-    Ship() {}
+    Ship()
+    {
+        debugName = "ship " + std::to_string(instanceCount);
+        instanceCount++;
+    }
     
     int meshID;
+    string debugName;
+    static int instanceCount;
 };
+
 
 COMPONENT(Missile)
 {
-    Missile() {}
-    
+    Missile()
+    {
+        debugName = "missile" + std::to_string(instanceCount);
+        instanceCount++;
+    }
     int meshID;
+    string debugName;
+    static int instanceCount;
 };
 
 
@@ -156,7 +169,32 @@ COMPONENT(OrbitPath)
     GLuint vbo;
 };
 
+struct Animation
+{
+    Animation() {}
+    Animation(float t) : totalTime(t) {}
+    
+    float elapsedTime = 0;
+    float totalTime;
+};
 
-
+struct CenterElement
+{
+    CenterElement() {};
+    
+    Animation time;
+};
+//GUI Circle menu consists of one center element and n leaf elements
+//on activation, center animates, then leaves animate to open state
+//mouseHover state
+//mouseClick state
+// send event to relevant system(s)
+COMPONENT(GUICircleMenu)
+{
+    GUICircleMenu() {}
+    
+    
+    int numberOfLeaves;
+};
 
 #endif

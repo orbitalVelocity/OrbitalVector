@@ -23,8 +23,6 @@ void DebugTextSystem::receive(const DebugEvent &e)
 {
     assert(nullptr not_eq debugTextPtr);
     
-    debugTextPtr->debugTexts.push_back(e.message);
-//    std::cout << "got debug message " << e.message << "\n";
     messages.push_back({currentTime, e.message});
 }
 

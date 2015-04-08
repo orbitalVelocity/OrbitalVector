@@ -14,8 +14,7 @@ void CameraSystem::update(EntityManager & entities,
                                   EventManager &events,
                                   double dt)
 {
-    ComponentHandle<CameraComponent> camera;
-    
+    CameraComponent::Handle camera;
     for (Entity entity: entities.entities_with_components(camera))
     {
         //call a function to get stuff

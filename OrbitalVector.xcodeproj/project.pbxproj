@@ -56,11 +56,11 @@
 		F1C8EFBB19CD2CA3008CCC90 /* shipVertex.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */; };
 		F1C8EFBC19CD2CA3008CCC90 /* shipFragment.glsl in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */; };
 		F1C8EFBD19CD2CAA008CCC90 /* jet.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1C8EFBA19CD2C86008CCC90 /* jet.obj */; };
-		F1C8EFC019CE1B26008CCC90 /* tiny_obj_loader.cc in Sources */ = {isa = PBXBuildFile; fileRef = F1C8EFBE19CE1B26008CCC90 /* tiny_obj_loader.cc */; };
 		F1CFAEE819FAC5F3007CB974 /* fxaa.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1D04FBE19FAC2A100B3520F /* fxaa.fs */; };
 		F1CFAEE919FAC5F3007CB974 /* passthrough.fs in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1D04FBD19FAC26B00B3520F /* passthrough.fs */; };
 		F1D4680E1AA511CB00869C62 /* grid.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1D4680C1AA511CB00869C62 /* grid.cpp */; };
 		F1D515371AD4B3C900F5074F /* menuCircle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1D515351AD4B3C900F5074F /* menuCircle.cpp */; };
+		F1D5153D1AD57CDE00F5074F /* tiny_obj_loader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1D5153C1AD57CDE00F5074F /* tiny_obj_loader.cpp */; };
 		F1DBBA1219F6758F0022F107 /* GPUTimer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */; };
 		F1EAC3411A07E124006B29CB /* square.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1EAC3401A07E110006B29CB /* square.obj */; };
 		F1EAC3431A07E55B006B29CB /* square_bracket.obj in CopyFiles */ = {isa = PBXBuildFile; fileRef = F1EAC3421A07E547006B29CB /* square_bracket.obj */; };
@@ -205,7 +205,6 @@
 		F1C8EFB719CD2B5B008CCC90 /* shipVertex.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = shipVertex.glsl; path = glsl/shipVertex.glsl; sourceTree = "<group>"; };
 		F1C8EFB819CD2B69008CCC90 /* shipFragment.glsl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = shipFragment.glsl; path = glsl/shipFragment.glsl; sourceTree = "<group>"; };
 		F1C8EFBA19CD2C86008CCC90 /* jet.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = jet.obj; sourceTree = "<group>"; };
-		F1C8EFBE19CE1B26008CCC90 /* tiny_obj_loader.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_obj_loader.cc; sourceTree = "<group>"; };
 		F1C8EFBF19CE1B26008CCC90 /* tiny_obj_loader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_obj_loader.h; sourceTree = "<group>"; };
 		F1D04FBD19FAC26B00B3520F /* passthrough.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = passthrough.fs; path = glsl/passthrough.fs; sourceTree = "<group>"; };
 		F1D04FBE19FAC2A100B3520F /* fxaa.fs */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = fxaa.fs; sourceTree = "<group>"; };
@@ -213,6 +212,7 @@
 		F1D4680D1AA511CB00869C62 /* grid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = grid.h; path = GameObject/grid.h; sourceTree = "<group>"; };
 		F1D515351AD4B3C900F5074F /* menuCircle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = menuCircle.cpp; path = GameObject/menuCircle.cpp; sourceTree = "<group>"; };
 		F1D515361AD4B3C900F5074F /* menuCircle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = menuCircle.h; path = GameObject/menuCircle.h; sourceTree = "<group>"; };
+		F1D5153C1AD57CDE00F5074F /* tiny_obj_loader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tiny_obj_loader.cpp; sourceTree = "<group>"; };
 		F1DBBA1019F6758F0022F107 /* GPUTimer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GPUTimer.cpp; sourceTree = "<group>"; };
 		F1DBBA1119F6758F0022F107 /* GPUTimer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GPUTimer.h; sourceTree = "<group>"; };
 		F1EAC3401A07E110006B29CB /* square.obj */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = square.obj; sourceTree = "<group>"; };
@@ -416,7 +416,7 @@
 				F111F26A19D48F8C00DD4439 /* text.h */,
 				F15D70DC19CFD303008F6573 /* spatial.cpp */,
 				F15D70DD19CFD303008F6573 /* spatial.h */,
-				F1C8EFBE19CE1B26008CCC90 /* tiny_obj_loader.cc */,
+				F1D5153C1AD57CDE00F5074F /* tiny_obj_loader.cpp */,
 				F1C8EFBF19CE1B26008CCC90 /* tiny_obj_loader.h */,
 				F1BB301019C1DB9200E349FE /* rk547m.cpp */,
 				F1BB301119C1DB9200E349FE /* rk547m.h */,
@@ -551,12 +551,12 @@
 				F1BFB92C1ABA7AB30066574E /* orbitalPhysicsSystem.cpp in Sources */,
 				F15E8EBA19BD47C9003E566C /* opengl_fontstashcallbacks.cpp in Sources */,
 				F1A9BD661AB6480800EF92B7 /* userInputSystem.cpp in Sources */,
+				F1D5153D1AD57CDE00F5074F /* tiny_obj_loader.cpp in Sources */,
 				F1648E361AD3F2F300051A9E /* componentTypes.cpp in Sources */,
 				F15E8EA519BD4696003E566C /* GLPrimitiveRenderer.cpp in Sources */,
 				F1D4680E1AA511CB00869C62 /* grid.cpp in Sources */,
 				F1BFB92F1ABA8CC10066574E /* cameraSystem.cpp in Sources */,
 				F15D70DE19CFD303008F6573 /* spatial.cpp in Sources */,
-				F1C8EFC019CE1B26008CCC90 /* tiny_obj_loader.cc in Sources */,
 				F17416FB1AB5F33600D2269F /* linePickSystem.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

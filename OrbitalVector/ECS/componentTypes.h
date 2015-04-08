@@ -192,8 +192,11 @@ struct CenterElement
 COMPONENT(GUICircleMenu)
 {
     GUICircleMenu() {}
+    GUICircleMenu(entityx::Entity t, int n) : target(t), numberOfLeaves(n) {}
     
-    
+    entityx::Entity target;
+    glm::vec2 screenPos;
+    int state;
     int numberOfLeaves;
 };
 

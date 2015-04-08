@@ -309,9 +309,7 @@ void GameSingleton::load(std::string, int width, int height )
 GameSingleton::GameSingleton(std::string filename)
     : renderer(userInput, camera)
 {
-//    textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "asteroid"));
     
-    //FIXME: remove UI asap
     scene.init();
     legacyUserInput = &userInput;
 
@@ -413,6 +411,7 @@ void GameSingleton::update(double dt)
 //    if (orbitCount++ % 1 == 0)
     {
         renderer.orbit.update(entities);
+        renderer.menuCircle.update(entities, events, dt);
     }
 }
 

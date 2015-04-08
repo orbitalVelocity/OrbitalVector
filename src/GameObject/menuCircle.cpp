@@ -19,7 +19,8 @@ MenuCircle::MenuCircle(GLenum _drawType) : OGLShader(_drawType)
 
 void MenuCircle::init()
 {
-    auto shipIdx = 1;
+    //FIXME: shapes should be... better organized
+    auto shipIdx = 3;
     loadShaders("spriteVertex.glsl", "spriteFragment.glsl", true);
     loadAttribute("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
     check_gl_error();
@@ -37,11 +38,34 @@ void MenuCircle::update(entityx::EntityManager &entities,
 {
     GUICircleMenu::Handle circle;
     //get cursor screen position
+    glm::vec2 animateBegin(0.05);
+    glm::vec2 animateEnd(0.1);
     for (auto entity : entities.entities_with_components(circle))
     {
         auto positionHandle = circle->target.component<Position>();
         //animate
-        //state transition
+        //state 0: expand center element
+        if (0 == circle->animationState)
+        {
+            auto &elapsedTime = circle->centerElement.time.elapsedTime;
+            auto &totalTime = circle->centerElement.time.totalTime;
+            if (elapsedTime >= totalTime) {
+                circle->animationState++;
+                elapsedTime = 0;
+                break;
+            }
+            
+            auto progress = elapsedTime/totalTime;
+//            progress = pow(progress, 4);
+            progress = sqrt(progress);
+            circle->scale2d = glm::lerp(animateBegin, animateEnd, progress);
+            elapsedTime += dt;
+        }
+        //state 1: fling out leaf elements
+        
+        //always: hit test: change color if one of them is hit
+        //based on state
+        
         //animate based on state and time elapsed in state
         //manipulate transform
         //check if cursor is over an interactive element
@@ -52,7 +76,7 @@ void MenuCircle::update(entityx::EntityManager &entities,
 }
 void MenuCircle::MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &entities)
 {
-    glm::vec3 color(1,.8,.8);
+    glm::vec3 color(1,.1,.1);
     GUICircleMenu::Handle circle;
     //draw each element w/ the associated transform
     glUseProgram(shaderProgram);
@@ -60,8 +84,14 @@ void MenuCircle::MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &enti
     {
         auto positionHandle = circle->target.component<Position>();
         auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
+        
+        //draw center element + leaf elements
         auto loc = glGetUniformLocation(shaderProgram, "centralPos");
         glUniform3fv(loc, 1, glm::value_ptr(centralPos));
+        loc = glGetUniformLocation(shaderProgram, "offset2d");
+        glUniform2fv(loc, 1, glm::value_ptr(circle->offset2d));
+        loc = glGetUniformLocation(shaderProgram, "scale2d");
+        glUniform2fv(loc, 1, glm::value_ptr(circle->scale2d));
         drawIndexed(camera, color);
     }
 }

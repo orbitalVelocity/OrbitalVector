@@ -70,6 +70,7 @@ COMPONENT(Weapon)
 
 enum UISelectionType
 {
+    INVALID,
     HOVER,
     SELECTED
 };
@@ -178,12 +179,15 @@ struct Animation
     float totalTime;
 };
 
-struct CenterElement
+struct UIElement
 {
-    CenterElement() {};
+    UIElement(float t) : time(t) {};
     
     Animation time;
+    //size, color, animation style?
 };
+
+
 //GUI Circle menu consists of one center element and n leaf elements
 //on activation, center animates, then leaves animate to open state
 //mouseHover state
@@ -195,9 +199,14 @@ COMPONENT(GUICircleMenu)
     GUICircleMenu(entityx::Entity t, int n) : target(t), numberOfLeaves(n) {}
     
     entityx::Entity target;
+    float size = 50; //circular hit target (radius)
+    glm::vec2 offset2d;
+    glm::vec2 scale2d;
     glm::vec2 screenPos;
-    int state;
+    UISelectionType state = UISelectionType::INVALID;
+    int animationState = 0;
     int numberOfLeaves;
+    UIElement centerElement = UIElement(0.2);
 };
 
 #endif

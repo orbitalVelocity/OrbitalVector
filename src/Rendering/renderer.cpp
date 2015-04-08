@@ -49,6 +49,8 @@ void Renderer::init(int width, int height)
     check_gl_error();
     grid.init();
     check_gl_error();
+    menuCircle.init();
+    check_gl_error();
 
     /* loading shaders and render targets */
     //ship.id = shipIdx;
@@ -511,6 +513,15 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
             auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
             auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
             glUniform3fv(loc, 1, glm::value_ptr(centralPos));
+
+            //this is here b/c it shares the same shader code w/ MenuCircle, and if I don't use it, it gets optimized away later
+            glm::vec2 offset2d(0);
+            glm::vec2 scale2d(0.1);
+            loc = glGetUniformLocation(sprite.shaderProgram, "offset2d");
+            glUniform2fv(loc, 1, glm::value_ptr(offset2d));
+            loc = glGetUniformLocation(sprite.shaderProgram, "scale2d");
+            glUniform2fv(loc, 1, glm::value_ptr(scale2d));
+            
             sprite.drawIndexed(_camera, color);
         }
     };
@@ -523,6 +534,8 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
         drawSelector(player->selectedEntities, shipOrbitColor);
         drawSelector(player->mouseOverEntities, gridColor);
     }
+    
+    menuCircle.draw(_camera, entities);
     
     glUseProgram(globe.shaderProgram);
 //    for (entityx::Entity entity : entities.entities_with_components(position, planet))

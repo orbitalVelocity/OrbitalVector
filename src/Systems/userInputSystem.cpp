@@ -141,7 +141,14 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     auto mouseX_NDC = ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f;
     auto mouseY_NDC = ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f;
     auto mouse_NDC = glm::vec2(mouseX_NDC * screenWidth, mouseY_NDC * screenHeight);
-    
+   
+    auto getDistanceToCursor = [&](glm::vec3 pos)
+    {
+        auto posNDC = camera.matrix() * world * glm::vec4(pos, 1.0);
+        posNDC /= posNDC.w;
+        auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
+        return glm::length(mouse_NDC - screenPosNDC);
+    };
     //for each entity, check if it is within the threshold of clickability,
     //pick the closest entity as a selectable entity
     //emits an event when there is a selectable entity,
@@ -152,23 +159,34 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     Entity selectableEntity;
     for (Entity entity : entities.entities_with_components(velocity, position))
     {
-        
-        //convert entity position from 3D to screen NDC space
-        auto posNDC = camera.matrix() * world * glm::vec4(position->pos, 1.0);
-        posNDC /= posNDC.w;
-        auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
-        auto onScreenDistance = glm::length(mouse_NDC - screenPosNDC);
+        auto onScreenDistance = getDistanceToCursor(position->pos);
         
         auto distanceFromCamera = glm::length(position->pos - camera.position);
         
-        //FIXME: threshold also depends on aparent size of object
-        const int thresholdInPixels = 40;
+        const int thresholdInPixels = 40; //TODO: value should be in entity
         
         //pick a clickable entity that is also the closest
         if (onScreenDistance < thresholdInPixels
             && distanceFromCamera < shortestDistance) {
             shortestDistance = distanceFromCamera;
             selectableEntity = entity;
+        }
+    }
+    
+    //FIXME: ideally this would go in the MenuCircle class
+    GUICircleMenu::Handle circle;
+    for (Entity entity : entities.entities_with_components(circle))
+    {
+        auto position = circle->target.component<Position>();
+       
+        //check for hit
+        //assumes circular hit target
+        auto onScreenDistance = getDistanceToCursor(position->pos);
+        
+        //check if mouse hits any elements in circle
+        //if so, update component's state
+        if (onScreenDistance < circle->size) {
+            circle->state = UISelectionType::HOVER;
         }
     }
     
@@ -228,10 +246,12 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
 //                timeWarp /= 2;
                 break;
             case ActionType::spawnMenu:
-                //check if anything selected
-                if (selectedEntities->size() == 1) {
+                //check if anything selected and no other menu for this has been created
+                if (selectedEntities->size() == 1
+                    ) {
                     auto entity = entities.create();
                     entity.assign<GUICircleMenu>(selectedEntities->front(), 4);
+                    std::cout << "new menu spawned!\n";
                 }
                 //then create menu
             default:
@@ -276,12 +296,14 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
         if (action == ActionType::fireGun)
         {
             Entity entity;
-            if (selectedEntities->empty()) {
+            if (selectedEntities->empty()
+                ) {
                 std::cout << "no target selected\n";
                 break;
             }
             auto targetEntity = selectedEntities->front();
-            if (targetEntity.valid() ) {//selectedEntities.front().valid()) {
+            if (targetEntity.valid()
+                and targetEntity.id() != myShip.id()) {
                 entity = entities.create();
                 entity.assign<MissileLogic>(myShip, selectedEntities->front());
                 assert(entity.valid());

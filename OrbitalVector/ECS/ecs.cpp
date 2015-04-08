@@ -413,7 +413,6 @@ void GameSingleton::update(double dt)
 //    if (orbitCount++ % 1 == 0)
     {
         renderer.orbit.update(entities);
-//        renderer.menuCircle.mouseUpdate(, <#bool lmb#>, <#bool rmb#>, <#entityx::Entity s#>)
     }
 }
 

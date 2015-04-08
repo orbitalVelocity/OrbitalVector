@@ -66,9 +66,6 @@ void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int m
             case GLFW_KEY_SPACE:
                 actionList.push_back(ActionType::fireGun);
                 break;
-            case GLFW_KEY_T:
-                actionList.push_back(ActionType::spawnMenu);
-                break;
             case GLFW_KEY_B:
                 globalShowFXAAAAirection ^= true;
                 break;

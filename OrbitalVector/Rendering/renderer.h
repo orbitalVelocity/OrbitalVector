@@ -25,14 +25,9 @@
 #include "orbit.h"
 #include "camera.h"
 #include "scene.h"
-
 #include "grid.h"
 #include "globe.h"
-#include "menuCircle.h"
-
 #include "input.h"
-
-
 #include "entityx/Entity.h"
 
 #define NOSHADER false
@@ -75,8 +70,6 @@ public:
     orbit(GL_LINES),
     ship(GL_TRIANGLES),
     sprite(GL_TRIANGLES),
-    menuCircle(GL_TRIANGLES),
-    
     missile(GL_TRIANGLES),
     hdr(GL_TRIANGLES),
     highPass(GL_TRIANGLES),
@@ -113,8 +106,6 @@ public:
     RenderableGrid grid;
     RenderableGlobe globe;
     RenderableOrbit orbit;
-    MenuCircle menuCircle;
-    
     glm::vec3 lightPos;
     friend class UserInput;
     UserInput &userInput;

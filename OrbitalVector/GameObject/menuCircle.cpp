@@ -7,7 +7,6 @@
 //
 
 #include "menuCircle.h"
-#include "componentTypes.h"
 #include "scene.h"
 
 using namespace std;
@@ -22,42 +21,21 @@ MenuCircle::MenuCircle(GLenum _drawType) : OGLShader(_drawType)
     setupBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, shapes[shipIdx].mesh.indices);
 }
 
-void MenuCircle::mouseUpdate(glm::vec2 mb, bool lmb, bool rmb, entityx::Entity s)
-{
-    mbPosition = mb;
-    
-}
 void MenuCircle::update(entityx::EntityManager &entities,
                         entityx::EventManager &events,
                         float dt)
 {
-    GUICircleMenu::Handle circle;
     //get cursor screen position
-    for (auto entity : entities.entities_with_components(circle))
-    {
-        auto positionHandle = circle->target.component<Position>();
-        //animate
-        //state transition
-        //animate based on state and time elapsed in state
-        //manipulate transform
-        //check if cursor is over an interactive element
-        //change state if so
-        //emit event when player has triggered an action
-        
-    }
+    //animate
+    //state transition
+    //animate based on state and time elapsed in state
+    //manipulate transform
+    //check if cursor is over an interactive element
+    //change state if so
+    //emit event when player has triggered an action
+    
 }
-void MenuCircle::MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &entities)
+void MenuCircle::MenuCircle::draw()
 {
-    glm::vec3 color(1,.8,.8);
-    GUICircleMenu::Handle circle;
     //draw each element w/ the associated transform
-    glUseProgram(shaderProgram);
-    for (auto entity : entities.entities_with_components(circle))
-    {
-        auto positionHandle = circle->target.component<Position>();
-        auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
-        auto loc = glGetUniformLocation(shaderProgram, "centralPos");
-        glUniform3fv(loc, 1, glm::value_ptr(centralPos));
-        drawIndexed(camera, color);
-    }
 }

@@ -29,6 +29,7 @@ enum class ActionType {
     fireGun, fireMissile, fireBeam,
     
     newShip,
+    spawnMenu,
     invalid
 };
 

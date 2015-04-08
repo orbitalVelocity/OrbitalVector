@@ -19,10 +19,15 @@
 
 class MenuCircle : public OGLShader
 {
+    glm::vec2 mbPosition;
+    int state;
+    entityx::Entity selectedEntity;
 public:
     MenuCircle(GLenum _drawType);
     
+    void init() override;
     void update(entityx::EntityManager &, entityx::EventManager &, float dt);
-    void draw();
+    void mouseUpdate(glm::vec2 mb, bool lmb, bool rmb, entityx::Entity s);
+    void draw(glm::mat4, entityx::EntityManager &);
 };
 #endif /* defined(__OrbitalVector__menuCircle__) */

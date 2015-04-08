@@ -227,6 +227,13 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
             case ActionType::timeWarpLess:
 //                timeWarp /= 2;
                 break;
+            case ActionType::spawnMenu:
+                //check if anything selected
+                if (selectedEntities->size() == 1) {
+                    auto entity = entities.create();
+                    entity.assign<GUICircleMenu>(selectedEntities->front(), 4);
+                }
+                //then create menu
             default:
                 break;
         }

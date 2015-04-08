@@ -111,7 +111,7 @@ void Scene::init()
 //    assert(true == TestLoadObj("suzanne.obj"));
 //    assert(true == TestLoadObj("olympus_1mesh.obj"));
     
-#define SETUP false
+#define SETUP true
 #if SETUP
     assert(true == TestLoadObj("terran_corvette_small.obj"));
     writeBinObject("terran_corvette_small");

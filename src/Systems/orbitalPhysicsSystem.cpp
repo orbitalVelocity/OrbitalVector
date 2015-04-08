@@ -9,7 +9,7 @@
 #include "orbitalPhysicsSystem.h"
 #include "componentTypes.h"
 
-#include "entityX/entity.h"
+#include "entityx/Entity.h"
 
 #include "vectord.h"
 #include "integration.h"

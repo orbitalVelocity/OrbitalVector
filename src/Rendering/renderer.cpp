@@ -115,7 +115,7 @@ void Renderer::init(int width, int height)
     
     {
         shadowMap.depthTexture = true;
-        shadowMap.loadShaders("simplePassthrough.vs", "depth.fs", true);
+        shadowMap.loadShaders("simplePassThrough.vs", "depth.fs", true);
         shadowMap.loadAttribute("position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
         shadowMap.setupBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, shapes[shipIdx].mesh.indices);
     }

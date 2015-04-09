@@ -133,6 +133,7 @@ void Scene::init()
     if (1) readBinObject(fileName2);
     if (1) readBinObject(fileName3);
     if (1) readBinObject(fileName4);
+  
 }
 
 

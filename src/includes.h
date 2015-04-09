@@ -53,6 +53,9 @@ glm::vec2 getVec2(glm::mat4 vp, glm::vec3 _pos);
 VectorD convertToParams (glm::vec3 pos, double gm);
 std::vector<double> toPosVelVector(glm::vec3 pos, glm::vec3 vel);
 
+template<typename T>
+T deg2rad(T degree);
+
 template <class T>
 class RingBuffer{
 public:

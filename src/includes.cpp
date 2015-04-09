@@ -26,6 +26,12 @@ const int stage10 = 0x0200;
 //const int stage11 = 0x0400;
 //const int stage12 = 0x0800;
 
+template<typename T>
+T deg2rad(T degree)
+{
+    return degree * M_PI/180;
+}
+
 void _debug_cout(string msg, const char *file, int line)
 {
     cerr <<file<<":"<<line << " " << msg << endl;

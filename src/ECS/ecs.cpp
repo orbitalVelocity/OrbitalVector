@@ -296,7 +296,7 @@ void GameSingleton::load(std::string, int width, int height )
     loadEntity(myShip,
                glm::vec3(110,0.1,0),
                glm::vec3(0,2.3,-0.1),
-               glm::rotate(glm::mat4(), 90.0f, glm::vec3(1, 0, 0)),
+               glm::rotate(glm::mat4(), (float)M_PI/2, glm::vec3(1, 0, 0)),
                gm,
                1,
                mainGrav.id(),

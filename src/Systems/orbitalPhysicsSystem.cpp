@@ -142,9 +142,9 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         
         drawOrbitalPath(orbitPathSteps, orbitPath, oe.sma, oe.ecc, oe.tra);
         
-        auto aop = glm::rotate(glm::mat4(), (float)(oe.aop*180/M_PI), glm::vec3(0, 0, 1));
-        auto inc = glm::rotate(glm::mat4(), (float)((oe.inc*180)/M_PI), glm::vec3(1, 0, 0));
-        auto lan = glm::rotate(glm::mat4(), (float)(oe.lan*180/M_PI), glm::vec3(0, 0, 1));
+        auto aop = glm::rotate(glm::mat4(), (float)(oe.aop), glm::vec3(0, 0, 1));
+        auto inc = glm::rotate(glm::mat4(), (float)(oe.inc), glm::vec3(1, 0, 0));
+        auto lan = glm::rotate(glm::mat4(), (float)(oe.lan), glm::vec3(0, 0, 1));
         orbit->transform  = lan * inc * aop;
         
         //calculate next position/velocity for this object

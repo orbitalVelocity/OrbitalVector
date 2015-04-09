@@ -71,9 +71,9 @@ void Camera::rotate(float up, float right)
     vAngle += up;
     hAngle += right;
     
-    hAngle = (hAngle > 360) ? hAngle - 360 : hAngle;
+    hAngle = (hAngle > 2*M_PI) ? hAngle - 2*M_PI: hAngle;
     vAngle = (vAngle > 0) ? 0 : vAngle;
-    vAngle = (vAngle < -180) ? -180 : vAngle;
+    vAngle = (vAngle < -M_PI) ? -M_PI: vAngle;
 }
 
 glm::mat4 Camera::orientation() const {

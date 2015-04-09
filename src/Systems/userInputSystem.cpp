@@ -9,6 +9,7 @@
 #include "userInputSystem.h"
 #include "componentTypes.h"
 #include "ecs.h"
+
 using namespace entityx;
 
 UserInputSystem::UserInputSystem(UserInput *ui) : legacyUserInput(ui)
@@ -58,7 +59,7 @@ void UserInputSystem::update(entityx::EntityManager &entities,
     double _y = my - prevMY;
     prevMX = mx;
     prevMY = my;
-    double mouseScale = .1;
+    double mouseScale = .005;
 
     if (legacyUserInput->rmbPressed) {
         camera.rotate(_y*mouseScale, _x*mouseScale);
@@ -209,7 +210,7 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
     }
     assert(1 == count);
     
-    float deltaMove = 2;
+    float deltaMove = .1;
     glm::vec3 forwardVector;
     auto hv = myShip.component<Velocity>();
 //    auto hp = myShip.component<Position>();

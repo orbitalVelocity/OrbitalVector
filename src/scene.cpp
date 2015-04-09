@@ -119,17 +119,20 @@ void Scene::init()
     writeBinObject("square_bracket2");
     assert(true == TestLoadObj("missile1.obj"));
     writeBinObject("missile1");
+    assert(true == TestLoadObj("circleMenu.obj"));
+    writeBinObject("circleMenu");
 #endif
     
     shapes.clear();
     char fileName[] = "terran_corvette_small";
     char fileName2[] = "square_bracket2";
     char fileName3[] = "missile1";
+    char fileName4[] = "circleMenu";
 //    char fileName[] = "olympus";
     if (1) readBinObject(fileName);
     if (1) readBinObject(fileName2);
     if (1) readBinObject(fileName3);
-  
+    if (1) readBinObject(fileName4);
 }
 
 

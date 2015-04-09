@@ -42,11 +42,17 @@ file(GLOB src_files
 )
 
 add_executable(${project_name} ${src_files})
-target_link_libraries(${project_name} ${OPENGL_LIBRARIES} GL GLU X11)
-target_link_libraries(${project_name} ${GLEW_LIBRARIES})
-target_link_libraries(${project_name} glfw3 ${GLFW_LIBRARIES})
-# linker errors say we need these
-target_link_libraries(${project_name} Xxf86vm pthread Xrandr Xi)
+
+if(APPLE)
+	SET(CMAKE_CXX_LINK_FLAGS "-framework OpenGL -framework Cocoa -framework IOKit -framework QuartzCore -lGLEW")
+	target_link_libraries(${project_name} glfw3 ${GLFW_LIBRARIES})
+else(LINUX)
+	target_link_libraries(${project_name} ${OPENGL_LIBRARIES} GL GLU X11)
+	target_link_libraries(${project_name} ${GLEW_LIBRARIES})
+	target_link_libraries(${project_name} glfw3 ${GLFW_LIBRARIES})
+	# linker errors say we need these
+	target_link_libraries(${project_name} Xxf86vm pthread Xrandr Xi)
+endif(APPLE)
 
 add_module(physics)
 add_module(orbitutils)

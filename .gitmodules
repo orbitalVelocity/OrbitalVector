@@ -1,8 +1,8 @@
-[submodule "build/orbitutils"]
-	path = build/orbitutils
+[submodule "orbitutils"]
+	path = orbitutils
 	url = https://github.com/orbitalVelocity/orbitutils
-[submodule "build/physics"]
-	path = build/physics
+[submodule "physics"]
+	path = physics
 	url = https://github.com/orbitalVelocity/physics
 [submodule "entityx"]
 	path = entityx

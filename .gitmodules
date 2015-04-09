@@ -7,3 +7,6 @@
 [submodule "entityx"]
 	path = entityx
 	url = https://github.com/alecthomas/entityx
+[submodule "glm"]
+	path = glm
+	url = https://github.com/g-truc/glm

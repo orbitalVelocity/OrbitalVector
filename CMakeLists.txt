@@ -57,7 +57,7 @@ endif(APPLE)
 add_module(physics)
 add_module(orbitutils)
 
-include_directories(glm/glm)
+include_directories(glm)
 
 add_subdirectory(entityx)
 include_directories(entityx)

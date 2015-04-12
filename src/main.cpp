@@ -22,6 +22,7 @@
 #include "text.h"
 #include "renderer.h"
 #include "GPUTimer.h"
+#include "log.h"
 #define CUSTOM_VSYNC 2
 #define VSYNC 1
 
@@ -250,6 +251,10 @@ void getText(TextRenderer &textObj, PerfMon &perfMon, WindowStates &ws)
 
 int main(int argc, const char * argv[])
 {
+    log_init(stdout);
+
+    log(DEBUG,"Creating window.");
+
     int width = 960, height = 540;
 
     WindowStates ws;
@@ -260,7 +265,9 @@ int main(int argc, const char * argv[])
 
     // Calculate pixel ratio for hi-dpi devices.
     auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
-    
+
+    log(DEBUG,"Creating GameSingleton.");
+
     GameSingleton myGameSingleton("testMap");
     myGameSingleton.load("test", width, height);
     assert(myGameSingleton.myShip.valid());
@@ -279,7 +286,9 @@ int main(int argc, const char * argv[])
     perfMon.tPrevFrame = glfwGetTime();
     
     myGameSingleton.pWindow = ws.pWindow;
-    
+
+    log(DEBUG,"Entering game loop.");
+
     while (!glfwWindowShouldClose(ws.pWindow))
     {
         perfMon.update(glfwGetTime());
@@ -312,5 +321,9 @@ int main(int argc, const char * argv[])
     }
     
     glfwTerminate();
+
+    log(DEBUG,"Terminating.");
+    log_free();
+
     return 0;
 }

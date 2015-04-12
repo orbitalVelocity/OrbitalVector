@@ -8,7 +8,6 @@
 
 #include "orbit.h"
 #include "OGLShader.h"
-#include "rk547m.h"
 #include "ecs.h"
 #include "componentTypes.h"
 
@@ -20,18 +19,9 @@ RenderableOrbit::RenderableOrbit(GLenum _drawType) : OGLShader(_drawType) {
 
 void RenderableOrbit::init()
 {
-    //load shaders
     string vertFilename = "lineVertex.glsl";
     string fragFilename = "lineFragment.glsl";
     loadShaders(vertFilename, fragFilename);
-    
-    generateVertexBuffer(vao, GL_ARRAY_BUFFER);
-    
-    //    setAttribute("position");
-    
-    //unbinds vao, prevents subsequent GL calls from modifying this object
-    glBindVertexArray(0);
-    //    vboIdx++; //FIXME: doesn't work w/ multiple vbo's!
 }
 
 

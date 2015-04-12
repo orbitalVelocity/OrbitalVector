@@ -10,7 +10,6 @@
 #define __GLFW3_test__orbit__
 
 #include "OGLShader.h"
-#include "rk547m.h"
 #include "entityx/Entity.h"
 #include <iostream>
 #include <set>

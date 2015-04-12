@@ -11,7 +11,6 @@
 #define GLFW_INCLUDE_GLCOREARB
 //#include <OpenGL/glu.h>
 #include "includes.h"
-#include "rk547m.h"
 #include "OGLShader.h"
 #include <GLFW/glfw3.h>
 
@@ -232,57 +231,7 @@ void getText(TextRenderer &textObj, PerfMon &perfMon, WindowStates &ws)
     
     
     //the following code should go into UserInput and GameLogic, not out here
-//    textOut << "planet (" << printVec3(sys[0].sn.pos) << ")";
-//    textObj.pushBackDebug(textOut);
-//    textOut << "planet v: " << glm::length(sys[0].sn.vel);
-//    textObj.pushBackDebug(textOut);
-//    textOut << "ship vel: " << glm::length(sys[1].sn.vel);
-//    textObj.pushBackDebug(textOut);
-//    textOut << "projectiles: " << sys.size() - 2;
-//    textObj.pushBackDebug(textOut);
-//    textOut << "paths: " << scene.orbit.paths.size() << " | ";
-//    for ( auto & path : scene.orbit.paths) {
-//        textOut << path.size()/3 << " ";
-//    }
-//    textObj.pushBackDebug(textOut);
-//    textOut << "path size: " << scene.orbit.drawCount;
-//    textObj.pushBackDebug(textOut);
-//    textOut << "grav offset: " << sysIndexOffset[BodyType::GRAV]
-//    << " size: " << numBodyPerType[BodyType::GRAV];
-//    textObj.pushBackDebug(textOut);
-//    textOut << "ship offset: " << sysIndexOffset[BodyType::SHIP]
-//    << " size: " << numBodyPerType[BodyType::SHIP];
-//    textObj.pushBackDebug(textOut);
-//    textOut << "miss offset: " << sysIndexOffset[BodyType::MISSILE]
-//    << " size: " << numBodyPerType[BodyType::MISSILE];
-//    textObj.pushBackDebug(textOut);
-//    textOut << "proj offset: " << sysIndexOffset[BodyType::MISSILE]
-//    << " size: " << numBodyPerType[BodyType::MISSILE];
-//    textObj.pushBackDebug(textOut);
-   
-//    //mouse debug
-//    double mx, my;
-//    glfwGetCursorPos(window, &mx, &my);
-//    textOut << "mouse: x " << mx << " y " << my;
-//    textObj.pushBackDebug(textOut);
-//    
 
-    //        textOut << "ray start: " << std::fixed
-    //                << std::setprecision(2)
-    //                << printVec3(scene.rayStart);
-    //        textObj.pushBackDebug(textOut);
-    //        textOut << "ray end: " <<std::fixed
-    //                << std::setprecision(2)
-    //                <<printVec3(scene.rayEnd);
-    //        textObj.pushBackDebug(textOut);
-    //        textOut << "planet camera coord: " << std::fixed
-    //                << std::setprecision(2)
-    //                << printVec3(scene.obj);
-    //        textObj.pushBackDebug(textOut);
-    
-    
-    
-//    return;
     textOut << "shadow pass: 1   " << ((renderStage & stage1) ? "On" : " ");
     textObj.pushBackDebug(textOut);
     textOut << "forward pass: 2  " << ((renderStage & stage2) ? "On" : " ");

@@ -9,11 +9,20 @@
 #ifndef OrbitalVector_componentTypes_h
 #define OrbitalVector_componentTypes_h
 
-#include "rk547m.h"
 #include "includes.h"
 #include "entityx/Entity.h"
 
 #define COMPONENT( X ) struct X : public entityx::Component<X>
+
+enum BodyType {
+    GRAV,
+    SHIP,
+    MISSILE,
+    PROJECTILE,
+    MAX_BODY_TYPE
+};
+
+extern glm::mat4 world;
 
 COMPONENT(MissileLogic)
 {
@@ -44,7 +53,7 @@ COMPONENT(Ship)
     }
     
     int meshID;
-    string debugName;
+    std::string debugName;
     static int instanceCount;
 };
 
@@ -57,7 +66,7 @@ COMPONENT(Missile)
         instanceCount++;
     }
     int meshID;
-    string debugName;
+    std::string debugName;
     static int instanceCount;
 };
 
@@ -164,7 +173,7 @@ COMPONENT(OrbitPath)
         glDeleteVertexArrays(1, &vao);
     }
     
-    vector<float> path;
+    std::vector<float> path;
     glm::mat4 transform;
     GLuint vao;
     GLuint vbo;
@@ -175,8 +184,8 @@ struct Animation
     Animation() {}
     Animation(float t) : totalTime(t) {}
     
-    float elapsedTime = 0;
-    float totalTime;
+    float elapsedTime = 0.01;
+    float totalTime = .6;
 };
 
 struct UIElement
@@ -196,7 +205,14 @@ struct UIElement
 COMPONENT(GUICircleMenu)
 {
     GUICircleMenu() {}
-    GUICircleMenu(entityx::Entity t, int n) : target(t), numberOfLeaves(n) {}
+    GUICircleMenu(entityx::Entity t, int n) : target(t), numberOfLeaves(n)
+    {
+        leafMenus.resize(numberOfLeaves);
+        for (auto i = 0; i < numberOfLeaves; i++)
+        {
+            leafMenus[i] = i * 2*M_PI/numberOfLeaves;
+        }
+    }
     
     entityx::Entity target;
     float size = 50; //circular hit target (radius)
@@ -206,7 +222,8 @@ COMPONENT(GUICircleMenu)
     UISelectionType state = UISelectionType::INVALID;
     int animationState = 0;
     int numberOfLeaves;
-    UIElement centerElement = UIElement(0.2);
+    UIElement centerElement = UIElement(0.6);
+    std::vector<float> leafMenus;
 };
 
 #endif

@@ -9,7 +9,6 @@
 #ifndef OrbitalVector_ECS_H
 #define OrbitalVector_ECS_H
 #include "includes.h"
-#include "rk547m.h"
 #include "entityx/entityx.h"
 #include "componentTypes.h"
 #include "camera.h"
@@ -37,14 +36,6 @@ glm::vec3 getMyShipVel();
 int getNumberOfShips();
 int getNumberOfMissiles();
 int getNumberOfEntities();
-
-std::vector<body> getAllOrbitalObjects(entityx::EntityManager& entities);
-void setAllOrbitalObjects(entityx::EntityManager& entities, std::vector<body>);
-void updateOrbitalPhysics(entityx::EntityManager& entities, float dt, std::vector<std::vector<state> > &ks, bool variableDT);
-
-void createRandomShip();
-
-
 
 class GameSingleton : public entityx::EntityX {
     //FIXME: make this private after removing gameLogic/scene class

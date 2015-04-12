@@ -11,3 +11,6 @@
 
 int Ship::instanceCount(0);
 int Missile::instanceCount(0);
+
+
+glm::mat4 world;

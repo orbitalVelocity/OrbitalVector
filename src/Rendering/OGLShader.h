@@ -33,6 +33,12 @@ public:
     template<typename T>
     void setupBuffer(GLuint bufferType, GLuint drawType, std::vector<T> &array)
     {
+        setupBuffer(vao, bufferType, drawType, array);
+    }
+    
+    template<typename T>
+    void setupBuffer(GLuint vao, GLuint bufferType, GLuint drawType, std::vector<T> &array)
+    {
         //must bind VAO first, else VBO won't be linked to VAO
         glBindVertexArray(vao);
         generateVertexBuffer(vao, bufferType);
@@ -50,6 +56,13 @@ public:
     void loadAttribute(GLuint vao, std::string name, std::vector<float> &input,
                     GLuint hint, GLuint type=GL_ARRAY_BUFFER);
     void update();
+    void drawIndexed(GLuint vao,
+                     int drawCount, 
+                     glm::mat4 &model,
+                     glm::vec3 &colors);
+    void drawIndexed(GLuint vao,
+                     glm::mat4 &model,
+                     glm::vec3 &colors);
     void drawIndexed(glm::mat4 &model,
                      glm::vec3 &colors);
     void drawIndexed(glm::mat4 &world,
@@ -59,6 +72,7 @@ public:
                      Camera &camera,
                      glm::vec3 light, glm::mat4 &mvp,
                      glm::vec3 colors);
+//    void draw(GLuint vao, glm::mat4 &camera, glm::vec3 color);
     void draw(glm::mat4 &camera, glm::vec3 color);
     void draw(glm::mat4 &camera);
 public:

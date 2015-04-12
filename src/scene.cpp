@@ -16,12 +16,12 @@ std::vector<tinyobj::material_t> materials;
 
 static bool
 TestLoadObj(
-            const char* filename,
+            std::string filename,
             const char* basepath = NULL)
 {
     std::cout << "Loading " << filename << std::endl;
     
-    std::string err = tinyobj::LoadObj(shapes, materials, filename, basepath);
+    std::string err = tinyobj::LoadObj(shapes, materials, filename.c_str(), basepath);
     
     if (!err.empty()) {
         std::cerr << err << std::endl;
@@ -107,33 +107,30 @@ void Scene::init()
 {
 
     /* mesh loading */
-//    assert(true == TestLoadObj("cornell_box.obj"));
-//    assert(true == TestLoadObj("suzanne.obj"));
-//    assert(true == TestLoadObj("olympus_1mesh.obj"));
-    
 #define SETUP true
 #if SETUP
-    assert(true == TestLoadObj("terran_corvette_small.obj"));
-    writeBinObject("terran_corvette_small");
-    assert(true == TestLoadObj("square_bracket2.obj"));
-    writeBinObject("square_bracket2");
-    assert(true == TestLoadObj("missile1.obj"));
-    writeBinObject("missile1");
-    assert(true == TestLoadObj("circleMenu.obj"));
-    writeBinObject("circleMenu");
-#endif
+    std::vector<std::string> meshNames;
+    meshNames.push_back("terran_corvette_small");
+    meshNames.push_back("square_bracket2");
+    meshNames.push_back("missile1");
+    meshNames.push_back("circleMenu");
+    meshNames.push_back("circleMenu_inner_circle");
+    meshNames.push_back("circleMenu_leaf_top");
     
+    for (auto name : meshNames)
+    {
+        assert(true == TestLoadObj(name + ".obj"));
+        writeBinObject(name);
+    }
+#endif
+
     shapes.clear();
-    char fileName[] = "terran_corvette_small";
-    char fileName2[] = "square_bracket2";
-    char fileName3[] = "missile1";
-    char fileName4[] = "circleMenu";
-//    char fileName[] = "olympus";
-    if (1) readBinObject(fileName);
-    if (1) readBinObject(fileName2);
-    if (1) readBinObject(fileName3);
-    if (1) readBinObject(fileName4);
-  
+    for (auto name : meshNames)
+    {
+        readBinObject(name);
+    }
+    
+
 }
 
 

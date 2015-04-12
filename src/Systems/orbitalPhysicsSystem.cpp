@@ -20,7 +20,7 @@
 
 using namespace entityx;
 
-void drawEllipse(int segments, vector<float> &path, GLdouble semiMajor, GLdouble semiMinor)
+void drawEllipse(int segments, std::vector<float> &path, GLdouble semiMajor, GLdouble semiMinor)
 {
     float DEG2RAD = M_PI/180.0f;
     
@@ -52,7 +52,7 @@ void drawEllipse(int segments, vector<float> &path, GLdouble semiMajor, GLdouble
     path.push_back(1e3);
 }
 
-void drawOrbitalPath(int segments, vector<float> &path, GLdouble a, GLdouble e, GLdouble tra)
+void drawOrbitalPath(int segments, std::vector<float> &path, GLdouble a, GLdouble e, GLdouble tra)
 {
     path.clear();
     path.reserve(segments * 3 * 2 + 12);
@@ -162,7 +162,7 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         assert(not orbit->path.empty());
         
 ////////DEBUG/////////////////////////////////////
-        string message;
+        std::string message;
 #if 1
 //        message = "r: " + to_string(position->pos.x)
 //        + " " + to_string(position->pos.y)

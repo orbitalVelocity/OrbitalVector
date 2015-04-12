@@ -323,12 +323,8 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
             auto vel = myShip.component<Velocity>()->vel
             + (shipVector)
             * 3.0f;
-//            body bullet(state(pos, vel), 10, gm, nullptr, BodyType::SHIP);
-//            //            addSatellite(bullet);
-//            InsertToSys(bullet, BodyType::MISSILE);
-//            //            newEntity(bullet, BodyType::MISSILE);
             assert(entity.valid());
-                assert(not entity.has_component<Position>() && "shouldn't have this component already");
+            assert(not entity.has_component<Position>() && "shouldn't have this component already");
             entity.assign<Position>(pos);
             entity.assign<Velocity>(vel);
             entity.assign<GM>(gm);

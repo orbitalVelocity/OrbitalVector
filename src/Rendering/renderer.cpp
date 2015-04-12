@@ -232,7 +232,7 @@ void Renderer::postFrame()
     static int reloadCount = 1;
     if (globalReload) {
         globalReload = false;
-        cout << "reloading #" << reloadCount++ << "\n";
+        std::cout << "reloading #" << reloadCount++ << "\n";
         //shut down shader program and delete shaders
         glUseProgram(0);
         glDeleteProgram(fxaa.shaderProgram);
@@ -500,7 +500,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     
     
     glUseProgram(sprite.shaderProgram);
-    auto drawSelector = [&](vector<entityx::Entity> entities, glm::vec3 color)
+    auto drawSelector = [&](std::vector<entityx::Entity> entities, glm::vec3 color)
     {
         for (auto selected : entities)
         {

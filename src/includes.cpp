@@ -7,7 +7,6 @@
 //
 
 #include "includes.h"
-#include "rk547m.h"
 using namespace std;
 
 bool globalShowFXAAAAirection = 0;

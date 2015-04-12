@@ -120,7 +120,7 @@ public:
     UserInput &userInput;
     
     //    RenderTarget rt, rtBloom, rtBloomV, rtShadowMap;
-    vector<RenderTarget> rt;
+    std::vector<RenderTarget> rt;
     OGLShader hdr, highPass, shadowMap,
         blit, composite, fxaa;
     

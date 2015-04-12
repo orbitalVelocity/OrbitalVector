@@ -11,7 +11,6 @@
 
 #include <stdio.h>
 #include "OGLShader.h"
-#include "rk547m.h"
 #include "entityx/Entity.h"
 #include <iostream>
 #include <set>
@@ -22,6 +21,8 @@ class MenuCircle : public OGLShader
     glm::vec2 mbPosition;
     int state;
     entityx::Entity selectedEntity;
+    std::vector<GLuint> vaos;
+    std::vector<int> drawCounts;
 public:
     MenuCircle(GLenum _drawType);
     

@@ -158,20 +158,20 @@ void OGLShader::loadAttribute(string attribName, vector<float> &path, GLuint dra
     loadAttribute(vao, attribName, path, drawHint, bufferType);
 }
 
+//bind vao, generate vbo, transfer data to buffer, set attribute
 void OGLShader::loadAttribute(GLuint vao, string attribName, vector<float> &path, GLuint drawHint, GLuint bufferType)
 {
-    //transfer position data
     glBindVertexArray(vao);
-
-    generateVertexBuffer(vao, bufferType);
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
     
+    glBindBuffer(bufferType, vbo);
+    check_gl_error();
     glBufferData(bufferType, sizeof(float)*path.size(), path.data(), drawHint);
         check_gl_error();
     
     //set position attribute
     setAttribute(attribName);
-    
-    vboIdx++;
 }
 
 
@@ -223,6 +223,16 @@ void OGLShader::drawIndexed(glm::mat4 &world, Camera &_camera, glm::mat4 &model)
 
 void OGLShader::drawIndexed(glm::mat4 &model, glm::vec3 &color)
 {
+    drawIndexed(vao, model, color);
+}
+
+void OGLShader::drawIndexed(GLuint vao, glm::mat4 &model, glm::vec3 &color)
+{
+    drawIndexed(vao, drawCount, model, color);
+}
+
+void OGLShader::drawIndexed(GLuint vao, int drawCount, glm::mat4 &model, glm::vec3 &color)
+{
     auto uniformID = glGetUniformLocation(shaderProgram, "model");
     glUniformMatrix4fv(uniformID, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -230,7 +240,6 @@ void OGLShader::drawIndexed(glm::mat4 &model, glm::vec3 &color)
     check_gl_error();
     glUniform3fv(uColor, 1, glm::value_ptr(color));
     check_gl_error();
-    
     glBindVertexArray(vao);
     check_gl_error();
     

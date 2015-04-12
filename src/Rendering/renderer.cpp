@@ -521,6 +521,8 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
             glUniform2fv(loc, 1, glm::value_ptr(offset2d));
             loc = glGetUniformLocation(sprite.shaderProgram, "scale2d");
             glUniform2fv(loc, 1, glm::value_ptr(scale2d));
+            loc = glGetUniformLocation(sprite.shaderProgram, "rotate2d");
+            glUniformMatrix2fv(loc, 1, false, glm::value_ptr(glm::mat2()));
             
             sprite.drawIndexed(_camera, color);
         }

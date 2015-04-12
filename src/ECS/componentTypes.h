@@ -210,7 +210,7 @@ COMPONENT(GUICircleMenu)
         leafMenus.resize(numberOfLeaves);
         for (auto i = 0; i < numberOfLeaves; i++)
         {
-            leafMenus[i] = i * 2*M_PI/numberOfLeaves;
+            leafMenus[i] = i * 2.0*M_PI/(float)numberOfLeaves;
         }
     }
     

@@ -118,6 +118,8 @@ void MenuCircle::MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &enti
         glUniform2fv(loc, 1, glm::value_ptr(circle->offset2d));
         loc = glGetUniformLocation(shaderProgram, "scale2d");
         glUniform2fv(loc, 1, glm::value_ptr(circle->scale2d));
+        loc = glGetUniformLocation(shaderProgram, "rotate2d");
+        glUniformMatrix2fv(loc, 1, false, glm::value_ptr(glm::mat2()));
         drawIndexed(vaos[0], drawCounts[0], camera, color);
                     //extend leaves
         
@@ -134,11 +136,14 @@ void MenuCircle::MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &enti
             std::cout << "rotation: " << leafRotation;
 //            auto leafOffset = rotate2d(leafRotation) * circle->offset2d;
             auto rotation = rotate2d(leafRotation);
-            auto leafOffset = rotation * circle->offset2d;
-            std::cout << "rotate offset: " << leafOffset.x << " " << leafOffset.y
-            << "\n";
-            loc = glGetUniformLocation(shaderProgram, "offset2d");
-            glUniform2fv(loc, 1, glm::value_ptr(leafOffset));
+            auto leafOffset = rotation;// * circle->scale2d;
+//            std::cout << "\noffset: " << circle->offset2d.x << " " << circle->offset2d.y;
+//            std::cout << "\trotate offset: " << leafOffset.x << " " << leafOffset.y
+//            << "\n";
+            loc = glGetUniformLocation(shaderProgram, "scale2d");
+            glUniform2fv(loc, 1, glm::value_ptr(circle->scale2d));
+            loc = glGetUniformLocation(shaderProgram, "rotate2d");
+            glUniformMatrix2fv(loc, 1, false, glm::value_ptr(leafOffset));
             drawIndexed(vaos[1], drawCounts[1], camera, color);
         }
         

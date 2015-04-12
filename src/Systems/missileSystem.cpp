@@ -35,7 +35,7 @@ void MissileSystem::update(EntityManager & entities,
     {
 
         
-#if 1        
+#if 0
         if (missile->done) {
             continue;
         }
@@ -74,19 +74,18 @@ void MissileSystem::update(EntityManager & entities,
             placeHolderEntity.assign<Position>(rfPos);
             placeHolderEntity.assign<Ship>();
             placeHolderEntity.assign<Orientation>();
-            //FIXME: hack, dt2 is off by 100-200x
-            auto velocities = boundingVelocities(gm, r0, rf, dt2/200, false);
+            auto velocities = boundingVelocities(gm, r0, rf, dt2, false);
             iv = glm::vec3(velocities[0],
                                    velocities[1],
                                    velocities[2]);
             dt2 /= 2.0;
             
-            if (dt < 0.1) {
+            if (dt2 < 0.1) {
                 std::cout << "BUG: no satisfiable dt found\n";
                 break;
             }
         }while(iv.x != iv.x);
-        if (dt < 0.1) {
+        if (dt2 < 0.1) {
             continue;
         }
 //        auto iv = glm::vec3(velocities[0],
@@ -102,9 +101,13 @@ void MissileSystem::update(EntityManager & entities,
 #else
         //acceleration should depend on missile engine and mass components
         //probably need to call on Jay's linear dynamics instead of this hacky thing
-        float scale = 0.001;
-        glm::vec3 targetVector = glm::normalize(targetPosition->pos - MissilePosition->pos);
-        MissileVelocity->vel += targetVector * scale;
+        Position::Handle targetPosition = missile->target.component<Position>();
+        Velocity::Handle targetVelocity = missile->target.component<Velocity>();
+        float spring = 0.001;
+        float damper = 0.001;
+        glm::vec3 offset_pos = targetPosition->pos - MissilePosition->pos;
+        glm::vec3 offset_vel = targetVelocity->vel - MissileVelocity->vel;
+        MissileVelocity->vel += offset_pos * spring + offset_vel * damper;
 #endif
     }
 }

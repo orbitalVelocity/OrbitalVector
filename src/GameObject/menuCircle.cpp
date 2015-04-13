@@ -128,18 +128,12 @@ void MenuCircle::MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &enti
             float array[] = {cos(theta), -sin(theta), sin(theta), cos(theta)};
             glm::mat2 temp = glm::make_mat2(array);
             return temp;
-//            return glm::tmat2x2(cos(theta), -sin(theta), sin(theta), cos(theta));
         };
         
         for (auto leafRotation : circle->leafMenus)
         {
-            std::cout << "rotation: " << leafRotation;
-//            auto leafOffset = rotate2d(leafRotation) * circle->offset2d;
             auto rotation = rotate2d(leafRotation);
-            auto leafOffset = rotation;// * circle->scale2d;
-//            std::cout << "\noffset: " << circle->offset2d.x << " " << circle->offset2d.y;
-//            std::cout << "\trotate offset: " << leafOffset.x << " " << leafOffset.y
-//            << "\n";
+            auto leafOffset = rotation;
             loc = glGetUniformLocation(shaderProgram, "scale2d");
             glUniform2fv(loc, 1, glm::value_ptr(circle->scale2d));
             loc = glGetUniformLocation(shaderProgram, "rotate2d");

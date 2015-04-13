@@ -55,38 +55,61 @@ void MenuCircle::update(entityx::EntityManager &entities,
     //get cursor screen position
     glm::vec2 animateBegin(0.05);
     glm::vec2 animateEnd(0.1);
+    
+    auto animate = [&](UIElement &center)
+    {
+        auto &elapsedTime = center.time.elapsedTime;
+        auto &totalTime = center.time.totalTime;
+        if (elapsedTime >= totalTime) {
+            center.state = AnimationState::end;
+            return;
+        }
+        
+        auto progress = elapsedTime/totalTime;
+        auto x = progress;
+        auto factor = 0.5;
+        progress = pow(2, -10*x)
+        * sin((x - factor / 4) * (2 * M_PI)/factor)
+        + 1.0;
+        center.scale2d = glm::vec2(1,1.6) * glm::lerp(animateBegin, animateEnd, progress);
+        elapsedTime += dt;
+        
+    };
+    //count until leaf elements also start
+    //NOTE: leaf delayStartTime must be less than center.time.totalTime!
+    //also delayedStart time is sorted increasing order
+    auto checkDelayedStart = [&](float elapsedTime, GUICircleMenu::Handle circle)
+    {
+        for (auto &leaf : circle->leafMenus)
+        {
+            if (elapsedTime > leaf.time.delayedStartTime) {
+                leaf.state = AnimationState::start;
+            }
+        }
+    };
+    
     for (auto entity : entities.entities_with_components(circle))
     {
         auto positionHandle = circle->target.component<Position>();
         //animate
         //state 0: expand center element
-        if (0 == circle->animationState)
+        auto &center = circle->centerElement;
+        auto &elapsedTime = center.time.elapsedTime;
+        auto &totalTime = center.time.totalTime;
+        if (AnimationState::start == center.state)
         {
-            auto &elapsedTime = circle->centerElement.time.elapsedTime;
-            auto &totalTime = circle->centerElement.time.totalTime;
-            if (elapsedTime >= totalTime) {
-                circle->animationState++;
-//                elapsedTime = 0;
-                break;
-            }
-            
-            auto progress = elapsedTime/totalTime;
-//            progress = pow(progress, 4);
-//            progress = sqrt(progress);
-            auto x = progress;
-            auto factor = 0.5;
-            progress = pow(2, -10*x)
-                     * sin((x - factor / 4) * (2 * M_PI)/factor)
-                     + 1.0;
-            circle->scale2d = glm::vec2(1,1.6) * glm::lerp(animateBegin, animateEnd, progress);
-            elapsedTime += dt;
-//            std::cout << totalTime << "," << elapsedTime
-//                      << "," << x << ","
-//                      << progress << "\n";
-            
-           
+            animate(center);
         }
+        
+        checkDelayedStart(elapsedTime, circle);
+        
+        for (auto& leaf: circle->leafMenus)
+        {
+            animate(leaf);
+        }
+        
         //state 1: fling out leaf elements
+        //do what the center thing did
         
         //always: hit test: change color if one of them is hit
         //based on state
@@ -115,9 +138,9 @@ void MenuCircle::MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &enti
         auto loc = glGetUniformLocation(shaderProgram, "centralPos");
         glUniform3fv(loc, 1, glm::value_ptr(centralPos));
         loc = glGetUniformLocation(shaderProgram, "offset2d");
-        glUniform2fv(loc, 1, glm::value_ptr(circle->offset2d));
+        glUniform2fv(loc, 1, glm::value_ptr(circle->centerElement.offset2d));
         loc = glGetUniformLocation(shaderProgram, "scale2d");
-        glUniform2fv(loc, 1, glm::value_ptr(circle->scale2d));
+        glUniform2fv(loc, 1, glm::value_ptr(circle->centerElement.scale2d));
         loc = glGetUniformLocation(shaderProgram, "rotate2d");
         glUniformMatrix2fv(loc, 1, false, glm::value_ptr(glm::mat2()));
         drawIndexed(vaos[0], drawCounts[0], camera, color);
@@ -130,14 +153,15 @@ void MenuCircle::MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &enti
             return temp;
         };
         
-        for (auto leafRotation : circle->leafMenus)
+        for (auto leaf: circle->leafMenus)
         {
-            auto rotation = rotate2d(leafRotation);
-            auto leafOffset = rotation;
             loc = glGetUniformLocation(shaderProgram, "scale2d");
-            glUniform2fv(loc, 1, glm::value_ptr(circle->scale2d));
+            glUniform2fv(loc, 1, glm::value_ptr(leaf.scale2d));
+
+            auto rotation = rotate2d(leaf.rotateByRadian);
             loc = glGetUniformLocation(shaderProgram, "rotate2d");
-            glUniformMatrix2fv(loc, 1, false, glm::value_ptr(leafOffset));
+            glUniformMatrix2fv(loc, 1, false, glm::value_ptr(rotation));
+            
             drawIndexed(vaos[1], drawCounts[1], camera, color);
         }
         

@@ -181,18 +181,33 @@ COMPONENT(OrbitPath)
 
 struct Animation
 {
-    Animation() {}
     Animation(float t) : totalTime(t) {}
+    Animation(float d, float t) : delayedStartTime(d),
+                                           totalTime(t)
+    {}
     
+    float delayedStartTime = 0;
     float elapsedTime = 0.01;
-    float totalTime = .6;
+    float totalTime;
+};
+
+enum class AnimationState
+{
+    invalid,
+    start,
+    end
 };
 
 struct UIElement
 {
-    UIElement(float t) : time(t) {};
+    UIElement(float t, float r) : time(t), rotateByRadian(r) {};
+    UIElement(float d, float t, float r) : time(d, t), rotateByRadian(r) {};
     
+    AnimationState state = AnimationState::invalid;
     Animation time;
+    glm::vec2 offset2d;
+    glm::vec2 scale2d;
+    float rotateByRadian;
     //size, color, animation style?
 };
 
@@ -205,25 +220,22 @@ struct UIElement
 COMPONENT(GUICircleMenu)
 {
     GUICircleMenu() {}
-    GUICircleMenu(entityx::Entity t, int n) : target(t), numberOfLeaves(n)
+    GUICircleMenu(entityx::Entity t, int n) : target(t)
     {
-        leafMenus.resize(numberOfLeaves);
-        for (auto i = 0; i < numberOfLeaves; i++)
+        leafMenus.reserve(n);
+        for (auto i = 0; i < n; i++)
         {
-            leafMenus[i] = i * 2.0*M_PI/(float)numberOfLeaves;
+            leafMenus.push_back(UIElement(i * 1.0 / (float)n,
+                                          0.6,
+                                          i * 2.0*M_PI/(float)n));
         }
+        centerElement.state = AnimationState::start;
     }
     
-    entityx::Entity target;
     float size = 50; //circular hit target (radius)
-    glm::vec2 offset2d;
-    glm::vec2 scale2d;
-    glm::vec2 screenPos;
-    UISelectionType state = UISelectionType::INVALID;
-    int animationState = 0;
-    int numberOfLeaves;
-    UIElement centerElement = UIElement(0.6);
-    std::vector<float> leafMenus;
+    entityx::Entity target;
+    UIElement centerElement = UIElement(0.6, 0);
+    std::vector<UIElement> leafMenus;
 };
 
 #endif

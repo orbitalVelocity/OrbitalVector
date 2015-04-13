@@ -187,7 +187,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
         //check if mouse hits any elements in circle
         //if so, update component's state
         if (onScreenDistance < circle->size) {
-            circle->state = UISelectionType::HOVER;
+//            circle->state = UISelectionType::HOVER;
         }
     }
     
@@ -209,7 +209,19 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
         count++;
     }
     assert(1 == count);
-    
+  
+    auto getThisMenu = [&](entityx::Entity selection)
+    {
+        GUICircleMenu::Handle menu;
+        for (Entity entity : entities.entities_with_components(menu)) {
+            if (menu->target.id() == selection.id()) {
+                return entity.id();
+            }
+        }
+        auto temp = entityx::Entity::INVALID;
+        return temp;
+    };
+
     float deltaMove = .1;
     glm::vec3 forwardVector;
     auto hv = myShip.component<Velocity>();
@@ -248,11 +260,19 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                 break;
             case ActionType::spawnMenu:
                 //check if anything selected and no other menu for this has been created
-                if (selectedEntities->size() == 1
-                    ) {
-                    auto entity = entities.create();
-                    entity.assign<GUICircleMenu>(selectedEntities->front(), 4);
-                    std::cout << "new menu spawned!\n";
+                if (selectedEntities->size() == 1)
+                {
+                    auto selection = selectedEntities->front();
+                    auto preexistingMenu = getThisMenu(selection);
+                    if (entityx::Entity::INVALID != preexistingMenu)
+                    {
+                        entities.get(preexistingMenu).destroy();
+                        //TODO: set entity to destroy state (w/ animation)
+                    } else {
+                        auto entity = entities.create();
+                        entity.assign<GUICircleMenu>(selectedEntities->front(), 4);
+                        std::cout << "new menu spawned!\n";
+                    }
                 }
                 //then create menu
             default:

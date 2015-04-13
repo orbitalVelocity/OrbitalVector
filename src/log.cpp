@@ -17,8 +17,8 @@ void log(LogLevel lvl, std::string message)
     fprintf(
             LOGFILE,
             "[%s] %s\n",
-            (lvl == DEBUG)   ? "DEBUG"   :
-            (lvl == WARNING) ? "WARNING" :
+            (lvl == LOG_DEBUG)   ? "DEBUG"   :
+            (lvl == LOG_WARNING) ? "WARNING" :
                                "ERROR",
             message.c_str()
     );

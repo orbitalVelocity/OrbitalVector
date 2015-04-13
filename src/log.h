@@ -1,12 +1,13 @@
 #ifndef LOG_H
+#define LOG_H
 
 #include <cstdio>
 #include <string>
 
 enum LogLevel {
-    DEBUG,
-    WARNING,
-    ERROR
+    LOG_DEBUG,
+    LOG_WARNING,
+    LOG_ERROR
 };
 
 void log_init(FILE*);

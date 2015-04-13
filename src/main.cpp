@@ -253,7 +253,7 @@ int main(int argc, const char * argv[])
 {
     log_init(stdout);
 
-    log(DEBUG,"Creating window.");
+    log(LOG_DEBUG,"Creating window.");
 
     int width = 960, height = 540;
 
@@ -266,7 +266,7 @@ int main(int argc, const char * argv[])
     // Calculate pixel ratio for hi-dpi devices.
     auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
 
-    log(DEBUG,"Creating GameSingleton.");
+    log(LOG_DEBUG,"Creating GameSingleton.");
 
     GameSingleton myGameSingleton("testMap");
     myGameSingleton.load("test", width, height);
@@ -287,7 +287,7 @@ int main(int argc, const char * argv[])
     
     myGameSingleton.pWindow = ws.pWindow;
 
-    log(DEBUG,"Entering game loop.");
+    log(LOG_DEBUG,"Entering game loop.");
 
     while (!glfwWindowShouldClose(ws.pWindow))
     {
@@ -322,7 +322,7 @@ int main(int argc, const char * argv[])
     
     glfwTerminate();
 
-    log(DEBUG,"Terminating.");
+    log(LOG_DEBUG,"Terminating.");
     log_free();
 
     return 0;

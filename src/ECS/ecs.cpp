@@ -179,6 +179,7 @@ void GameSingleton::update(double dt)
     //requires timeWarp declared in this class
     //requires tighter integration w/ userInput, it needs access to timeWarp variable
 //    dt *= timeWarpFactor;
+//    dt /= 10;
     assert(myShip.valid());
     systems.system<UserInputSystem>()->update(entities, events, dt,
                                               legacyUserInput, myShip,

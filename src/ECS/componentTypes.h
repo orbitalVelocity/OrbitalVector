@@ -201,12 +201,13 @@ enum class AnimationState
 struct UIElement
 {
     UIElement(float t, float r) : time(t), rotateByRadian(r) {};
-    UIElement(float d, float t, float r) : time(d, t), rotateByRadian(r) {};
+    UIElement(float d, float t, float r) : time(d, t), initialRotation(r) {};
     
     AnimationState state = AnimationState::invalid;
     Animation time;
     glm::vec2 offset2d;
     glm::vec2 scale2d;
+    float initialRotation;
     float rotateByRadian;
     //size, color, animation style?
 };
@@ -225,9 +226,9 @@ COMPONENT(GUICircleMenu)
         leafMenus.reserve(n);
         for (auto i = 0; i < n; i++)
         {
-            leafMenus.push_back(UIElement(i * 1.0 / (float)n,
+            leafMenus.push_back(UIElement((i+1) * 0.05 / (float)n,
                                           0.6,
-                                          i * 2.0*M_PI/(float)n));
+                                          -M_PI/4 + i * 2.0*M_PI/(float)n));
         }
         centerElement.state = AnimationState::start;
     }

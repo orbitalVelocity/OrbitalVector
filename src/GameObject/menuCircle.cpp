@@ -47,34 +47,52 @@ void MenuCircle::mouseUpdate(glm::vec2 mb, bool lmb, bool rmb, entityx::Entity s
     mbPosition = mb;
     
 }
+
+template<typename T>
+T lerp(T a, T b, float t)
+{
+    return (1-t)*a + t*b;
+}
+
+float spring(float factor, float progress)
+{
+    auto x = progress;
+    progress = pow(2, -10*x)
+            * sin((x - factor / 4) * (2 * M_PI)/factor)
+            + 1.0;
+    return progress;
+}
 void MenuCircle::update(entityx::EntityManager &entities,
                         entityx::EventManager &events,
                         float dt)
 {
     GUICircleMenu::Handle circle;
     //get cursor screen position
-    glm::vec2 animateBegin(0.05);
-    glm::vec2 animateEnd(0.1);
+    float scaleBegin(0.05);
+    float scaleEnd(0.1);
     
-    auto animate = [&](UIElement &center)
+    float rotateBegin = 0;
+    float rotateEnd = M_PI/4;
+    auto animate = [&](UIElement &element)
     {
-        auto &elapsedTime = center.time.elapsedTime;
-        auto &totalTime = center.time.totalTime;
+        auto &elapsedTime = element.time.elapsedTime;
+        auto &totalTime = element.time.totalTime;
         if (elapsedTime >= totalTime) {
-            center.state = AnimationState::end;
+            element.state = AnimationState::end;
             return;
         }
         
         auto progress = elapsedTime/totalTime;
-        auto x = progress;
-        auto factor = 0.5;
-        progress = pow(2, -10*x)
-        * sin((x - factor / 4) * (2 * M_PI)/factor)
-        + 1.0;
-        center.scale2d = glm::vec2(1,1.6) * glm::lerp(animateBegin, animateEnd, progress);
-        elapsedTime += dt;
+        auto progress1 = spring(0.4, progress);
+        glm::vec2 screenAspectRatio(1, 1.6);
+        element.scale2d = screenAspectRatio * lerp(scaleBegin, scaleEnd, progress1);
         
+        auto progress2 = spring(0.8, progress);
+        element.rotateByRadian = element.initialRotation + lerp(rotateBegin, rotateEnd, progress2);
+
+        elapsedTime += dt;
     };
+    
     //count until leaf elements also start
     //NOTE: leaf delayStartTime must be less than center.time.totalTime!
     //also delayedStart time is sorted increasing order
@@ -82,7 +100,8 @@ void MenuCircle::update(entityx::EntityManager &entities,
     {
         for (auto &leaf : circle->leafMenus)
         {
-            if (elapsedTime > leaf.time.delayedStartTime) {
+            if (AnimationState::invalid == leaf.state
+                and elapsedTime > leaf.time.delayedStartTime) {
                 leaf.state = AnimationState::start;
             }
         }
@@ -105,7 +124,10 @@ void MenuCircle::update(entityx::EntityManager &entities,
         
         for (auto& leaf: circle->leafMenus)
         {
-            animate(leaf);
+            if (AnimationState::start == leaf.state)
+            {
+                animate(leaf);
+            }
         }
         
         //state 1: fling out leaf elements

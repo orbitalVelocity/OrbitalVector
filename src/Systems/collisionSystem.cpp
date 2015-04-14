@@ -52,7 +52,7 @@ void CollisionSystem::update(EntityManager & entities,
         }
     }
  
-    processCollisions();
+    processCollisions(entities);
 }
 
 //FIXME: handle self/target collision relationships
@@ -78,13 +78,21 @@ void CollisionSystem::addCollision(Entity entity){
         collided.push(temp);//{currentTime, entity});
     }
 }
-void CollisionSystem::processCollisions()
+void CollisionSystem::processCollisions(EntityManager & entities)
 {
     //process all past and present collisions
     while (not collided.empty() && collided.top().time <= currentTime)
     {
         auto myPair = collided.top();
         assert(myPair.entity.valid());
+        //check if a menu is attached to entity
+        GUICircleMenu::Handle menuCircle;
+        for (auto entity : entities.entities_with_components(menuCircle))
+        {
+            if (menuCircle->target.id() == myPair.entity.id()) {
+                entity.destroy();
+            }
+        }
         myPair.entity.destroy();
         //clear this pair from collided map
         collided.pop();

@@ -109,6 +109,7 @@ void MenuCircle::update(entityx::EntityManager &entities,
     
     for (auto entity : entities.entities_with_components(circle))
     {
+        assert(circle->target.valid());
         auto positionHandle = circle->target.component<Position>();
         //animate
         //state 0: expand center element
@@ -129,9 +130,6 @@ void MenuCircle::update(entityx::EntityManager &entities,
                 animate(leaf);
             }
         }
-        
-        //state 1: fling out leaf elements
-        //do what the center thing did
         
         //always: hit test: change color if one of them is hit
         //based on state

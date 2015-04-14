@@ -18,6 +18,7 @@ DebugTextSystem::DebugTextSystem(TextRenderer *text)
 void DebugTextSystem::configure(entityx::EventManager &events)
 {
     events.subscribe<DebugEvent>(*this);
+    events.subscribe<GUITextEvent>(*this);
 }
 void DebugTextSystem::receive(const DebugEvent &e)
 {
@@ -26,6 +27,11 @@ void DebugTextSystem::receive(const DebugEvent &e)
     messages.push_back({currentTime, e.message});
 }
 
+void DebugTextSystem::receive(const GUITextEvent &e)
+{
+    assert(nullptr not_eq debugTextPtr);
+    debugTextPtr->guiText.push_back(Text(e.position2d, e.size, e.message));
+}
 
 void DebugTextSystem::update(EntityManager & entities,
                              EventManager &events,

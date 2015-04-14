@@ -65,7 +65,7 @@ void drawOrbitalPath(int segments, std::vector<float> &path, GLdouble a, GLdoubl
     {
         float denominator = (1.0f+e*cos(theta));
         if (denominator < 0) {
-            continue;
+//            continue;
         }
         auto r = a*(1.0f-e*e)/denominator;
         auto x=r*cos(theta);

@@ -11,7 +11,7 @@
 
 #include "entityx/Event.h"
 #include "entityx/Entity.h"
-
+#include "glm/glm.hpp"
 #define EVENT( X ) struct X : public entityx::Event<X>
 
 EVENT(UserInputEvent)
@@ -53,6 +53,17 @@ EVENT(DebugEvent)
     {}
     
     std::string message;
+};
+
+EVENT(GUITextEvent)
+{
+    GUITextEvent(glm::vec2 p, float s, std::string m)
+    : message(m), position2d(p), size(s)
+    {}
+    
+    std::string message;
+    glm::vec2 position2d;
+    float size;
 };
 
 EVENT(FireWeaponEvent)

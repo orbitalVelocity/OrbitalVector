@@ -26,6 +26,7 @@ public:
     void configure(entityx::EventManager& eventManager);
     
     void receive(const DebugEvent &e);
+    void receive(const GUITextEvent &e);
     
     void update(entityx::EntityManager & entities,
                 entityx::EventManager & events,

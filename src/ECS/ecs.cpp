@@ -8,7 +8,6 @@
 
 #include <stdio.h>
 #include "ecs.h"
-#include "linePickSystem.h"
 #include "userInputSystem.h"
 #include "missileSystem.h"
 #include "collisionSystem.h"
@@ -236,8 +235,10 @@ void GameSingleton::update(double dt)
         for (auto entity : entities.entities_with_components(missile, position, orbit))
         {
             auto vp = camera.matrix() * world;
-            textObj.guiText.push_back({getVec2(vp, position->pos),
-                15.0f, missile->debugName});
+//            textObj.guiText.push_back({getVec2(vp, position->pos),
+//                15.0f, missile->debugName});
+            events.emit<GUITextEvent>(getVec2(vp, position->pos),
+                                      15.0f, missile->debugName);
         }
     };
     UITextSetup();

@@ -46,7 +46,7 @@ public:
                 entityx::EventManager & events,
                 double dt);
     
-    void processCollisions();
+    void processCollisions(entityx::EntityManager & entities);
     
     void addCollision(entityx::Entity entity);
     

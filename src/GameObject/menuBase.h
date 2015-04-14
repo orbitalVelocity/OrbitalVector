@@ -16,17 +16,22 @@
 #include <iostream>
 #include <set>
 #include "includes.h"
+#include "componentTypes.h"
 
 class MenuBase : public OGLShader
 {
+public:
     std::vector<GLuint> vaos;
     std::vector<int> drawCounts;
 public:
     MenuBase(GLenum _drawType);
     
-    void init() override;
-    void update(entityx::EntityManager &, entityx::EventManager &, float dt);
-    void mouseUpdate(glm::vec2 mb, bool lmb, bool rmb, entityx::Entity s);
-    void draw(glm::mat4, entityx::EntityManager &);
+    void loadGUIMesh(int meshID, int GUIElementID);
+    virtual void init(){}
+    
+    void animate(UIElement &, float dt);
+    void triggerDelayedStart(float elapsedTime, GUICircleMenu::Handle);
+    virtual void update(entityx::EntityManager &, entityx::EventManager &, float dt){}
+    virtual void draw(glm::mat4, entityx::EntityManager &) {}
 };
 #endif /* defined(__OrbitalVector__MenuBase__) */

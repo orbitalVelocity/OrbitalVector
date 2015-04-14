@@ -175,12 +175,6 @@ void OGLShader::loadAttribute(GLuint vao, string attribName, vector<float> &path
 }
 
 
-void OGLShader::update()
-{
-//call back function?
-}
-
-
 void OGLShader::drawIndexed(glm::mat4 &world, Camera &_camera, glm::vec3 lightPos, glm::mat4 &model,
                       glm::vec3 color)
 {

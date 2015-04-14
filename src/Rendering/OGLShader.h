@@ -55,7 +55,6 @@ public:
                     GLuint hint, GLuint type=GL_ARRAY_BUFFER);
     void loadAttribute(GLuint vao, std::string name, std::vector<float> &input,
                     GLuint hint, GLuint type=GL_ARRAY_BUFFER);
-    void update();
     void drawIndexed(GLuint vao,
                      int drawCount, 
                      glm::mat4 &model,

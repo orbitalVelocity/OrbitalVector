@@ -37,6 +37,17 @@ void _debug_cout(string msg, const char *file, int line)
     
 }
 
+
+
+float spring(float factor, float progress)
+{
+    auto x = progress;
+    progress = pow(2, -10*x)
+    * sin((x - factor / 4) * (2 * M_PI)/factor)
+    + 1.0;
+    return progress;
+}
+
 string get_file_contents(string filename)
 {
     std::ifstream in(filename, std::ios::in | std::ios::binary);

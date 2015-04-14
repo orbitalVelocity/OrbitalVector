@@ -12,100 +12,29 @@
 
 using namespace std;
 
-MenuCircle::MenuCircle(GLenum _drawType) : OGLShader(_drawType)
+MenuCircle::MenuCircle(GLenum _drawType) : MenuBase(_drawType)
 {
     
 }
 
 void MenuCircle::init()
 {
-    loadShaders("spriteVertex.glsl", "spriteFragment.glsl", true);
-   
-    //FIXME: need a central factility to map mesh names to mesh vector,
-    // and mesh names to vao/vbo id
-
-    auto shipIdx = 4;
     auto numMeshes = 2;
     vaos.resize(numMeshes);
     drawCounts.resize(numMeshes);
     glGenVertexArrays(numMeshes, &vaos[0]);
-    auto genGLNames = [&](int i)
-    {
-        loadAttribute(vaos[i], "position", shapes[shipIdx].mesh.positions, GL_STATIC_DRAW);
-        check_gl_error();
-        loadAttribute(vaos[i],"normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
-        setupBuffer(vaos[i], GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, shapes[shipIdx].mesh.indices);
-        drawCounts[i] = (int)shapes[shipIdx].mesh.indices.size();
-    };
-    
-    genGLNames(0);
-        shipIdx++;
-    genGLNames(1);
-}
-void MenuCircle::mouseUpdate(glm::vec2 mb, bool lmb, bool rmb, entityx::Entity s)
-{
-    mbPosition = mb;
-    
+    //translate mesh name to meshID using a mesh manager singleton
+    loadGUIMesh(4, 0);
+    loadGUIMesh(5, 1);
 }
 
-template<typename T>
-T lerp(T a, T b, float t)
-{
-    return (1-t)*a + t*b;
-}
 
-float spring(float factor, float progress)
-{
-    auto x = progress;
-    progress = pow(2, -10*x)
-            * sin((x - factor / 4) * (2 * M_PI)/factor)
-            + 1.0;
-    return progress;
-}
+
 void MenuCircle::update(entityx::EntityManager &entities,
                         entityx::EventManager &events,
                         float dt)
 {
     GUICircleMenu::Handle circle;
-    //get cursor screen position
-    float scaleBegin(0.05);
-    float scaleEnd(0.1);
-    
-    float rotateBegin = 0;
-    float rotateEnd = M_PI/4;
-    auto animate = [&](UIElement &element)
-    {
-        auto &elapsedTime = element.time.elapsedTime;
-        auto &totalTime = element.time.totalTime;
-        if (elapsedTime >= totalTime) {
-            element.state = AnimationState::end;
-            return;
-        }
-        
-        auto progress = elapsedTime/totalTime;
-        auto progress1 = spring(0.4, progress);
-        glm::vec2 screenAspectRatio(1, 1.6);
-        element.scale2d = screenAspectRatio * lerp(scaleBegin, scaleEnd, progress1);
-        
-        auto progress2 = spring(0.8, progress);
-        element.rotateByRadian = element.initialRotation + lerp(rotateBegin, rotateEnd, progress2);
-
-        elapsedTime += dt;
-    };
-    
-    //count until leaf elements also start
-    //NOTE: leaf delayStartTime must be less than center.time.totalTime!
-    //also delayedStart time is sorted increasing order
-    auto checkDelayedStart = [&](float elapsedTime, GUICircleMenu::Handle circle)
-    {
-        for (auto &leaf : circle->leafMenus)
-        {
-            if (AnimationState::invalid == leaf.state
-                and elapsedTime > leaf.time.delayedStartTime) {
-                leaf.state = AnimationState::start;
-            }
-        }
-    };
     
     for (auto entity : entities.entities_with_components(circle))
     {
@@ -118,16 +47,16 @@ void MenuCircle::update(entityx::EntityManager &entities,
         auto &totalTime = center.time.totalTime;
         if (AnimationState::start == center.state)
         {
-            animate(center);
+            animate(center, dt);
         }
         
-        checkDelayedStart(elapsedTime, circle);
+        triggerDelayedStart(elapsedTime, circle);
         
         for (auto& leaf: circle->leafMenus)
         {
             if (AnimationState::start == leaf.state)
             {
-                animate(leaf);
+                animate(leaf, dt);
             }
         }
         

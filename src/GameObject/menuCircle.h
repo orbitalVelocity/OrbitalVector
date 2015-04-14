@@ -10,19 +10,14 @@
 #define __OrbitalVector__menuCircle__
 
 #include <stdio.h>
-#include "OGLShader.h"
+#include "menuBase.h"
 #include "entityx/Entity.h"
 #include <iostream>
 #include <set>
 #include "includes.h"
 
-class MenuCircle : public OGLShader
+class MenuCircle : public MenuBase
 {
-    glm::vec2 mbPosition;
-    int state;
-    entityx::Entity selectedEntity;
-    std::vector<GLuint> vaos;
-    std::vector<int> drawCounts;
 public:
     MenuCircle(GLenum _drawType);
     

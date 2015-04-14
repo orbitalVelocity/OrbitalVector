@@ -49,6 +49,17 @@ std::string get_file_contents(std::string filename);
 std::string printVec3(glm::vec3 v);
 glm::vec2 getVec2(glm::mat4 vp, glm::vec3 _pos);
 
+
+//template<typename T>
+//T lerp(T a, T b, float t);
+template<typename T>
+T lerp(T a, T b, float t)
+{
+    return (1-t)*a + t*b;
+}
+float spring(float factor, float progress);
+
+
 //orbital stuff
 VectorD convertToParams (glm::vec3 pos, double gm);
 std::vector<double> toPosVelVector(glm::vec3 pos, glm::vec3 vel);

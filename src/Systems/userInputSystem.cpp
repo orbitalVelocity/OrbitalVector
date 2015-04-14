@@ -254,10 +254,10 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                 ho->orientation = glm::rotate(ho->orientation, deltaMove, glm::vec3(0, 0, 1));
                 break;
             case ActionType::timeWarpMore:
-//                timeWarp *= 2;
+                legacyUserInput->timeWarp *= 2;
                 break;
             case ActionType::timeWarpLess:
-//                timeWarp /= 2;
+                legacyUserInput->timeWarp /= 2;
                 break;
             case ActionType::spawnMenu:
                 //check if anything selected and no other menu for this has been created

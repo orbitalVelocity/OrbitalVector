@@ -42,6 +42,10 @@ public:
     float xMouse, yMouse;
     bool lmbPressed, rmbPressed;
     std::vector<ActionType> actionList;
+    
+    //is this bad? probably
+    //FIXME: put this else where that makes more sense
+    float timeWarp = 1.0;
 public:
     UserInput();
     void setEventHandling() {

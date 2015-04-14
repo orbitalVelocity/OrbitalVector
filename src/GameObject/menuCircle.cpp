@@ -35,7 +35,7 @@ void MenuCircle::init()
         check_gl_error();
         loadAttribute(vaos[i],"normal", shapes[shipIdx].mesh.normals, GL_STATIC_DRAW);
         setupBuffer(vaos[i], GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW, shapes[shipIdx].mesh.indices);
-        drawCounts[i] = shapes[shipIdx].mesh.indices.size();
+        drawCounts[i] = (int)shapes[shipIdx].mesh.indices.size();
     };
     
     genGLNames(0);

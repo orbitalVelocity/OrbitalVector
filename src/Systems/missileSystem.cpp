@@ -101,13 +101,18 @@ void MissileSystem::update(EntityManager & entities,
 #else
         //acceleration should depend on missile engine and mass components
         //probably need to call on Jay's linear dynamics instead of this hacky thing
+        if (not missile->target.valid()) {
+            entity.remove<MissileLogic>();
+            continue;
+            //now the missile is dead
+        }
         Position::Handle targetPosition = missile->target.component<Position>();
         Velocity::Handle targetVelocity = missile->target.component<Velocity>();
-        float spring = 0.001;
-        float damper = 0.001;
+        float spring = 0.1;
+        float damper = 0.1;
         glm::vec3 offset_pos = targetPosition->pos - MissilePosition->pos;
         glm::vec3 offset_vel = targetVelocity->vel - MissileVelocity->vel;
-        MissileVelocity->vel += offset_pos * spring + offset_vel * damper;
+        MissileVelocity->vel += glm::normalize(offset_pos) * spring + glm::normalize(offset_vel) * damper;
 #endif
     }
 }

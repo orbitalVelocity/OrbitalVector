@@ -8,11 +8,13 @@
 
 #include <stdio.h>
 #include "ecs.h"
+#include "uuidSystem.h"
 #include "userInputSystem.h"
 #include "missileSystem.h"
 #include "collisionSystem.h"
 #include "debugTextSystem.h"
 #include "orbitalPhysicsSystem.h"
+#include "log.h"
 
 
 void GameSingleton::loadEntity(entityx::Entity entity,
@@ -32,6 +34,7 @@ void GameSingleton::loadEntity(entityx::Entity entity,
     entity.assign<OrbitalBodyType>(bt);
     entity.assign<Orientation>(orientation);
     entity.assign<Radius>(r);
+    entity.assign<UUID>();
     
     if (bt == BodyType::MISSILE or bt == BodyType::SHIP)
     {
@@ -147,6 +150,7 @@ GameSingleton::GameSingleton(std::string filename)
     scene.init();
     legacyUserInput = &userInput;
 
+    systems.add<UUIDSystem>();
     systems.add<UserInputSystem>(legacyUserInput);
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();
@@ -183,6 +187,7 @@ void GameSingleton::update(double dt)
     systems.system<UserInputSystem>()->update(entities, events, dt,
                                               legacyUserInput, myShip,
                                              pWindow, camera);
+    systems.update<UUIDSystem>(dt);
     systems.update<MissileSystem>(dt);
     systems.update<OrbitalPhysicsSystem>(dt);
     systems.update<CollisionSystem>(dt);

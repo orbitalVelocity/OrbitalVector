@@ -11,6 +11,8 @@
 
 #include "includes.h"
 #include "entityx/Entity.h"
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 
 #define COMPONENT( X ) struct X : public entityx::Component<X>
 
@@ -24,16 +26,25 @@ enum BodyType {
 
 extern glm::mat4 world;
 
+COMPONENT(UUID)
+{
+    UUID()
+    : tag(boost::uuids::random_generator()()) {}
+
+    boost::uuids::uuid tag;
+};
+
 COMPONENT(MissileLogic)
 {
     MissileLogic() {}
     MissileLogic(entityx::Entity p, entityx::Entity t)
     : parent(p), target(t) {}
     
+    boost::uuids::uuid targetuuid;
     entityx::Entity target;
+    boost::uuids::uuid parentuuid;
     entityx::Entity parent;
     bool done = false;
-    
 };
 
 COMPONENT(PlayerControl)
@@ -120,6 +131,7 @@ COMPONENT(Parent)
     Parent() {}
     Parent(entityx::Entity::Id p) : parent(p) {}
     
+    boost::uuids::uuid parentuuid;
     entityx::Entity::Id parent;
 };
 

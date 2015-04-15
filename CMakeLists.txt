@@ -58,7 +58,6 @@ add_module(physics)
 add_module(orbitutils)
 
 include_directories(glm)
-include_directories(uuid/include)
 
 add_subdirectory(entityx)
 include_directories(entityx)

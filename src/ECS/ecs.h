@@ -59,7 +59,7 @@ public:
     void init();//UserInput *ui, TextRenderer *text);
     void load(std::string filename, int width, int height);
     void initCamera(int width, int height);
-
+   
     /**
      * Convenience function for creating a generic orbiting body in ECS
      * @parameter pos glm::vec3 position

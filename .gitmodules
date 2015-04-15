@@ -10,6 +10,3 @@
 [submodule "glm"]
 	path = glm
 	url = https://github.com/g-truc/glm
-[submodule "uuid"]
-	path = uuid
-	url = https://github.com/boostorg/uuid

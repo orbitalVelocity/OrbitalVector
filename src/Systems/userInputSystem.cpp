@@ -9,7 +9,6 @@
 #include "userInputSystem.h"
 #include "componentTypes.h"
 #include "ecs.h"
-#include "log.h"
 
 using namespace entityx;
 
@@ -313,7 +312,6 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                 entity.assign<Radius>(10);
                 entity.assign<Ship>();
                 entity.assign<OrbitPath>();
-                entity.assign<UUID>();
             }
         }
         if (action == ActionType::fireGun)
@@ -356,7 +354,6 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
             entity.assign<Radius>(1);
             entity.assign<Missile>();
             entity.assign<OrbitPath>();
-            entity.assign<UUID>();
         }
         
     }

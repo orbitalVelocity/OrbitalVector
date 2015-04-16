@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include "ecs.h"
+#include "tagSystem.h"
 #include "userInputSystem.h"
 #include "missileSystem.h"
 #include "collisionSystem.h"
@@ -147,6 +148,7 @@ GameSingleton::GameSingleton(std::string filename)
     scene.init();
     legacyUserInput = &userInput;
 
+    systems.add<TagSystem>();
     systems.add<UserInputSystem>(legacyUserInput);
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();
@@ -183,6 +185,7 @@ void GameSingleton::update(double dt)
     systems.system<UserInputSystem>()->update(entities, events, dt,
                                               legacyUserInput, myShip,
                                              pWindow, camera);
+    //systems.update<TagSystem>(dt); //TODO: Do this only after unserialization.
     systems.update<MissileSystem>(dt);
     systems.update<OrbitalPhysicsSystem>(dt);
     systems.update<CollisionSystem>(dt);

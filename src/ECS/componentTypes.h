@@ -24,13 +24,29 @@ enum BodyType {
 
 extern glm::mat4 world;
 
+typedef unsigned int tag_t;
+
+COMPONENT(Tag)
+{
+    static tag_t previous;
+
+    Tag()
+    {
+        tag = ++previous;
+    }
+
+    tag_t tag;
+};
+
 COMPONENT(MissileLogic)
 {
     MissileLogic() {}
     MissileLogic(entityx::Entity p, entityx::Entity t)
     : parent(p), target(t) {}
-    
+
+    tag_t targettag;
     entityx::Entity target;
+    tag_t parenttag;
     entityx::Entity parent;
     bool done = false;
     
@@ -120,6 +136,7 @@ COMPONENT(Parent)
     Parent() {}
     Parent(entityx::Entity::Id p) : parent(p) {}
     
+    tag_t parenttag;
     entityx::Entity::Id parent;
 };
 

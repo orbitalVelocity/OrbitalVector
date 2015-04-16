@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include "componentTypes.h"
 
+tag_t Tag::previous = 0;
+
 int Ship::instanceCount(0);
 int Missile::instanceCount(0);
 

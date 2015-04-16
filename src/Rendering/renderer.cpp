@@ -500,41 +500,90 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     
     
     glUseProgram(sprite.shaderProgram);
-    auto drawSelector = [&](std::vector<entityx::Entity> entities, glm::vec3 color)
+    auto drawSprite = [&](glm::vec3 pos, glm::vec3 color)
+    {
+        auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
+        glUniform3fv(loc, 1, glm::value_ptr(pos));
+        sprite.drawIndexed(_camera, color);
+    };
+    
+    auto drawSelectors = [&](std::vector<entityx::Entity> entities, glm::vec3 color)
     {
         for (auto selected : entities)
         {
             if (not selected.valid()) {
                 continue;
-                
             }
             auto positionHandle = selected.component<Position>();
-            
             auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
-            auto loc = glGetUniformLocation(sprite.shaderProgram, "centralPos");
-            glUniform3fv(loc, 1, glm::value_ptr(centralPos));
-
-            //this is here b/c it shares the same shader code w/ MenuCircle, and if I don't use it, it gets optimized away later
-            glm::vec2 offset2d(0);
-            glm::vec2 scale2d(0.1);
-            loc = glGetUniformLocation(sprite.shaderProgram, "offset2d");
-            glUniform2fv(loc, 1, glm::value_ptr(offset2d));
-            loc = glGetUniformLocation(sprite.shaderProgram, "scale2d");
-            glUniform2fv(loc, 1, glm::value_ptr(scale2d));
-            loc = glGetUniformLocation(sprite.shaderProgram, "rotate2d");
-            glUniformMatrix2fv(loc, 1, false, glm::value_ptr(glm::mat2()));
-            
-            sprite.drawIndexed(_camera, color);
+            drawSprite(centralPos, color);
         }
     };
 
+    //this is here b/c it shares the same shader code w/ MenuCircle, and if I don't use it, it gets optimized away later
+    glm::vec2 offset2d(0);
+    glm::vec2 scale2d(0.1);
+    auto loc = glGetUniformLocation(sprite.shaderProgram, "offset2d");
+    glUniform2fv(loc, 1, glm::value_ptr(offset2d));
+    loc = glGetUniformLocation(sprite.shaderProgram, "scale2d");
+    glUniform2fv(loc, 1, glm::value_ptr(scale2d));
+    loc = glGetUniformLocation(sprite.shaderProgram, "rotate2d");
+    glUniformMatrix2fv(loc, 1, false, glm::value_ptr(glm::mat2()));
     //assert(get number of entities with playerControl component == 1);
     //need to put renderer in ecs
     PlayerControl::Handle player;
     for (Entity entity : entities.entities_with_components(player))
     {
-        drawSelector(player->selectedEntities, shipOrbitColor);
-        drawSelector(player->mouseOverEntities, gridColor);
+        (void)entity;
+        drawSelectors(player->selectedEntities, shipOrbitColor);
+        drawSelectors(player->mouseOverEntities, gridColor);
+    }
+   
+    //DEBUG code//////////////////////////////////////////////////////////
+    auto rotate2d = [](float theta)
+    {
+        float array[4];
+        array[0] = cos(theta);
+        array[1] = -sin(theta);
+        array[2] = sin(theta);
+        array[3] = cos(theta);
+        glm::mat2 temp = glm::make_mat2(array);
+        return temp;
+    };
+    
+//    for (auto pos : barycenters)
+//    {
+//        drawSprite(pos, glm::vec3(1));
+//    }
+    loc = glGetUniformLocation(sprite.shaderProgram, "scale2d");
+    glm::vec2 screenAspectRatio(1, 1.6); //FIXME: hardcoded
+    auto newscale2d = glm::vec2(.08) * screenAspectRatio;
+    glUniform2fv(loc, 1, glm::value_ptr(newscale2d));
+    
+    GUICircleMenu::Handle circle;
+    for (Entity entity : entities.entities_with_components(circle))
+    {
+        (void) entity;
+        auto positionHandle = circle->target.component<Position>();
+        auto position= glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
+        
+        drawSprite(position, glm::vec3(1));
+        
+        auto petalCenter = barycenters[5];
+        std::cout << "petal barycenter: "
+                  << petalCenter.x << ", "
+                  << petalCenter.y << ", "
+                  << petalCenter.z << "\n";
+        for (auto leaf: circle->leafMenus)
+        {
+            auto offset2d = rotate2d(leaf.rotateByRadian) * glm::vec2(petalCenter);
+//            auto offset2d =  glm::vec2(petalCenter.y, petalCenter.x) * rotate2d(leaf.rotateByRadian);
+            std::cout << "rotated: " << offset2d.x << ", " << offset2d.y << "\n";
+            loc = glGetUniformLocation(sprite.shaderProgram, "offset2d");
+            glUniform2fv(loc, 1, glm::value_ptr(screenAspectRatio * offset2d));
+            
+            drawSprite(position, glm::vec3(1));
+        }
     }
     
     menuCircle.draw(_camera, entities);

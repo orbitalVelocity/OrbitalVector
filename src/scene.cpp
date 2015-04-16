@@ -11,6 +11,7 @@
 #include "ecs.h"
 
 
+std::vector<glm::vec3> barycenters;
 std::vector<tinyobj::shape_t> shapes;
 std::vector<tinyobj::material_t> materials;
 
@@ -99,6 +100,24 @@ void readBinObject(string _fileName)
         auto &iArray = shapes[shipIdx].mesh.indices;
         iArray.resize(vecSizes[2]);
         fread((void *)iArray.data(), sizeof(int), vecSizes[2], pFile);
+    }
+    
+    {
+        barycenters.resize(shapes.size());
+        glm::vec3 barycenter;
+        //find barycenter of mesh
+        for (auto i = 0; i < shapes[shipIdx].mesh.positions.size(); i += 3)
+        {
+            barycenter.x += shapes[shipIdx].mesh.positions[i];
+            barycenter.y += shapes[shipIdx].mesh.positions[i+1];
+            barycenter.z += shapes[shipIdx].mesh.positions[i+2];
+        }
+        barycenters[shipIdx] = barycenter / 3.0/shapes[shipIdx].mesh.positions.size();
+        auto petalCenter = barycenter;
+        std::cout << "petal barycenter: "
+                  << petalCenter.x << ", "
+                  << petalCenter.y << ", "
+                  << petalCenter.z << "\n";
     }
 }
 

@@ -178,6 +178,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     GUICircleMenu::Handle circle;
     for (Entity entity : entities.entities_with_components(circle))
     {
+        (void) entity;
         auto position = circle->target.component<Position>();
        
         //check for hit
@@ -201,9 +202,10 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
 {
     PlayerControl::Handle player;
     auto count = 0;
-    vector<Entity> *selectedEntities;
-    vector<Entity> *mouseOverEntities;
+    vector<Entity> *selectedEntities = nullptr;
+    vector<Entity> *mouseOverEntities = nullptr;
     for (Entity entity : entities.entities_with_components(player)) {
+        (void) entity;
         selectedEntities = &(player->selectedEntities);
         mouseOverEntities = &(player->mouseOverEntities);
         count++;

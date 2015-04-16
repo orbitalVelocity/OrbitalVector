@@ -17,6 +17,7 @@
 
 #include "tiny_obj_loader.h"
 
+extern std::vector<glm::vec3> barycenters;
 extern std::vector<tinyobj::shape_t> shapes;
 extern std::vector<tinyobj::material_t> materials;
 

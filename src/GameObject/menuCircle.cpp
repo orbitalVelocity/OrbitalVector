@@ -71,7 +71,8 @@ void MenuCircle::update(entityx::EntityManager &entities,
         
     }
 }
-void MenuCircle::MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &entities)
+
+void MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &entities)
 {
     glm::vec3 color(1,.1,.1);
     GUICircleMenu::Handle circle;
@@ -79,6 +80,7 @@ void MenuCircle::MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &enti
     glUseProgram(shaderProgram);
     for (auto entity : entities.entities_with_components(circle))
     {
+        (void) entity;
         auto positionHandle = circle->target.component<Position>();
         auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
         

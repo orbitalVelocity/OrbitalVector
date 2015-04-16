@@ -142,13 +142,13 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     mouseY = screenHeight - mouseY; //for some reason, mouseY is flipped from tutorial
     auto mouseX_NDC = ((float)mouseX/(float)screenWidth  - 0.5f) * 2.0f;
     auto mouseY_NDC = ((float)mouseY/(float)screenHeight - 0.5f) * 2.0f;
-    auto mouse_NDC = glm::vec2(mouseX_NDC * screenWidth, mouseY_NDC * screenHeight);
+    auto mouse_NDC = glm::vec2(mouseX_NDC , mouseY_NDC);
    
     auto getDistanceToCursor = [&](glm::vec3 pos)
     {
         auto posNDC = camera.matrix() * world * glm::vec4(pos, 1.0);
         posNDC /= posNDC.w;
-        auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
+        auto screenPosNDC = glm::vec2(posNDC.x , posNDC.y);
         return glm::length(mouse_NDC - screenPosNDC);
     };
     
@@ -166,7 +166,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
         
         auto distanceFromCamera = glm::length(position->pos - camera.position);
         
-        const int thresholdInPixels = 40; //TODO: value should be in entity
+        float thresholdInPixels = 40/900.0; //TODO: value should be in entity
         
         //pick a clickable entity that is also the closest
         if (onScreenDistance < thresholdInPixels
@@ -191,6 +191,13 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     for (Entity entity : entities.entities_with_components(circle))
     {
         (void) entity;
+        //takes a 3D position, converts it to NDC, then adds leaf offset,
+        //then compares against mouseNDC;
+        
+        //when checking vertices of leaf it self, it should already be in NDC (no aspect ratio adjustments though, but maybe don't need to since not going through camera projection transformation
+        //so rotate leaf vertices (instead of the bary center)
+        //and compare rotated vertices(RV) against bary center,
+        //if any RV-mouse is more than 90 degrees off from mouse - barycenter
         auto position = circle->target.component<Position>();
        
         //check if mouse hits any elements in circle
@@ -209,12 +216,12 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
             posNDC.x += offset2d.x; //CRUCIAL!
             posNDC.y += offset2d.y; //CRUCIAL!
             
-            auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
+            auto screenPosNDC = glm::vec2(posNDC.x, posNDC.y);
             auto onScreenDistance = glm::length(mouse_NDC - screenPosNDC);
             
         
             //assumes circular hit target
-            if (onScreenDistance < circle->size) {
+            if (onScreenDistance < .05) {
                 leaf.hover = true;
             } else {
                 leaf.hover = false;

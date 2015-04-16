@@ -98,6 +98,7 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
     PlayerControl::Handle player;
     auto count = 0;
     for (Entity entity : entities.entities_with_components(player)) {
+        (void) entity;
         auto &selectedEntities = player->selectedEntities;
         auto &mouseOverEntities = player->mouseOverEntities;
         auto enableMultiSelection = false;
@@ -150,7 +151,8 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
         auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
         return glm::length(mouse_NDC - screenPosNDC);
     };
-    //for each entity, check if it is within the threshold of clickability,
+    
+    //for each physics(position, velocity) entity, check if it is within the threshold of clickability,
     //pick the closest entity as a selectable entity
     //emits an event when there is a selectable entity,
     //and on state change from valid to invalid selection
@@ -173,22 +175,50 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
             selectableEntity = entity;
         }
     }
-    
-    //FIXME: ideally this would go in the MenuCircle class
+    //DEBUG code for barycenters of petal menus////////////////////////
+    auto rotate2d = [](float theta)
+    {
+        float array[4];
+        array[0] = cos(theta);
+        array[1] = -sin(theta);
+        array[2] = sin(theta);
+        array[3] = cos(theta);
+        glm::mat2 temp = glm::make_mat2(array);
+        return temp;
+    };
+    //FIXME: ideally this would go in the menu class
     GUICircleMenu::Handle circle;
     for (Entity entity : entities.entities_with_components(circle))
     {
         (void) entity;
         auto position = circle->target.component<Position>();
        
-        //check for hit
-        //assumes circular hit target
-        auto onScreenDistance = getDistanceToCursor(position->pos);
-        
         //check if mouse hits any elements in circle
-        //if so, update component's state
-        if (onScreenDistance < circle->size) {
-//            circle->state = UISelectionType::HOVER;
+        for (auto &leaf: circle->leafMenus)
+        {
+            //barycenter is offset already
+            auto petalCenter = barycenters[5];
+            auto offset2d = rotate2d(leaf.rotateByRadian) * glm::vec2(petalCenter);
+            
+            offset2d *= glm::vec2(1, 1.6); //adjust for aspect ratio
+            
+            auto pos = position->pos;
+            auto posNDC = camera.matrix() * world * glm::vec4(pos, 1.0);
+            posNDC /= posNDC.w;
+            
+            posNDC.x += offset2d.x; //CRUCIAL!
+            posNDC.y += offset2d.y; //CRUCIAL!
+            
+            auto screenPosNDC = glm::vec2(posNDC.x * screenWidth, posNDC.y * screenHeight);
+            auto onScreenDistance = glm::length(mouse_NDC - screenPosNDC);
+            
+        
+            //assumes circular hit target
+            if (onScreenDistance < circle->size) {
+                leaf.hover = true;
+            } else {
+                leaf.hover = false;
+            }
         }
     }
     

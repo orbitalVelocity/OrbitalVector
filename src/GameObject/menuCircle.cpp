@@ -112,8 +112,11 @@ void MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &entities)
             auto rotation = rotate2d(leaf.rotateByRadian);
             loc = glGetUniformLocation(shaderProgram, "rotate2d");
             glUniformMatrix2fv(loc, 1, false, glm::value_ptr(rotation));
-            
-            drawIndexed(vaos[1], drawCounts[1], camera, color);
+            auto leafColor = color;
+            if (leaf.hover) {
+                leafColor = glm::vec3(.2, .2, 1);
+            }
+            drawIndexed(vaos[1], drawCounts[1], camera, leafColor);
         }
         
     }

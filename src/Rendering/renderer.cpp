@@ -539,7 +539,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
         drawSelectors(player->mouseOverEntities, gridColor);
     }
    
-    //DEBUG code//////////////////////////////////////////////////////////
+    //DEBUG code for barycenters of petal menus////////////////////////
     auto rotate2d = [](float theta)
     {
         float array[4];
@@ -570,15 +570,15 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
         drawSprite(position, glm::vec3(1));
         
         auto petalCenter = barycenters[5];
-        std::cout << "petal barycenter: "
-                  << petalCenter.x << ", "
-                  << petalCenter.y << ", "
-                  << petalCenter.z << "\n";
+//        std::cout << "petal barycenter: "
+//                  << petalCenter.x << ", "
+//                  << petalCenter.y << ", "
+//                  << petalCenter.z << "\n";
         for (auto leaf: circle->leafMenus)
         {
             auto offset2d = rotate2d(leaf.rotateByRadian) * glm::vec2(petalCenter);
 //            auto offset2d =  glm::vec2(petalCenter.y, petalCenter.x) * rotate2d(leaf.rotateByRadian);
-            std::cout << "rotated: " << offset2d.x << ", " << offset2d.y << "\n";
+//            std::cout << "rotated: " << offset2d.x << ", " << offset2d.y << "\n";
             loc = glGetUniformLocation(sprite.shaderProgram, "offset2d");
             glUniform2fv(loc, 1, glm::value_ptr(screenAspectRatio * offset2d));
             

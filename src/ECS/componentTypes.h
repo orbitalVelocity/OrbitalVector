@@ -220,6 +220,7 @@ struct UIElement
     UIElement(float t, float r) : time(t), rotateByRadian(r) {};
     UIElement(float d, float t, float r) : time(d, t), initialRotation(r) {};
     
+    bool hover = false;
     AnimationState state = AnimationState::invalid;
     Animation time;
     glm::vec2 offset2d;

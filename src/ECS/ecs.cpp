@@ -158,96 +158,27 @@ GameSingleton::GameSingleton(std::string filename)
     systems.configure();
 }
 
-//TODO: all of this includes and template function just to print OE! must find a more elegant solution
-#include "vectord.h"
-#include "integration.h"
-#include "twobody.h"
-
-#include "orbitalelements.h"
-#include "oeconvert.h"
-
-#include "componentTypes.h" //FIXME: hack, need to refactor
-
-template <typename T>
-std::string to_string_with_precision(const T a_value, const int n = 6)
-{
-    std::ostringstream out;
-    out << std::setprecision(n) << a_value;
-    return out.str();
-}
-
 void GameSingleton::update(double dt)
 {
     dt *= legacyUserInput->timeWarp;
+    
+    //FIXME: no "game lost" condition yet
     assert(myShip.valid());
+    
+    systems.update<DebugTextSystem>(dt);
     systems.system<UserInputSystem>()->update(entities, events, dt,
                                               legacyUserInput, myShip,
                                              pWindow, camera);
     //systems.update<TagSystem>(dt); //TODO: Do this only after unserialization.
     systems.update<MissileSystem>(dt);
     systems.update<ShipSystem>(dt);
-    systems.update<OrbitalPhysicsSystem>(dt);
+    systems.system<OrbitalPhysicsSystem>()->update(entities, events, dt, camera);
     systems.update<CollisionSystem>(dt);
-    systems.update<DebugTextSystem>(dt); //this does nothing right now
     
     //move the world in the OPPOSITE direction of the focus
     world = glm::translate(glm::mat4(), -myShip.component<Position>()->pos);
     
-    auto totalOffset = glm::vec2(0, 0.02);
-    auto offset = glm::vec2(0, 0.02);
-    auto vp = camera.matrix() * world;
-    auto printOE = [&](string name, float element, glm::vec3 pos)
-    {
-        auto orbitParamString = name + to_string_with_precision(element);
-        textObj.guiText.push_back({getVec2(vp, pos)+totalOffset, 15.0f, orbitParamString});
-        totalOffset += offset;
-    };
-    auto UITextSetup = [&](){
-        Ship::Handle ship;
-        Missile::Handle missile;
-        Position::Handle position;
-        Velocity::Handle velocity;
-        OrbitPath::Handle orbit;
-        
-        
-        textObj.guiText.clear();
-        for (auto entity : entities.entities_with_components(ship, position, velocity, orbit))
-        {
-            textObj.guiText.push_back({getVec2(vp, position->pos),
-                15.0f, ship->debugName})
-            ;
-            
-            //print out orbital elements
-            auto parentEntityID = entity.component<Parent>()->parent;
-            auto parentEntity = entities.get(parentEntityID);
-            auto parentPosition = parentEntity.component<Position>();
-            auto parentGM = parentEntity.component<GM>();
-            auto posVel = toPosVelVector(position->pos, velocity->vel);
-            auto oe = rv2oe(parentGM->gm, posVel);
-            
-            printOE("sma: ", oe.sma, position->pos);
-            printOE("ecc: ", oe.ecc, position->pos);
-            printOE("inc: ", oe.inc, position->pos);
-            printOE("aop: ", oe.aop, position->pos);
-            printOE("lan: ", oe.lan, position->pos);
-            printOE("tra: ", oe.tra, position->pos);
-            totalOffset = offset;
-            
-        }
-        for (auto entity : entities.entities_with_components(missile, position, orbit))
-        {
-            auto vp = camera.matrix() * world;
-//            textObj.guiText.push_back({getVec2(vp, position->pos),
-//                15.0f, missile->debugName});
-            events.emit<GUITextEvent>(getVec2(vp, position->pos),
-                                      15.0f, missile->debugName);
-        }
-    };
-    UITextSetup();
-    
-    //calculate trajectories every 30 frames
-//    static int orbitCount = 1;
-//    if (orbitCount++ % 1 == 0)
+    //TODO: update orbits only when necessary
     {
         renderer.orbit.update(entities);
         renderer.menuCircle.update(entities, events, dt);

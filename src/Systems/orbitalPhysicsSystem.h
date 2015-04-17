@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "entityx/System.h"
 #include "events.h"
+#include "camera.h"
 
 class OrbitalPhysicsSystem : public entityx::System<OrbitalPhysicsSystem>
 //public entityx::Receiver<OrbitalChangeEvent>
@@ -20,7 +21,11 @@ public:
     OrbitalPhysicsSystem() {}
     void update(entityx::EntityManager &entities,
                 entityx::EventManager &events,
-                double dt);
+                double dt,
+                Camera &camera);
    
+    void  update(entityx::EntityManager & entities,
+                entityx::EventManager & events,
+                double dt) override {}
 };
 #endif /* defined(__OrbitalVector__orbitalPhysicsSystem__) */

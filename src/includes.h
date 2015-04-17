@@ -59,6 +59,13 @@ T lerp(T a, T b, float t)
 }
 float spring(float factor, float progress);
 
+template <typename T>
+std::string to_string_with_precision(const T a_value, const int n=6)
+{
+    std::ostringstream out;
+    out << std::setprecision(n) << a_value;
+    return out.str();
+}
 
 //orbital stuff
 VectorD convertToParams (glm::vec3 pos, double gm);

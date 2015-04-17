@@ -18,6 +18,8 @@
 #include "orbitalelements.h"
 #include "oeconvert.h"
 
+#include "includes.h"
+
 using namespace entityx;
 
 void drawEllipse(int segments, std::vector<float> &path, GLdouble semiMajor, GLdouble semiMinor)
@@ -107,7 +109,8 @@ void drawOrbitalPath(int segments, std::vector<float> &path, GLdouble a, GLdoubl
 
 void OrbitalPhysicsSystem::update(EntityManager & entities,
                              EventManager &events,
-                             double dt)
+                             double dt,
+                             Camera &camera)
 {
     /**
      *  Refactor goal: update only based on events
@@ -162,48 +165,57 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         assert(not orbit->path.empty());
         
 ////////DEBUG/////////////////////////////////////
-        std::string message;
-#if 1
-//        message = "r: " + to_string(position->pos.x)
-//        + " " + to_string(position->pos.y)
-//        + " " + to_string(position->pos.z);
-//        events.emit(DebugEvent(message));
-//        
-//        message = "v: " + to_string(velocity->vel.x)
-//        + " " + to_string(velocity->vel.y)
-//        + " " + to_string(velocity->vel.z);
-//        events.emit(DebugEvent(message));
-        
-//        message = "sma: " + to_string(oe.sma);
-//        events.emit(DebugEvent(message));
-//        message = "ecc: " + to_string(oe.ecc);
-//        events.emit(DebugEvent(message));
-//        message = "inc: " + to_string(oe.inc);
-//        events.emit(DebugEvent(message));
-//        message = "lan: " + to_string(oe.lan);
-//        events.emit(DebugEvent(message));
-//        message = "aop: " + to_string(oe.aop);
-//        events.emit(DebugEvent(message));
-//        message = "tra: " + to_string(oe.tra);
-//        events.emit(DebugEvent(message));
-#else
-        message = "orbits: " + to_string(orbitCount);
-        events.emit(DebugEvent(message));
-#endif
+
+        //print stuff to screen
+        auto totalOffset = glm::vec2(0, 0.02);
+        auto offset = glm::vec2(0, 0.02);
+        auto vp = camera.matrix() * world;
+        auto printOE = [&](std::string name, float element, glm::vec3 pos)
+        {
+            auto orbitParamString = name + to_string_with_precision(element);
+            events.emit<GUITextEvent>(getVec2(vp, pos)+totalOffset, 15.0f, orbitParamString);
+            totalOffset += offset;
+        };
+        auto UITextSetup = [&](){
+            Ship::Handle ship;
+            Missile::Handle missile;
+            Position::Handle position;
+            Velocity::Handle velocity;
+            OrbitPath::Handle orbit;
+            
+            
+            for (auto entity : entities.entities_with_components(ship, position, velocity, orbit))
+            {
+                events.emit<GUITextEvent>(getVec2(vp, position->pos),
+                    15.0f, ship->debugName);
+                
+                //print out orbital elements
+                auto parentEntityID = entity.component<Parent>()->parent;
+                auto parentEntity = entities.get(parentEntityID);
+                //            auto parentPosition = parentEntity.component<Position>();
+                auto parentGM = parentEntity.component<GM>();
+                auto posVel = toPosVelVector(position->pos, velocity->vel);
+                auto oe = rv2oe(parentGM->gm, posVel);
+                
+                printOE("sma: ", oe.sma, position->pos);
+                printOE("ecc: ", oe.ecc, position->pos);
+                printOE("inc: ", oe.inc, position->pos);
+                printOE("aop: ", oe.aop, position->pos);
+                printOE("lan: ", oe.lan, position->pos);
+                printOE("tra: ", oe.tra, position->pos);
+                totalOffset = offset;
+                
+            }
+            for (auto entity : entities.entities_with_components(missile, position, orbit))
+            {
+                (void) entity;
+                events.emit<GUITextEvent>(getVec2(vp, position->pos),
+                                          15.0f, missile->debugName);
+            }
+        };
+        UITextSetup();
 ////////DEBUG/////////////////////////////////////
         
     }
     
-//    for (Entity entity: entities.entities_with_components(position, velocity))
-//    {
-//        auto parentEntityID = entity.component<Parent>()->parent;
-//        auto parentEntity = entities.get(parentEntityID);
-//        auto parentPosition = parentEntity.component<Position>();
-//        auto parentVelocity = parentEntity.component<Velocity>();
-//        auto parentGM = parentEntity.component<GM>();
-//        auto &orbitPath = orbit->path;
-//        auto orbitPathSteps = 360;
-//        
-//        //TODO: move the integration from the loop above to here (so all elements with position/velocity can still move about, only those w/ orbit components need to recompute orbits
-//    }
 }

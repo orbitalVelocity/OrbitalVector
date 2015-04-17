@@ -37,6 +37,7 @@ void DebugTextSystem::update(EntityManager & entities,
                              EventManager &events,
                              double dt)
 {
+    debugTextPtr->guiText.clear();
     currentTime += dt;
     //each message lasts n seconds
     for (auto &message : messages)
@@ -54,4 +55,6 @@ void DebugTextSystem::update(EntityManager & entities,
             break;
         }
     }
+    
+    
 }

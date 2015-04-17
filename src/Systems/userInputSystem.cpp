@@ -266,12 +266,14 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
     auto hv = myShip.component<Velocity>();
 //    auto hp = myShip.component<Position>();
     auto ho = myShip.component<Orientation>();
+    auto hs = myShip.component<Ship>();
     for (auto &action : legacyUserInput->actionList )
     {
         switch (action) {
             case ActionType::transForward:
-                forwardVector = glm::vec3(ho->orientation * glm::vec4(0, 0, 1, 1));
-                hv->vel += glm::normalize(forwardVector) * (float).01;
+//                forwardVector = glm::vec3(ho->orientation * glm::vec4(0, 0, 1, 1));
+//                hv->vel += glm::normalize(forwardVector) * (float).01;
+                hs->thrust = true;
                 break;
             case ActionType::yawLeft:
                 ho->orientation = glm::rotate(ho->orientation, deltaMove, glm::vec3(0, 1, 0));

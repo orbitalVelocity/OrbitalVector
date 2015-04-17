@@ -42,6 +42,9 @@ void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int m
         case GLFW_KEY_E:
             actionList.push_back(ActionType::rollCW);
             break;
+        case GLFW_KEY_F:
+            actionList.push_back(ActionType::transForward);
+            break;
             
         default:
             break;
@@ -50,9 +53,6 @@ void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int m
         switch (key) {
             case GLFW_KEY_ESCAPE:
                 glfwSetWindowShouldClose(window, GL_TRUE);
-                break;
-            case GLFW_KEY_F:
-                actionList.push_back(ActionType::transForward);
                 break;
             case GLFW_KEY_G:
                 actionList.push_back(ActionType::transBackward);

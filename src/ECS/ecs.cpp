@@ -14,7 +14,7 @@
 #include "collisionSystem.h"
 #include "debugTextSystem.h"
 #include "orbitalPhysicsSystem.h"
-
+#include "shipSystem.h"
 
 void GameSingleton::loadEntity(entityx::Entity entity,
                     glm::vec3 pos,
@@ -153,6 +153,7 @@ GameSingleton::GameSingleton(std::string filename)
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();
     systems.add<DebugTextSystem>(&textObj);
+    systems.add<ShipSystem>();
     systems.add<OrbitalPhysicsSystem>();
     systems.configure();
 }
@@ -177,16 +178,14 @@ std::string to_string_with_precision(const T a_value, const int n = 6)
 
 void GameSingleton::update(double dt)
 {
-    //requires timeWarp declared in this class
-    //requires tighter integration w/ userInput, it needs access to timeWarp variable
     dt *= legacyUserInput->timeWarp;
-//    dt /= 10;
     assert(myShip.valid());
     systems.system<UserInputSystem>()->update(entities, events, dt,
                                               legacyUserInput, myShip,
                                              pWindow, camera);
     //systems.update<TagSystem>(dt); //TODO: Do this only after unserialization.
     systems.update<MissileSystem>(dt);
+    systems.update<ShipSystem>(dt);
     systems.update<OrbitalPhysicsSystem>(dt);
     systems.update<CollisionSystem>(dt);
     systems.update<DebugTextSystem>(dt); //this does nothing right now

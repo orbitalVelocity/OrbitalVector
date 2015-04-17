@@ -109,8 +109,7 @@ void drawOrbitalPath(int segments, std::vector<float> &path, GLdouble a, GLdoubl
 
 void OrbitalPhysicsSystem::update(EntityManager & entities,
                              EventManager &events,
-                             double dt,
-                             Camera &camera)
+                             double dt)
 {
     /**
      *  Refactor goal: update only based on events
@@ -169,11 +168,10 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         //print stuff to screen
         auto totalOffset = glm::vec2(0, 0.02);
         auto offset = glm::vec2(0, 0.02);
-        auto vp = camera.matrix() * world;
         auto printOE = [&](std::string name, float element, glm::vec3 pos)
         {
             auto orbitParamString = name + to_string_with_precision(element);
-            events.emit<GUITextEvent>(getVec2(vp, pos)+totalOffset, 15.0f, orbitParamString);
+            events.emit<GUITextEvent>(pos, totalOffset, 15.0f, orbitParamString);
             totalOffset += offset;
         };
         auto UITextSetup = [&](){
@@ -186,7 +184,7 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
             
             for (auto entity : entities.entities_with_components(ship, position, velocity, orbit))
             {
-                events.emit<GUITextEvent>(getVec2(vp, position->pos),
+                events.emit<GUITextEvent>(position->pos, glm::vec2(),
                     15.0f, ship->debugName);
                 
                 //print out orbital elements
@@ -209,7 +207,7 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
             for (auto entity : entities.entities_with_components(missile, position, orbit))
             {
                 (void) entity;
-                events.emit<GUITextEvent>(getVec2(vp, position->pos),
+                events.emit<GUITextEvent>(position->pos, glm::vec2(),
                                           15.0f, missile->debugName);
             }
         };

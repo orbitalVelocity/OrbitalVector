@@ -7,12 +7,15 @@
 //
 
 #include "debugTextSystem.h"
+#include "includes.h"
 
 using namespace entityx;
 
-DebugTextSystem::DebugTextSystem(TextRenderer *text)
+DebugTextSystem::DebugTextSystem(TextRenderer *text, Camera *camera, glm::mat4 *world)
 {
     debugTextPtr = text;
+    cameraPtr = camera;
+    worldPtr = world;
 }
 
 void DebugTextSystem::configure(entityx::EventManager &events)
@@ -30,7 +33,10 @@ void DebugTextSystem::receive(const DebugEvent &e)
 void DebugTextSystem::receive(const GUITextEvent &e)
 {
     assert(nullptr not_eq debugTextPtr);
-    debugTextPtr->guiText.push_back(Text(e.position2d, e.size, e.message));
+    //fixme: this should happen after the world/camera updates later this frame
+    auto vp = cameraPtr->matrix() * *worldPtr;
+    auto position2d = getVec2(vp, e.position3d);
+    debugTextPtr->guiText.push_back(Text(position2d+e.offset2d, e.size, e.message));
 }
 
 void DebugTextSystem::update(EntityManager & entities,

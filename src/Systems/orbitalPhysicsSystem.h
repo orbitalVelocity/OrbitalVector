@@ -19,13 +19,9 @@ class OrbitalPhysicsSystem : public entityx::System<OrbitalPhysicsSystem>
 {
 public:
     OrbitalPhysicsSystem() {}
-    void update(entityx::EntityManager &entities,
-                entityx::EventManager &events,
-                double dt,
-                Camera &camera);
-   
+    
     void  update(entityx::EntityManager & entities,
                 entityx::EventManager & events,
-                double dt) override {}
+                double dt) override;
 };
 #endif /* defined(__OrbitalVector__orbitalPhysicsSystem__) */

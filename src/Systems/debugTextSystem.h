@@ -14,13 +14,14 @@
 #include "entityx/System.h"
 #include "events.h"
 #include "text.h"
+#include "camera.h"
 
 class DebugTextSystem: public entityx::System<DebugTextSystem>,
 public entityx::Receiver<DebugEvent>
 {
 public:
     
-    DebugTextSystem(TextRenderer *text);
+    DebugTextSystem(TextRenderer *, Camera *, glm::mat4 *);
 //    void init(TextRenderer *text);
     
     void configure(entityx::EventManager& eventManager);
@@ -40,6 +41,8 @@ private:
         string message;
     };
     TextRenderer *debugTextPtr = nullptr;
+    Camera *cameraPtr = nullptr;
+    glm::mat4 *worldPtr = nullptr;
     std::vector<expiringMessage> messages;
     double currentTime = 0.0;
     double lifeTime = 3;

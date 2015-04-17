@@ -152,7 +152,7 @@ GameSingleton::GameSingleton(std::string filename)
     systems.add<UserInputSystem>(legacyUserInput);
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();
-    systems.add<DebugTextSystem>(&textObj);
+    systems.add<DebugTextSystem>(&textObj, &camera, &world);
     systems.add<ShipSystem>();
     systems.add<OrbitalPhysicsSystem>();
     systems.configure();
@@ -172,7 +172,7 @@ void GameSingleton::update(double dt)
     //systems.update<TagSystem>(dt); //TODO: Do this only after unserialization.
     systems.update<MissileSystem>(dt);
     systems.update<ShipSystem>(dt);
-    systems.system<OrbitalPhysicsSystem>()->update(entities, events, dt, camera);
+    systems.update<OrbitalPhysicsSystem>(dt);
     systems.update<CollisionSystem>(dt);
     
     //move the world in the OPPOSITE direction of the focus

@@ -57,12 +57,13 @@ EVENT(DebugEvent)
 
 EVENT(GUITextEvent)
 {
-    GUITextEvent(glm::vec2 p, float s, std::string m)
-    : message(m), position2d(p), size(s)
+    GUITextEvent(glm::vec3 p, glm::vec2 o, float s, std::string m)
+    : message(m), position3d(p), offset2d(o), size(s)
     {}
     
     std::string message;
-    glm::vec2 position2d;
+    glm::vec3 position3d;
+    glm::vec2 offset2d;
     float size;
 };
 

@@ -301,13 +301,13 @@ int main(int argc, const char * argv[])
         myGameSingleton.textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
 		
         myGameSingleton.textObj.debugTexts.clear();
+        getText(myGameSingleton.textObj, perfMon, ws);
+       
         myGameSingleton.update(dt);
         
         
         myGameSingleton.renderer.update();
 
-        getText(myGameSingleton.textObj, perfMon, ws);
-       
         myGameSingleton.renderer.render(myGameSingleton.entities);
         myGameSingleton.textObj.render();
        

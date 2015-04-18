@@ -9,6 +9,7 @@
 #include "shipSystem.h"
 #include "componentTypes.h"
 
+float fuelUsed, availableFuel;
 float engineBurn(Ship::Handle ship, float dt)
 {
     //check how much fuel
@@ -20,28 +21,27 @@ float engineBurn(Ship::Handle ship, float dt)
     }
     //set remaining fuel to max engines
     //assumes all fuel connected to all engines
-    auto availableFuel = totalFuel;
+    availableFuel = totalFuel;
     auto totalThrust = 0.0;
     for (auto engine : ship->engines.list())
     {
         totalThrust += engine.burn(availableFuel, dt);
     }
     
-    auto fuelUsed = totalFuel - availableFuel;
-    std::cout << "fuel used: " << fuelUsed << std::endl;
-    std::cout << "fuel remaining: " << availableFuel << std::endl;
+    fuelUsed = totalFuel - availableFuel;
 
     ship->mass -= fuelUsed; //FIXME: add fuelMass into equation
     
     //update fuel tanks
+    auto fuelUsedTemp = fuelUsed;
     for (auto &fuelTank : ship->fuelTanks.list())
     {
-        if (fuelUsed > 0) {
-            if (fuelTank.fuel >= fuelUsed) {
-                fuelTank.fuel -= fuelUsed;
-                fuelUsed = 0;
+        if (fuelUsedTemp > 0) {
+            if (fuelTank.fuel >= fuelUsedTemp) {
+                fuelTank.fuel -= fuelUsedTemp;
+                fuelUsedTemp = 0;
             } else {
-                fuelUsed -= fuelTank.fuel;
+                fuelUsedTemp -= fuelTank.fuel;
                 fuelTank.fuel = 0;
             }
         }
@@ -55,9 +55,15 @@ float engineBurn(Ship::Handle ship, float dt)
 
 void ShipSystem::update(entityx::EntityManager &entities, entityx::EventManager &events, double dt)
 {
+    static float dv = 0;
+
+    std::stringstream deltav;
+    float acceleration;
+    
     Ship::Handle ship;
     Velocity::Handle velocity;
     Orientation::Handle orientation;
+    
     for (auto entity : entities.entities_with_components(ship, velocity, orientation))
     {
         (void) entity;
@@ -68,13 +74,24 @@ void ShipSystem::update(entityx::EntityManager &entities, entityx::EventManager 
             ship->thrust = false;
             auto forwardVector = glm::vec3(orientation->orientation * glm::vec4(0, 0, 1, 1));
 
-            auto acceleration = thrust / ship->mass;
-            std::cout << "acceleration: " << acceleration << std::endl;
+            acceleration = thrust / ship->mass;
             velocity->vel += glm::normalize(forwardVector) * acceleration;
          
             auto lnMass = log(ship->mass / ship->dryMass);
-            auto dv = ship->engines[0].isp /9.81 * lnMass;
-            std::cout << "deltaV: " << dv << std::endl;
+            dv = ship->engines[0].isp /9.81 * lnMass;
+            
         }
     }
+    deltav << "remaining dv: " << dv;
+    events.emit(DebugEvent(deltav.str()));
+    deltav.str(std::string());
+    deltav << "fuel used: " << fuelUsed;
+    events.emit(DebugEvent(deltav.str()));
+    deltav.str(std::string());
+    deltav << "available fuel: " << availableFuel;
+    events.emit(DebugEvent(deltav.str()));
+    deltav.str(std::string());
+    deltav << "acceleration: " << acceleration;
+    events.emit(DebugEvent(deltav.str()));
+    deltav.str(std::string());
 }

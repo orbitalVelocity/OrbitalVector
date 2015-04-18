@@ -409,4 +409,27 @@ COMPONENT(GUICircleMenu)
     std::vector<UIElement> leafMenus;
 };
 
+COMPONENT(UIText)
+{
+    UIText() {}
+    UIText(float size) : fontSize(size), totalOffset2d(glm::vec2())
+    {
+        auto verticalOffset = 0.02 / 15.0 * size; //FIXME: needs access to window size
+        offset2d = glm::vec2(0, verticalOffset);
+    }
+    glm::vec2 getOffset()
+    {
+        totalOffset2d += offset2d;
+        return totalOffset2d;
+    }
+    void clearOffset()
+    {
+        totalOffset2d = glm::vec2();
+    }
+    
+    glm::vec2 offset2d, totalOffset2d;
+    float fontSize;
+    //rotation?
+};
+
 #endif

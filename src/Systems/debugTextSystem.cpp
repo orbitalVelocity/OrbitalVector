@@ -8,6 +8,7 @@
 
 #include "debugTextSystem.h"
 #include "includes.h"
+#include "componentTypes.h"
 
 using namespace entityx;
 
@@ -33,10 +34,23 @@ void DebugTextSystem::receive(const DebugEvent &e)
 void DebugTextSystem::receive(const GUITextEvent &e)
 {
     assert(nullptr not_eq debugTextPtr);
+    entityx::Entity entity = e.entity; //get rid of const-ness
+
     //fixme: this should happen after the world/camera updates later this frame
     auto vp = cameraPtr->matrix() * *worldPtr;
-    auto position2d = getVec2(vp, e.position3d);
-    debugTextPtr->guiText.push_back(Text(position2d+e.offset2d, e.size, e.message));
+    auto pos = entity.component<Position>()->pos;
+    
+    auto position2d = getVec2(vp, pos);
+    
+    if (not e.entity.has_component<UIText>()) {
+        entity.assign<UIText>(e.size);
+    }
+    auto UIHandle = entity.component<UIText>();
+    auto offset2d = UIHandle->getOffset();
+
+    debugTextPtr->guiText.push_back(Text(position2d+offset2d,
+                                         e.size,
+                                         e.message));
 }
 
 void DebugTextSystem::update(EntityManager & entities,
@@ -44,6 +58,13 @@ void DebugTextSystem::update(EntityManager & entities,
                              double dt)
 {
     debugTextPtr->guiText.clear();
+    
+    UIText::Handle text;
+    for (auto entity : entities.entities_with_components(text))
+    {
+        text->clearOffset();
+    }
+    
     currentTime += dt;
     //each message lasts n seconds
     for (auto &message : messages)

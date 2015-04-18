@@ -166,14 +166,13 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
 ////////DEBUG/////////////////////////////////////
 
         //print stuff to screen
-        auto totalOffset = glm::vec2(0, 0.02);
-        auto offset = glm::vec2(0, 0.02);
-        auto printOE = [&](std::string name, float element, glm::vec3 pos)
+        auto printOE = [&](std::string name, float element, entityx::Entity entity)
         {
             auto orbitParamString = name + to_string_with_precision(element);
-            events.emit<GUITextEvent>(pos, totalOffset, 15.0f, orbitParamString);
-            totalOffset += offset;
+//            auto pos = entity.component<Position>()->pos;
+            events.emit<GUITextEvent>(entity, 15.0f, orbitParamString);
         };
+        
         auto UITextSetup = [&](){
             Ship::Handle ship;
             Missile::Handle missile;
@@ -184,8 +183,10 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
             
             for (auto entity : entities.entities_with_components(ship, position, velocity, orbit))
             {
-                events.emit<GUITextEvent>(position->pos, glm::vec2(),
-                    15.0f, ship->debugName);
+                assert(entity.has_component<Position>());
+                events.emit<GUITextEvent>(entity,
+                                          15.0f,
+                                          ship->debugName);
                 
                 //print out orbital elements
                 auto parentEntityID = entity.component<Parent>()->parent;
@@ -195,20 +196,20 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
                 auto posVel = toPosVelVector(position->pos, velocity->vel);
                 auto oe = rv2oe(parentGM->gm, posVel);
                 
-                printOE("sma: ", oe.sma, position->pos);
-                printOE("ecc: ", oe.ecc, position->pos);
-                printOE("inc: ", oe.inc, position->pos);
-                printOE("aop: ", oe.aop, position->pos);
-                printOE("lan: ", oe.lan, position->pos);
-                printOE("tra: ", oe.tra, position->pos);
-                totalOffset = offset;
+                printOE("sma: ", oe.sma, entity);
+                printOE("ecc: ", oe.ecc, entity);
+                printOE("inc: ", oe.inc, entity);
+                printOE("aop: ", oe.aop, entity);
+                printOE("lan: ", oe.lan, entity);
+                printOE("tra: ", oe.tra, entity);
                 
             }
             for (auto entity : entities.entities_with_components(missile, position, orbit))
             {
                 (void) entity;
-                events.emit<GUITextEvent>(position->pos, glm::vec2(),
-                                          15.0f, missile->debugName);
+                events.emit<GUITextEvent>(entity,
+                                          15.0f,
+                                          missile->debugName);
             }
         };
         UITextSetup();

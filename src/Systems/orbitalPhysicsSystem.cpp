@@ -163,58 +163,57 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
                                   posVel[5]);
         assert(not orbit->path.empty());
         
+    }
 ////////DEBUG/////////////////////////////////////
 
-        //print stuff to screen
-        auto printOE = [&](std::string name, float element, entityx::Entity entity)
-        {
-            auto orbitParamString = name + to_string_with_precision(element);
-//            auto pos = entity.component<Position>()->pos;
-            events.emit<GUITextEvent>(entity, 15.0f, orbitParamString);
-        };
+    //print stuff to screen
+    auto printOE = [&](std::string name, float element, entityx::Entity entity)
+    {
+        auto orbitParamString = name + to_string_with_precision(element);
+        events.emit<GUITextEvent>(entity, 15.0f, orbitParamString);
+    };
+    
+    auto UITextSetup = [&](){
+        Ship::Handle ship;
+        Missile::Handle missile;
+        Position::Handle position;
+        Velocity::Handle velocity;
+        OrbitPath::Handle orbit;
         
-        auto UITextSetup = [&](){
-            Ship::Handle ship;
-            Missile::Handle missile;
-            Position::Handle position;
-            Velocity::Handle velocity;
-            OrbitPath::Handle orbit;
+        
+        for (auto entity : entities.entities_with_components(ship, position, velocity, orbit))
+        {
+            assert(entity.has_component<Position>());
+            events.emit<GUITextEvent>(entity,
+                                      15.0f,
+                                      ship->debugName);
             
+            //print out orbital elements
+            auto parentEntityID = entity.component<Parent>()->parent;
+            auto parentEntity = entities.get(parentEntityID);
+            //            auto parentPosition = parentEntity.component<Position>();
+            auto parentGM = parentEntity.component<GM>();
+            auto posVel = toPosVelVector(position->pos, velocity->vel);
+            auto oe = rv2oe(parentGM->gm, posVel);
             
-            for (auto entity : entities.entities_with_components(ship, position, velocity, orbit))
-            {
-                assert(entity.has_component<Position>());
-                events.emit<GUITextEvent>(entity,
-                                          15.0f,
-                                          ship->debugName);
-                
-                //print out orbital elements
-                auto parentEntityID = entity.component<Parent>()->parent;
-                auto parentEntity = entities.get(parentEntityID);
-                //            auto parentPosition = parentEntity.component<Position>();
-                auto parentGM = parentEntity.component<GM>();
-                auto posVel = toPosVelVector(position->pos, velocity->vel);
-                auto oe = rv2oe(parentGM->gm, posVel);
-                
-                printOE("sma: ", oe.sma, entity);
-                printOE("ecc: ", oe.ecc, entity);
-                printOE("inc: ", oe.inc, entity);
-                printOE("aop: ", oe.aop, entity);
-                printOE("lan: ", oe.lan, entity);
-                printOE("tra: ", oe.tra, entity);
-                
-            }
-            for (auto entity : entities.entities_with_components(missile, position, orbit))
-            {
-                (void) entity;
-                events.emit<GUITextEvent>(entity,
-                                          15.0f,
-                                          missile->debugName);
-            }
-        };
-        UITextSetup();
+            printOE("sma: ", oe.sma, entity);
+            printOE("ecc: ", oe.ecc, entity);
+            printOE("inc: ", oe.inc, entity);
+            printOE("aop: ", oe.aop, entity);
+            printOE("lan: ", oe.lan, entity);
+            printOE("tra: ", oe.tra, entity);
+            
+        }
+        for (auto entity : entities.entities_with_components(missile, position, orbit))
+        {
+            (void) entity;
+            events.emit<GUITextEvent>(entity,
+                                      15.0f,
+                                      missile->debugName);
+        }
+    };
+    UITextSetup();
 ////////DEBUG/////////////////////////////////////
         
-    }
     
 }

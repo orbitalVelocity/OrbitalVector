@@ -115,7 +115,7 @@ void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int m
     
     
     isPressed = (action == GLFW_PRESS);
-    auto isPressedString = (isPressed) ? "pressed" : "released";
+//    auto isPressedString = (isPressed) ? "pressed" : "released";
     
     //only one modifier pressed at a time is supported
     //this only works on key press, mods=0 when key released (glfw quirk)
@@ -123,17 +123,17 @@ void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int m
         case GLFW_MOD_ALT:
             altPressed = true;
             altKey = key;
-            std::cout << "alt " << isPressedString << "\n";
+//            std::cout << "alt " << isPressedString << "\n";
             break;
         case GLFW_MOD_CONTROL:
             ctrlPressed = true;
             ctrlKey = key;
-            std::cout << "ctrl " << isPressedString << "\n";
+//            std::cout << "ctrl " << isPressedString << "\n";
             break;
         case GLFW_MOD_SHIFT:
             shiftPressed = true;
             shiftKey = key;
-            std::cout << "shift " << isPressedString << "\n";
+//            std::cout << "shift " << isPressedString << "\n";
             break;
             
         default:
@@ -143,7 +143,7 @@ void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int m
     if (action == GLFW_RELEASE) {
         if (key == altKey and altKey not_eq 0 ) {
             altPressed = false;
-            std::cout << "alt " << isPressedString << "\n";
+//            std::cout << "alt " << isPressedString << "\n";
         } else
         if (key == ctrlKey and ctrlKey not_eq 0 ) {
             ctrlPressed = false;
@@ -157,17 +157,14 @@ void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int m
 
 void UserInput::mb(GLFWwindow* window, int button, int action, int mods)
 {
-    if (action == GLFW_PRESS) {
+    if (action == GLFW_PRESS || action == GLFW_RELEASE) {
         if (button == GLFW_MOUSE_BUTTON_RIGHT) {
-            rmbPressed = true;
+            rmbPressed = (action == GLFW_PRESS);
         }
         if (button == GLFW_MOUSE_BUTTON_LEFT) {
-            lmbPressed = true;
+            lmbPressed = (action == GLFW_PRESS);
         }
-    } else {
-        rmbPressed = false;
-        lmbPressed = false;
-    }
+    } 
 }
 
 void UserInput::scroll(GLFWwindow* window, double xoffset, double yoffset)

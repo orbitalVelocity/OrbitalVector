@@ -190,7 +190,6 @@ void GameSingleton::update(double dt)
             auto lastFocusPosition = lastFocus.component<Position>()->pos;
             
             float progress = playerControl->getProgress(dt);
-            std::cout << "focus animation: " << progress << "\n";
             desiredPosition = glm::lerp(lastFocusPosition, focusPosition, progress);
         } else {
             desiredPosition = focus.component<Position>()->pos;

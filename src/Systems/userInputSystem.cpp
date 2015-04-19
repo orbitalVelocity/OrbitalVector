@@ -117,7 +117,7 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
         //move camera, prevent selection from happening if so
         if (legacyUserInput->altPressed and legacyUserInput->lmbPressed) {
             player->newFocus(selectableEntity);
-            std::cout << "alt pressed!!!\n";
+            std::cout << "switch focus!\n";
             continue;
         }
         

@@ -38,13 +38,9 @@ void MenuCircle::update(entityx::EntityManager &entities,
     
     for (auto entity : entities.entities_with_components(circle))
     {
-        assert(circle->target.valid());
-        auto positionHandle = circle->target.component<Position>();
-        //animate
-        //state 0: expand center element
+        (void) entity;
         auto &center = circle->centerElement;
         auto &elapsedTime = center.time.elapsedTime;
-        auto &totalTime = center.time.totalTime;
         if (AnimationState::start == center.state)
         {
             animate(center, dt);
@@ -81,6 +77,7 @@ void MenuCircle::draw(glm::mat4 camera, entityx::EntityManager &entities)
     for (auto entity : entities.entities_with_components(circle))
     {
         (void) entity;
+        assert(circle->target.valid());
         auto positionHandle = circle->target.component<Position>();
         auto centralPos = glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
         

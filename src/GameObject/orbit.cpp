@@ -37,6 +37,11 @@ void RenderableOrbit::update(entityx::EntityManager &entities)
     for (Entity entity : entities.entities_with_components(orbit))
     {
         auto &path = orbit->path;
+        if (path.empty())
+        {
+            std::cout << "empty orbit path\n";
+            continue;
+        }
         glBindVertexArray(orbit->vao);
         vao = orbit->vao;
         glBindBuffer(GL_ARRAY_BUFFER, orbit->vbo);

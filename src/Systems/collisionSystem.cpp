@@ -44,7 +44,8 @@ void CollisionSystem::update(EntityManager & entities,
                 text << "collision: distance: " << distance << " r1: "
                     << left_entity.component<OrbitalBodyType>()->orbitalBodyType << " : " << left_radius->radius
                     << " r2: " << right_entity.component<OrbitalBodyType>()->orbitalBodyType << " : " << right_radius->radius << std::endl;
-                events.emit<DebugEvent>(text.str());
+//                events.emit<DebugEvent>(text.str());
+                std::cout << text.str() << std::endl;
                 
                 addCollision(left_entity);
                 addCollision(right_entity);

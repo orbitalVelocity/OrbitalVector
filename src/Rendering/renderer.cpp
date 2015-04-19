@@ -551,40 +551,30 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
         return temp;
     };
     
-//    for (auto pos : barycenters)
-//    {
-//        drawSprite(pos, glm::vec3(1));
-//    }
     loc = glGetUniformLocation(sprite.shaderProgram, "scale2d");
     glm::vec2 screenAspectRatio(1, 1.6); //FIXME: hardcoded
     auto newscale2d = glm::vec2(.08) * screenAspectRatio;
     glUniform2fv(loc, 1, glm::value_ptr(newscale2d));
     
-    GUICircleMenu::Handle circle;
-    for (Entity entity : entities.entities_with_components(circle))
-    {
-        (void) entity;
-        auto positionHandle = circle->target.component<Position>();
-        auto position= glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
-        
-        drawSprite(position, glm::vec3(1));
-        
-        auto petalCenter = barycenters[5];
-//        std::cout << "petal barycenter: "
-//                  << petalCenter.x << ", "
-//                  << petalCenter.y << ", "
-//                  << petalCenter.z << "\n";
-        for (auto leaf: circle->leafMenus)
-        {
-            auto offset2d = rotate2d(leaf.rotateByRadian) * glm::vec2(petalCenter);
-//            auto offset2d =  glm::vec2(petalCenter.y, petalCenter.x) * rotate2d(leaf.rotateByRadian);
-//            std::cout << "rotated: " << offset2d.x << ", " << offset2d.y << "\n";
-            loc = glGetUniformLocation(sprite.shaderProgram, "offset2d");
-            glUniform2fv(loc, 1, glm::value_ptr(screenAspectRatio * offset2d));
-            
-            drawSprite(position, glm::vec3(1));
-        }
-    }
+//    GUICircleMenu::Handle circle;
+//    for (Entity entity : entities.entities_with_components(circle))
+//    {
+//        (void) entity;
+//        auto positionHandle = circle->target.component<Position>();
+//        auto position= glm::vec3(world * glm::vec4(positionHandle->pos, 1.0));
+//        
+//        drawSprite(position, glm::vec3(1));
+//        
+//        auto petalCenter = barycenters[5];
+//        for (auto leaf: circle->leafMenus)
+//        {
+//            auto offset2d = rotate2d(leaf.rotateByRadian) * glm::vec2(petalCenter);
+//            loc = glGetUniformLocation(sprite.shaderProgram, "offset2d");
+//            glUniform2fv(loc, 1, glm::value_ptr(screenAspectRatio * offset2d));
+//            
+//            drawSprite(position, glm::vec3(1));
+//        }
+//    }
     
     menuCircle.draw(_camera, entities);
     

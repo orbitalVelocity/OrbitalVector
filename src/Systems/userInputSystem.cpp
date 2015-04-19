@@ -9,6 +9,7 @@
 #include "userInputSystem.h"
 #include "componentTypes.h"
 #include "ecs.h"
+#include "log.h"
 
 using namespace entityx;
 
@@ -117,17 +118,15 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
         //move camera, prevent selection from happening if so
         if (legacyUserInput->altPressed and legacyUserInput->lmbPressed) {
             player->newFocus(selectableEntity);
-            std::cout << "switch focus!\n";
+            log(LOG_DEBUG, "switch focus!\n");
             continue;
         }
         
         if (selectionMode) {
             selectedEntities.emplace_back(selectableEntity);
-//            std::cout << "selected: " << selectableEntity.id() << std::endl;
             
         } else { //else mouseOverMode
             mouseOverEntities.emplace_back(selectableEntity);
-//            std::cout << "mouseOver: " << selectableEntity.id() << std::endl;
         }
         assert(count++==0);
      
@@ -242,6 +241,8 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
  * process list of actions form legacyUserInput
  * future refactor: actionlist should be a standalone thing that both user and AI populate
  */
+#define ASSIGN_FROM_COPY(sink, source, type) {type temp = *source.component<type>().get(); sink.assign_from_copy<type>(temp);}
+//#define ASSIGN_FROM_COPY(sink, copy, type) sink.assign_from_copy<type>(copy);
 void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::Entity myShip)
 {
     PlayerControl::Handle player;
@@ -276,13 +277,14 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
     entityx::Entity shadow;
     if (orbitPlanningMode) {
         shadow = myShip.component<PlayerControl>()->shadowEntity;
-        ho = shadow.component<Orientation>();
-        hv = shadow.component<Velocity>();
-        hs = shadow.component<Ship>();
         assert(shadow.valid());
         assert(shadow.has_component<Ship>());
         assert(shadow.has_component<Velocity>());
         assert(shadow.has_component<Orientation>());
+
+        hs = shadow.component<Ship>();
+        hv = shadow.component<Velocity>();
+        ho = shadow.component<Orientation>();
     }
     
     for (auto &action : legacyUserInput->actionList )
@@ -328,9 +330,10 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                     } else {
                         auto entity = entities.create();
                         entity.assign<GUICircleMenu>(selectedEntities->front(), 4);
-                        std::cout << "new menu spawned!\n";
+                        assert(entity.component<GUICircleMenu>()->target.valid());
                     }
                 }
+                break;
             case ActionType::planOrbit:
                 orbitPlanningMode = not orbitPlanningMode;
                 if (orbitPlanningMode)
@@ -339,13 +342,18 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                     {
                         //create shadow copy of myShip
                         shadow = entities.create();
-                        auto handle = myShip.component<OrbitPath>();
-                        shadow.assign_from_copy(handle);
-                        assert(shadow.has_component<OrbitPath>());
-                        shadow.assign_from_copy(myShip.component<Position>());
-                        shadow.assign_from_copy(myShip.component<Velocity>());
-                        const Ship* myshipship = (myShip.component<Ship>().get());
-                        shadow.assign_from_copy(&myshipship);
+                        //semantics is
+                        //shadow.Ship = myShip.ship;
+                        ASSIGN_FROM_COPY(shadow, myShip, Ship);
+                        ASSIGN_FROM_COPY(shadow, myShip, Parent);
+                        ASSIGN_FROM_COPY(shadow, myShip, Velocity);
+                        ASSIGN_FROM_COPY(shadow, myShip, Position);
+                        ASSIGN_FROM_COPY(shadow, myShip, Orientation);
+                        {
+                            //maybe a custom copy constructor?
+                            auto ho = shadow.assign<OrbitPath>();
+                            ho->transform = myShip.component<OrbitPath>()->transform;
+                        }
                         assert(shadow.has_component<Ship>());
                         myShip.component<PlayerControl>()->shadowEntity = shadow;
                     }
@@ -357,7 +365,6 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
             default:
                 break;
         }
-        
         
         if (action == ActionType::newShip)
         {
@@ -398,7 +405,7 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
             Entity entity;
             if (selectedEntities->empty()
                 ) {
-                std::cout << "no target selected\n";
+                log(LOG_DEBUG, "no target selected\n");
                 break;
             }
             auto targetEntity = selectedEntities->front();
@@ -415,7 +422,7 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
             double G = 6.673e-11;
             double gm = m * G;
             auto shipVector = glm::normalize(targetEntity.component<Position>()->pos - myShip.component<Position>()->pos);
-            cout << "ship orientation: " << printVec3(shipVector) << "\n";
+//            cout << "ship orientation: " << printVec3(shipVector) << "\n";
             auto pos = myShip.component<Position>()->pos
             + (shipVector)
             * 10.0f;

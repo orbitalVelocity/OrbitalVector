@@ -71,6 +71,7 @@ void ShipSystem::update(entityx::EntityManager &entities, entityx::EventManager 
         //do process actions
         //thruster
         if (ship->thrust) {
+        std::cout << "thrusting on " << ship->debugName << "\n";
             auto thrust = engineBurn(ship, dt);
             ship->thrust = false;
             auto forwardVector = glm::vec3(orientation->orientation * glm::vec4(0, 0, 1, 1));

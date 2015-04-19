@@ -106,11 +106,53 @@ void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int m
                 renderStage ^= stage10;
                 break;
                 
+                
             case GLFW_KEY_ENTER:
                 actionList.push_back(ActionType::newShip);
                 break;
         }
     }
+    
+    
+    isPressed = (action == GLFW_PRESS);
+    auto isPressedString = (isPressed) ? "pressed" : "released";
+    
+    //only one modifier pressed at a time is supported
+    //this only works on key press, mods=0 when key released (glfw quirk)
+    switch (mods) {
+        case GLFW_MOD_ALT:
+            altPressed = true;
+            altKey = key;
+            std::cout << "alt " << isPressedString << "\n";
+            break;
+        case GLFW_MOD_CONTROL:
+            ctrlPressed = true;
+            ctrlKey = key;
+            std::cout << "ctrl " << isPressedString << "\n";
+            break;
+        case GLFW_MOD_SHIFT:
+            shiftPressed = true;
+            shiftKey = key;
+            std::cout << "shift " << isPressedString << "\n";
+            break;
+            
+        default:
+            break;
+    }
+    //need this to work w/ mod key release
+    if (action == GLFW_RELEASE) {
+        if (key == altKey and altKey not_eq 0 ) {
+            altPressed = false;
+            std::cout << "alt " << isPressedString << "\n";
+        } else
+        if (key == ctrlKey and ctrlKey not_eq 0 ) {
+            ctrlPressed = false;
+        } else
+        if (key == shiftKey and shiftKey not_eq 0 ) {
+            shiftPressed = false;
+        }
+    }
+    
 }
 
 void UserInput::mb(GLFWwindow* window, int button, int action, int mods)

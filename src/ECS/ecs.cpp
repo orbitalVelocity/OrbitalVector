@@ -138,6 +138,7 @@ void GameSingleton::load(std::string, int width, int height )
                BodyType::SHIP
                );
     myShip.assign<PlayerControl>();
+    myShip.component<PlayerControl>()->focusOnEntity = myShip;
     assert(myShip.valid());
 }
 
@@ -176,7 +177,27 @@ void GameSingleton::update(double dt)
     systems.update<CollisionSystem>(dt);
     
     //move the world in the OPPOSITE direction of the focus
-    world = glm::translate(glm::mat4(), -myShip.component<Position>()->pos);
+    auto playerControl = myShip.component<PlayerControl>();
+    auto focus = playerControl->focusOnEntity;
+    auto lastFocus = playerControl->lastEntityFocused;
+    if (focus.valid()) {
+        glm::vec3 desiredPosition;
+
+        //animation
+        if (playerControl->switchedFocus and lastFocus.valid()) {
+           //lerp between the two positions
+            auto focusPosition = focus.component<Position>()->pos;
+            auto lastFocusPosition = lastFocus.component<Position>()->pos;
+            
+            float progress = playerControl->getProgress(dt);
+            std::cout << "focus animation: " << progress << "\n";
+            desiredPosition = glm::lerp(lastFocusPosition, focusPosition, progress);
+        } else {
+            desiredPosition = focus.component<Position>()->pos;
+        }
+        world = glm::translate(glm::mat4(), -desiredPosition);
+    }
+    //myShip.component<Position>()->pos);
     
     //TODO: update orbits only when necessary
     {

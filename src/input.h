@@ -40,7 +40,17 @@ public:
     /* Contains all data members for user input states */
     float yScroll, xScroll;
     float xMouse, yMouse;
+    
+    bool isPressed = false;
     bool lmbPressed, rmbPressed;
+    
+    bool altPressed = false,
+        ctrlPressed = false,
+        shiftPressed = false;
+    int altKey = 0,
+        shiftKey = 0,
+        ctrlKey = 0;
+
     std::vector<ActionType> actionList;
     
     //is this bad? probably

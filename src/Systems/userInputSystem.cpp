@@ -52,6 +52,7 @@ void UserInputSystem::update(entityx::EntityManager &entities,
     updateMouseSelection(entities, selectableEntity);
     
 
+    //update camera, or update shiporientation should be in shipSystem and cameraSystem...
     double mx, my;
     static double prevMX = 0, prevMY = 0;
     glfwGetCursorPos(window, &mx, &my);     //consider consolidating this line w/ the one in linePick();
@@ -82,7 +83,7 @@ void UserInputSystem::update(entityx::EntityManager &entities,
 
 
 /**
- *  only gets called when mouse overs an entity
+ *  updates mouse selection states
  */
 void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selectableEntity)
 {
@@ -90,10 +91,7 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
     auto cameraRotateMode = legacyUserInput->rmbPressed;
     auto selectionMode = legacyUserInput->lmbPressed and not cameraRotateMode;
     
-    //FIXME: ideally, MB callback will signal event to trigger this function too
-    //          in order to detect when a user has clicked anywhere (including nothing)
-    //OR don't put any of this in the receive, leave it in linePick, so much easier that way!
-    //OR give the MB call back access to selectedEntities as well so it can update dynamically as well (but now we have multiple locations that writes to the same set of structures... :( easy for bugs to creep out!
+//    enableMultiSelection =
     
     PlayerControl::Handle player;
     auto count = 0;
@@ -102,6 +100,8 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
         auto &selectedEntities = player->selectedEntities;
         auto &mouseOverEntities = player->mouseOverEntities;
         auto enableMultiSelection = false;
+        
+        //clear selection in preparation for writing over selection states
         if (not enableMultiSelection) {
             if (selectionMode) {
                 selectedEntities.clear();
@@ -114,6 +114,13 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
             return;
         }
         
+        //move camera, prevent selection from happening if so
+        if (legacyUserInput->altPressed and legacyUserInput->lmbPressed) {
+            player->newFocus(selectableEntity);
+            std::cout << "alt pressed!!!\n";
+            continue;
+        }
+        
         if (selectionMode) {
             selectedEntities.emplace_back(selectableEntity);
 //            std::cout << "selected: " << selectableEntity.id() << std::endl;
@@ -123,8 +130,8 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
 //            std::cout << "mouseOver: " << selectableEntity.id() << std::endl;
         }
         assert(count++==0);
+     
     }
-    //what happens when the cursor moves? is that called in a callback??
 }
 
 

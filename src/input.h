@@ -28,6 +28,9 @@ enum class ActionType {
     
     fireGun, fireMissile, fireBeam,
     
+    //UI state change
+    planOrbit,
+    
     newShip,
     spawnMenu,
     invalid

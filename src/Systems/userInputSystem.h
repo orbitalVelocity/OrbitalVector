@@ -57,6 +57,7 @@ void updateMouseSelection(entityx::EntityManager &entities, entityx::Entity sele
     void processAction(entityx::EntityManager &entities, entityx::Entity myShip);
 
 private:
+bool orbitPlanningMode = false;
     GLFWwindow *pWindow;
     UserInput* legacyUserInput = nullptr;   //get rid of this when userInput is absorbed into this class
 };

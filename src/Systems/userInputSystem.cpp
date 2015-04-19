@@ -271,15 +271,24 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
     float deltaMove = .1;
     glm::vec3 forwardVector;
     auto hv = myShip.component<Velocity>();
-//    auto hp = myShip.component<Position>();
     auto ho = myShip.component<Orientation>();
     auto hs = myShip.component<Ship>();
+    entityx::Entity shadow;
+    if (orbitPlanningMode) {
+        shadow = myShip.component<PlayerControl>()->shadowEntity;
+        ho = shadow.component<Orientation>();
+        hv = shadow.component<Velocity>();
+        hs = shadow.component<Ship>();
+        assert(shadow.valid());
+        assert(shadow.has_component<Ship>());
+        assert(shadow.has_component<Velocity>());
+        assert(shadow.has_component<Orientation>());
+    }
+    
     for (auto &action : legacyUserInput->actionList )
     {
         switch (action) {
             case ActionType::transForward:
-//                forwardVector = glm::vec3(ho->orientation * glm::vec4(0, 0, 1, 1));
-//                hv->vel += glm::normalize(forwardVector) * (float).01;
                 hs->thrust = true;
                 break;
             case ActionType::yawLeft:
@@ -322,7 +331,29 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                         std::cout << "new menu spawned!\n";
                     }
                 }
-                //then create menu
+            case ActionType::planOrbit:
+                orbitPlanningMode = not orbitPlanningMode;
+                if (orbitPlanningMode)
+                {
+                    if (not myShip.component<PlayerControl>()->shadowEntity.valid())
+                    {
+                        //create shadow copy of myShip
+                        shadow = entities.create();
+                        auto handle = myShip.component<OrbitPath>();
+                        shadow.assign_from_copy(handle);
+                        assert(shadow.has_component<OrbitPath>());
+                        shadow.assign_from_copy(myShip.component<Position>());
+                        shadow.assign_from_copy(myShip.component<Velocity>());
+                        const Ship* myshipship = (myShip.component<Ship>().get());
+                        shadow.assign_from_copy(&myshipship);
+                        assert(shadow.has_component<Ship>());
+                        myShip.component<PlayerControl>()->shadowEntity = shadow;
+                    }
+                } else {
+                    assert(shadow.valid());
+                    shadow.destroy();
+                }
+                break;
             default:
                 break;
         }

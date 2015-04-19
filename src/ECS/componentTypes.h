@@ -80,6 +80,8 @@ COMPONENT(PlayerControl)
     entityx::Entity focusOnEntity, lastEntityFocused;
     std::vector<entityx::Entity> selectedEntities;
     std::vector<entityx::Entity> mouseOverEntities;
+    
+    entityx::Entity shadowEntity; //for orbit planning
 };
 
 struct Part

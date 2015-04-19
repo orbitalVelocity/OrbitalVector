@@ -9,7 +9,7 @@
 #include "shipSystem.h"
 #include "componentTypes.h"
 
-float fuelUsed, availableFuel;
+float fuelUsed, remainingFuel;
 float engineBurn(Ship::Handle ship, float dt)
 {
     //check how much fuel
@@ -21,32 +21,33 @@ float engineBurn(Ship::Handle ship, float dt)
     }
     //set remaining fuel to max engines
     //assumes all fuel connected to all engines
-    availableFuel = totalFuel;
+    remainingFuel = totalFuel;
     auto totalThrust = 0.0;
     for (auto engine : ship->engines.list())
     {
-        totalThrust += engine.burn(availableFuel, dt);
+        totalThrust += engine.burn(remainingFuel, dt);
     }
     
-    fuelUsed = totalFuel - availableFuel;
-
+    fuelUsed = totalFuel - remainingFuel;
+    assert(fuelUsed >= 0);
+    
     ship->mass -= fuelUsed; //FIXME: add fuelMass into equation
     
     //update fuel tanks
     auto fuelUsedTemp = fuelUsed;
-    for (auto &fuelTank : ship->fuelTanks.list())
+//    for (auto &fuelTank : ship->fuelTanks.list())
+    for (auto i = 0; i < ship->fuelTanks.size() && fuelUsedTemp > 0; i++)
     {
-        if (fuelUsedTemp > 0) {
-            if (fuelTank.fuel >= fuelUsedTemp) {
-                fuelTank.fuel -= fuelUsedTemp;
-                fuelUsedTemp = 0;
-            } else {
-                fuelUsedTemp -= fuelTank.fuel;
-                fuelTank.fuel = 0;
-            }
+        auto &fuelTank = ship->fuelTanks[i];
+        if (fuelTank.fuel >= fuelUsedTemp) {
+            fuelTank.fuel -= fuelUsedTemp;
+            fuelUsedTemp = 0;
+        } else {
+            fuelUsedTemp -= fuelTank.fuel;
+            fuelTank.fuel = 0;
         }
     }
-    
+    assert(fuelUsedTemp == 0);
     return totalThrust;
 //    std::cout << "thrust: " << totalThrust
 //            << "\naccel: " << acceleration
@@ -58,7 +59,7 @@ void ShipSystem::update(entityx::EntityManager &entities, entityx::EventManager 
     static float dv = 0;
 
     std::stringstream deltav;
-    float acceleration;
+    float acceleration = 0;
     
     Ship::Handle ship;
     Velocity::Handle velocity;
@@ -81,14 +82,21 @@ void ShipSystem::update(entityx::EntityManager &entities, entityx::EventManager 
             dv = ship->engines[0].isp /9.81 * lnMass;
             
         }
+        
+        float vel = glm::length(velocity->vel);
+        deltav << "velocity: " << to_string_with_precision(vel);
+        events.emit<GUITextEvent>(entity, 15.0f, deltav.str());
+        deltav.str(std::string());
+
+        deltav << "remaining dv: " << dv;
+        events.emit<GUITextEvent>(entity, 15.0f, deltav.str());
     }
-    deltav << "remaining dv: " << dv;
     events.emit(DebugEvent(deltav.str()));
     deltav.str(std::string());
     deltav << "fuel used: " << fuelUsed;
     events.emit(DebugEvent(deltav.str()));
     deltav.str(std::string());
-    deltav << "available fuel: " << availableFuel;
+    deltav << "available fuel: " << remainingFuel;
     events.emit(DebugEvent(deltav.str()));
     deltav.str(std::string());
     deltav << "acceleration: " << acceleration;

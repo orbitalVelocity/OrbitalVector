@@ -263,9 +263,6 @@ int main(int argc, const char * argv[])
     glfwGetFramebufferSize(ws.pWindow, &ws.fbWidth, &ws.fbHeight);
     glViewport(0, 0, ws.fbWidth, ws.fbHeight);
 
-    // Calculate pixel ratio for hi-dpi devices.
-    auto pxRatio = (float)ws.fbWidth / (float)ws.winWidth;
-
     log(LOG_DEBUG,"Creating GameSingleton.");
 
     GameSingleton myGameSingleton("testMap");
@@ -275,10 +272,6 @@ int main(int argc, const char * argv[])
     initFontStash();
     myGameSingleton.renderer.init(ws.fbWidth, ws.fbHeight);
         check_gl_error();
-    
-    // creating vector of string
-//    myGameSingleton.textObj.updateSettings(pxRatio, ws.fbWidth, ws.fbHeight);
-//    myGameSingleton.textObj.guiText.push_back(Text(glm::vec2(.5, .4), 10.0f, "my ship"));
     
     // performance measurement
     glfwSetTime(0);

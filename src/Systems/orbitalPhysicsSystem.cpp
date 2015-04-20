@@ -149,6 +149,10 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         auto lan = glm::rotate(glm::mat4(), (float)(oe.lan), glm::vec3(0, 0, 1));
         orbit->transform  = lan * inc * aop;
         
+        if (entity.has_component<Exempt>())// and entity.component<Exempt>()->linearDynamics)
+        {
+            continue;
+        }
         //calculate next position/velocity for this object
         VectorD params = convertToParams(parentPosition->pos, parentGM->gm);
         

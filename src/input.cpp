@@ -166,8 +166,11 @@ void UserInput::mb(GLFWwindow* window, int button, int action, int mods)
         }
         if (button == GLFW_MOUSE_BUTTON_LEFT) {
             lmbPressed = (action == GLFW_PRESS);
+            lmbDown = lmbPressed;
         }
-    } 
+    } else {
+        lmbDown = false;
+    }
 }
 
 void UserInput::scroll(GLFWwindow* window, double xoffset, double yoffset)

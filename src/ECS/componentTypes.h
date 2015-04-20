@@ -288,6 +288,12 @@ COMPONENT(UISelection)
     int type;
 };
 
+COMPONENT(OrbitMouseHOver)
+{
+    OrbitMouseHOver() {}
+    bool hover;
+};
+
 COMPONENT(Velocity)
 {
     Velocity() {}
@@ -435,6 +441,13 @@ COMPONENT(GUICircleMenu)
     entityx::Entity target;
     UIElement centerElement = UIElement(0.6, 0);
     std::vector<UIElement> leafMenus;
+};
+
+COMPONENT(Exempt)
+{
+    Exempt() {}
+    bool linearDynamics = false;
+    bool circleMenu = false;
 };
 
 COMPONENT(UIText)

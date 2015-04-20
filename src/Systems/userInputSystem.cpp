@@ -10,6 +10,7 @@
 #include "componentTypes.h"
 #include "ecs.h"
 #include "log.h"
+#include <limits>
 
 using namespace entityx;
 
@@ -234,7 +235,60 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
             }
         }
     }
+    //ideally, this would go into orbitPhysicsSystem... or OrbitPath component
+    //finds closest spot of orbit to cursor
+    OrbitPath::Handle orbit;
+    struct Closest{
+        void compare(float dist, glm::vec3 p)
+        {
+            //what about depth?
+            if (dist < minimumDistance) {
+                minimumDistance = dist;
+                pos = p;
+            }
+        }
+        float minimumDistance = std::numeric_limits<float>::max();
+        glm::vec3 pos;
+    };
     
+    Closest closest;
+    for (auto entity : entities.entities_with_components(orbit))
+    {
+        auto &path = orbit->path;
+        for (int i = 0; i < path.size(); i += 3)
+        {
+            glm::vec3 vertex(path[i],
+                             path[i+1],
+                             path[i+2]);
+            vertex = glm::vec3(orbit->transform * glm::vec4(vertex, 1));
+            auto onScreenDistance = getDistanceToCursor(vertex);
+            closest.compare(onScreenDistance, vertex);
+        }
+    }
+    if (closest.minimumDistance < 0.02) {
+    std::cout << "closest distance: " << closest.minimumDistance << "\n";
+        //spawn a missile at that location
+        OrbitMouseHOver::Handle omo;
+        bool omoExists = false;
+        for (auto entity : entities.entities_with_components(omo))
+        {
+            assert(not omoExists);
+            omoExists = true;
+            entity.component<Position>()->pos = closest.pos;
+            //break; this hides a potential bug
+        }
+        if (not omoExists) {
+            auto thing = entities.create();
+            thing.assign<Position>(closest.pos);
+            thing.assign<Missile>();
+            thing.assign<Orientation>();
+            thing.assign<OrbitMouseHOver>();
+        }
+        if (legacyUserInput->lmbDown)
+        {
+            //go into orbitPlanningMode;
+        }
+    }
     return selectableEntity;
 }
 /*
@@ -354,6 +408,9 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                             auto ho = shadow.assign<OrbitPath>();
                             ho->transform = myShip.component<OrbitPath>()->transform;
                         }
+                        shadow.assign<Exempt>();
+                        shadow.component<Exempt>()->linearDynamics = true;
+                        shadow.component<Exempt>()->circleMenu = true;
                         assert(shadow.has_component<Ship>());
                         myShip.component<PlayerControl>()->shadowEntity = shadow;
                     }

@@ -292,6 +292,9 @@ COMPONENT(OrbitMouseHover)
 {
     OrbitMouseHover() {}
     bool hover;
+    float trueAnomaly;
+    float timeToTrueAnomaly;
+    glm::vec3 injectionVelocity;
 };
 
 COMPONENT(Velocity)

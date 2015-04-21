@@ -16,8 +16,8 @@
 #include "entityx/System.h"
 #include "events.h"
 #include "input.h" //legacy
-#include "camera.h" //legacy
 
+#include "oeconvert.h"//FIXME: remove after refactor
 /**
  * Grabs user input from the UserInput class 
  *      FIXME: (UserInput is legacy, needs to move that into this system... maybe?)

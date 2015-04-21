@@ -270,14 +270,39 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
         //spawn a missile at that location
         OrbitMouseHover::Handle omo;
         bool omoExists = false;
+        //update existing shadow entity
         for (auto entity : entities.entities_with_components(omo))
         {
-            assert(not omoExists);
             omoExists = true;
             entity.component<Position>()->pos = closest.pos;
+            //get true anomaly
+            //need complete oe first
+            PlayerControl::Handle playerControl;
+            Position::Handle position;
+            Velocity::Handle velocity;
+            for (auto myShip : entities.entities_with_components(playerControl,
+                                                                 position,
+                                                                 velocity))
+            {
+                auto parentEntityID = myShip.component<Parent>()->parent;
+                auto parentEntity = entities.get(parentEntityID);
+                auto gm = parentEntity.component<GM>()->gm;
+                
+                //using lambert equation
+                //get my oe
+                auto posVel = toPosVelVector(position->pos, velocity->vel);
+                auto oeMyShip = rv2oe(gm, posVel);
+                entity.component<OrbitMouseHover>()->trueAnomaly = 0; //need tra at closest.pos!!
+            }
+            //get time to it
+            //record deltaV
+            
             //break; this hides a potential bug
         }
+        //if shadow ship doesn't already exist
+        //first time initializing
         if (not omoExists) {
+            omoExists = true;
             auto thing = entities.create();
             thing.assign<Position>(closest.pos);
             thing.assign<Missile>();

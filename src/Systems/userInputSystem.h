@@ -50,7 +50,9 @@ public:
     entityx::Entity linePick(entityx::EntityManager & entities,
                   GLFWwindow *w, Camera &c);
 
-void updateMouseSelection(entityx::EntityManager &entities, entityx::Entity selectableEntity);
+    void createShadow(entityx::EntityManager &entities, entityx::Entity myShip);
+    void createShadow(entityx::EntityManager &entities, entityx::Entity myShip, glm::vec3 pos);
+    void updateMouseSelection(entityx::EntityManager &entities, entityx::Entity selectableEntity);
     
     void updateCamera();
 

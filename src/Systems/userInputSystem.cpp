@@ -266,9 +266,9 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
         }
     }
     if (closest.minimumDistance < 0.02) {
-    std::cout << "closest distance: " << closest.minimumDistance << "\n";
+//    std::cout << "closest distance: " << closest.minimumDistance << "\n";
         //spawn a missile at that location
-        OrbitMouseHOver::Handle omo;
+        OrbitMouseHover::Handle omo;
         bool omoExists = false;
         for (auto entity : entities.entities_with_components(omo))
         {
@@ -282,11 +282,15 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
             thing.assign<Position>(closest.pos);
             thing.assign<Missile>();
             thing.assign<Orientation>();
-            thing.assign<OrbitMouseHOver>();
-        }
-        if (legacyUserInput->lmbDown)
+            thing.assign<OrbitMouseHover>();
+        } else if (legacyUserInput->lmbDown)
         {
             //go into orbitPlanningMode;
+            PlayerControl::Handle playerControl;
+            for (auto myShip : entities.entities_with_components(playerControl))
+            {
+                createShadow(entities, myShip, closest.pos);
+            }
         }
     }
     return selectableEntity;
@@ -297,6 +301,41 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
  */
 #define ASSIGN_FROM_COPY(sink, source, type) {type temp = *source.component<type>().get(); sink.assign_from_copy<type>(temp);}
 //#define ASSIGN_FROM_COPY(sink, copy, type) sink.assign_from_copy<type>(copy);
+void UserInputSystem::createShadow(entityx::EntityManager &entities, entityx::Entity myShip)
+{
+    createShadow(entities, myShip, myShip.component<Position>()->pos);
+}
+
+void UserInputSystem::createShadow(entityx::EntityManager &entities, entityx::Entity myShip, glm::vec3 pos)
+{
+    orbitPlanningMode = true;
+    if (not myShip.component<PlayerControl>()->shadowEntity.valid())
+    {
+        //create shadow copy of myShip
+        auto shadow = entities.create();
+        //semantics is
+        //shadow.Ship = myShip.ship;
+        ASSIGN_FROM_COPY(shadow, myShip, Ship);
+        ASSIGN_FROM_COPY(shadow, myShip, Parent);
+        ASSIGN_FROM_COPY(shadow, myShip, Velocity);
+        ASSIGN_FROM_COPY(shadow, myShip, Orientation);
+        {
+            //maybe a custom copy constructor?
+            auto ho = shadow.assign<OrbitPath>();
+            ho->transform = myShip.component<OrbitPath>()->transform;
+        }
+        shadow.assign<Exempt>();
+        shadow.assign<Position>(pos);
+        shadow.component<Exempt>()->linearDynamics = true;
+        shadow.component<Exempt>()->circleMenu = true;
+        assert(shadow.has_component<Ship>());
+        myShip.component<PlayerControl>()->shadowEntity = shadow;
+    }
+//    else {
+//        assert(false && "shadow already exists!");
+    std::cout <<  "shadow already exists!";
+//    }
+}
 void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::Entity myShip)
 {
     PlayerControl::Handle player;
@@ -392,28 +431,8 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                 orbitPlanningMode = not orbitPlanningMode;
                 if (orbitPlanningMode)
                 {
-                    if (not myShip.component<PlayerControl>()->shadowEntity.valid())
-                    {
-                        //create shadow copy of myShip
-                        shadow = entities.create();
-                        //semantics is
-                        //shadow.Ship = myShip.ship;
-                        ASSIGN_FROM_COPY(shadow, myShip, Ship);
-                        ASSIGN_FROM_COPY(shadow, myShip, Parent);
-                        ASSIGN_FROM_COPY(shadow, myShip, Velocity);
-                        ASSIGN_FROM_COPY(shadow, myShip, Position);
-                        ASSIGN_FROM_COPY(shadow, myShip, Orientation);
-                        {
-                            //maybe a custom copy constructor?
-                            auto ho = shadow.assign<OrbitPath>();
-                            ho->transform = myShip.component<OrbitPath>()->transform;
-                        }
-                        shadow.assign<Exempt>();
-                        shadow.component<Exempt>()->linearDynamics = true;
-                        shadow.component<Exempt>()->circleMenu = true;
-                        assert(shadow.has_component<Ship>());
-                        myShip.component<PlayerControl>()->shadowEntity = shadow;
-                    }
+                    createShadow(entities, myShip);
+                    
                 } else {
                     assert(shadow.valid());
                     shadow.destroy();

@@ -288,9 +288,9 @@ COMPONENT(UISelection)
     int type;
 };
 
-COMPONENT(OrbitMouseHOver)
+COMPONENT(OrbitMouseHover)
 {
-    OrbitMouseHOver() {}
+    OrbitMouseHover() {}
     bool hover;
 };
 

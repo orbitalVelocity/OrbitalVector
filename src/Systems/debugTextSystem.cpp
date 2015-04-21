@@ -27,7 +27,6 @@ void DebugTextSystem::configure(entityx::EventManager &events)
 void DebugTextSystem::receive(const DebugEvent &e)
 {
     assert(nullptr not_eq debugTextPtr);
-    
     messages.push_back({currentTime, e.message});
 }
 

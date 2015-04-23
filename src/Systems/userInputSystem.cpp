@@ -267,7 +267,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     }
     if (closest.minimumDistance < 0.02) {
 //    std::cout << "closest distance: " << closest.minimumDistance << "\n";
-        //spawn a missile at that location
+        //spawn a missile (place holder) at that location
         OrbitMouseHover::Handle omo;
         bool omoExists = false;
         //update existing shadow entity
@@ -284,18 +284,46 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
                                                                  position,
                                                                  velocity))
             {
+                //algorithm: find angle between 2 vectors (current pos and closest pos on orbit that the mouse is hovering over
+                //find true anomaly of selected spot by adding angle to current true anomaly
+                //get time to true anomally of selected spot
+                
                 auto parentEntityID = myShip.component<Parent>()->parent;
                 auto parentEntity = entities.get(parentEntityID);
                 auto gm = parentEntity.component<GM>()->gm;
                 
-                //using lambert equation
                 //get my oe
                 auto posVel = toPosVelVector(position->pos, velocity->vel);
-                auto oeMyShip = rv2oe(gm, posVel);
-                entity.component<OrbitMouseHover>()->trueAnomaly = 0; //need tra at closest.pos!!
+                auto oe0 = rv2oe(gm, posVel);
+                
+                //find angle
+                auto a = position->pos;
+                auto b = closest.pos;
+                float dotAB = glm::dot(a, b);
+                float lengthALengthB = glm::length(a) * glm::length(b);
+                float angle = acos(dotAB/lengthALengthB);
+                
+                glm::vec3 vn(0, 0, 1);
+                auto sign = glm::dot(vn, glm::cross(a, b));
+                if (sign < 0) //detect if in range [Pi,2Pi]
+                {
+                    angle = 2*M_PI - angle;
+                }
+                
+                sign = glm::dot(vn, glm::cross(a, velocity->vel));
+                if (sign < 0) //detect if orbiting CCW
+                {
+                    angle = 2*M_PI - angle;
+                }
+                
+                std::cout << "angle: " << angle << std::endl;
+                auto &tra = entity.component<OrbitMouseHover>()->trueAnomaly;
+                auto &tttra = entity.component<OrbitMouseHover>()->timeToTrueAnomaly;
+                tra = fmod((oe0.tra+ angle), (2*M_PI));
+                tttra = timeUntilAnomaly(gm, oe0, tra);
+                std::cout << "Time to true anomally: " << tttra << std::endl;
             }
-            //get time to it
-            //record deltaV
+            //record all subsequent deltaV until exit of planning mode
             
             //break; this hides a potential bug
         }
@@ -342,7 +370,8 @@ void UserInputSystem::createShadow(entityx::EntityManager &entities, entityx::En
         //shadow.Ship = myShip.ship;
         ASSIGN_FROM_COPY(shadow, myShip, Ship);
         ASSIGN_FROM_COPY(shadow, myShip, Parent);
-        ASSIGN_FROM_COPY(shadow, myShip, Velocity);
+        ASSIGN_FROM_COPY(shadow, myShip, Velocity);//FIXME: must calc velocity at designated position
+        //find the angle difference, get the tra, then get velocity at tra
         ASSIGN_FROM_COPY(shadow, myShip, Orientation);
         {
             //maybe a custom copy constructor?

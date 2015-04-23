@@ -16,7 +16,7 @@
 #include "entityx/System.h"
 #include "events.h"
 #include "input.h" //legacy
-
+#include "math.h"
 #include "oeconvert.h"//FIXME: remove after refactor
 /**
  * Grabs user input from the UserInput class 

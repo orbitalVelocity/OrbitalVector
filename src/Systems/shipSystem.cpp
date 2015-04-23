@@ -75,12 +75,13 @@ void ShipSystem::update(entityx::EntityManager &entities, entityx::EventManager 
             auto thrust = engineBurn(ship, dt);
             ship->thrust = false;
             auto forwardVector = glm::vec3(orientation->orientation * glm::vec4(0, 0, 1, 1));
-
+//FIXME: store acceleration in ship and push it to the physics system
+            //also clear it after use
             acceleration = thrust / ship->mass;
             velocity->vel += glm::normalize(forwardVector) * acceleration;
          
             auto lnMass = log(ship->mass / ship->dryMass);
-            dv = ship->engines[0].isp /9.81 * lnMass;
+            dv = ship->engines[0].isp * 9.81 * lnMass;
             
         }
         

@@ -84,7 +84,8 @@ void MissileSystem::update(EntityManager & entities,
                 std::cout << "BUG: no satisfiable dt found\n";
                 break;
             }
-        }while(iv.x != iv.x);
+        }while(std::isnan(iv.x));
+        
         if (dt2 < 0.1) {
             continue;
         }

@@ -10,6 +10,12 @@ GLEW
 GLFW3
 CMake
 
+#Downloading
+1. git clone https://github.com/orbitalVelocity/OrbitalVector
+2. cd OrbitalVector
+3. git submodule init
+4. git submodule update
+
 #Command line build instructions (Mac/Linux)
 1. mkdir build
 2. cd build

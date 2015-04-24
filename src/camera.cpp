@@ -36,12 +36,20 @@ void Camera::setFocus(const glm::vec3 f)
     focus= f;
 }
 
+
+
 void Camera::offsetPos(const glm::vec3 offset)
 {
-    if (offset.z + position.z > 2.0f)
-        position += offset;
-    else
-        position = glm::vec3(0, 0.5, 2.0f);
+    // TODO: change these constants based on OS.
+#ifdef __APPLE__
+    float scaling = 0.03f;
+#elif WIN32
+    float scaling = 0.03f;
+#else
+    float scaling = 0.03f;
+#endif    
+    position += offset*glm::length(position)*scaling;
+    if (glm::length(position) < 4.0f) position *= 4.0f/glm::length(position);
 }
 
 float Camera::getFOV() const

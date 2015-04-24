@@ -75,7 +75,10 @@ void UserInputSystem::update(entityx::EntityManager &entities,
     }
 
     //scroll behavior
-    camera.offsetPos(glm::vec3(0,0, -legacyUserInput->yScroll));
+    auto modifiedScroll = legacyUserInput->yScroll;
+    std::cout << "scroll: " << modifiedScroll << std::endl;
+//    modifiedScroll = pow(modifiedScroll, 0.5);
+    camera.offsetPos(glm::vec3(0,0, -modifiedScroll));
     legacyUserInput->yScroll = 0;
     
     //process actions

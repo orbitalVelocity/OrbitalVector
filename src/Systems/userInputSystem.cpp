@@ -76,7 +76,7 @@ void UserInputSystem::update(entityx::EntityManager &entities,
 
     //scroll behavior
     auto modifiedScroll = legacyUserInput->yScroll;
-    std::cout << "scroll: " << modifiedScroll << std::endl;
+//    std::cout << "scroll: " << modifiedScroll << std::endl;
 //    modifiedScroll = pow(modifiedScroll, 0.5);
     camera.offsetPos(glm::vec3(0,0, -modifiedScroll));
     legacyUserInput->yScroll = 0;
@@ -145,31 +145,19 @@ float getGM(entityx::EntityManager &entities, entityx::Entity entity) {
     
     return gm;
 }
+
 float findAngle(glm::vec3 pos, glm::vec3 vel, glm::vec3 targetPos, float gm)
 {
-
-    //find angle
-    auto a = pos;
-    auto b = targetPos;
-    float dotAB = glm::dot(a, b);
-    float lengthALengthB = glm::length(a) * glm::length(b);
+    float dotAB = glm::dot(pos, targetPos);
+    float lengthALengthB = glm::length(pos) * glm::length(targetPos);
     float angle = acos(dotAB/lengthALengthB);
     
-    glm::vec3 vn(0, 0, 1);
-    
-    //really tempted to fuse both ifs with !=
-    //http://stackoverflow.com/questions/1596668/logical-xor-operator-in-c
-    auto sign = glm::dot(vn, glm::cross(a, b));
+    auto sign = glm::dot(glm::cross(pos, targetPos), glm::cross(pos, vel));
     if (sign < 0) //detect if in range [Pi,2Pi]
     {
         angle = 2*M_PI - angle;
     }
-    
-    sign = glm::dot(vn, glm::cross(a, vel));
-    if (sign < 0) //detect if orbiting CCW
-    {
-        angle = 2*M_PI - angle;
-    }
+
     return angle;
 }
 
@@ -185,12 +173,9 @@ glm::vec3 getVelocityAtPosition(entityx::EntityManager &entities, entityx::Entit
                            myShipVel,
                            pos,
                            gm);
-    //replace oe0.tra with new tra,
     auto oe1 = oe0;
     oe1.tra += angle;
-    //then reconvert back to rv,
     auto rv = oe2rv(gm, oe1);
-    //grab v
     glm::vec3 v(rv[3],
                 rv[4],
                 rv[5]);
@@ -355,7 +340,6 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
                
                 auto angle = findAngle(position->pos, velocity->vel, closest.pos, gm);
 
-//                std::cout << "angle: " << angle << std::endl;
                 auto &tra = entity.component<OrbitMouseHover>()->trueAnomaly;
                 auto &tttra = entity.component<OrbitMouseHover>()->timeToTrueAnomaly;
 
@@ -363,7 +347,6 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
                 auto oe0 = rv2oe(gm, posVel);
                 tra = fmod((oe0.tra+ angle), (2*M_PI));
                 tttra = timeUntilAnomaly(gm, oe0, tra);
-//                std::cout << "Time to true anomally: " << tttra << std::endl;
             }
             //record all subsequent deltaV orbit planning mode
             
@@ -371,7 +354,8 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
         }
         //if shadow ship doesn't already exist
         //first time initializing
-        //this only creates an indication of a shadow (no orbit planning yet)
+        //this only creates an indication of a shadow
+        //(no orbit planning yet)
         if (not omoExists) {
             omoExists = true;
             auto thing = entities.create();
@@ -379,7 +363,8 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
             thing.assign<Missile>();
             thing.assign<Orientation>();
             thing.assign<OrbitMouseHover>();
-        } else if (legacyUserInput->lmbDown)
+        //TODO: temporarily override modes when altPressed is true
+        } else if (legacyUserInput->lmbDown and not legacyUserInput->altPressed)
         {
             //go into orbitPlanningMode;
             PlayerControl::Handle playerControl;

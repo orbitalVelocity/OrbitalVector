@@ -180,6 +180,8 @@ void GameSingleton::update(double dt)
     auto playerControl = myShip.component<PlayerControl>();
     auto focus = playerControl->focusOnEntity;
     auto lastFocus = playerControl->lastEntityFocused;
+    
+    //TODO: this should go in the cameraSystem!
     if (focus.valid()) {
         glm::vec3 desiredPosition;
 
@@ -190,6 +192,7 @@ void GameSingleton::update(double dt)
             auto lastFocusPosition = lastFocus.component<Position>()->pos;
             
             float progress = playerControl->getProgress(dt);
+//            std::cout << progress << ",";
             desiredPosition = glm::lerp(lastFocusPosition, focusPosition, progress);
         } else {
             desiredPosition = focus.component<Position>()->pos;

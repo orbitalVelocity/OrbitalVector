@@ -99,6 +99,7 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
     auto count = 0;
     for (Entity entity : entities.entities_with_components(player)) {
         (void) entity;
+        assert(count++==0);
         auto &selectedEntities = player->selectedEntities;
         auto &mouseOverEntities = player->mouseOverEntities;
         auto enableMultiSelection = false;
@@ -117,10 +118,11 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
         }
         
         //move camera, prevent selection from happening if so
-        if (legacyUserInput->altPressed and legacyUserInput->lmbPressed) {
+        if (legacyUserInput->altPressed and legacyUserInput->lmbDown) {
             player->newFocus(selectableEntity);
-            log(LOG_DEBUG, "switch focus!\n");
-            continue;
+            log(LOG_DEBUG, "switch focus!");
+            legacyUserInput->lmbDown = false;
+            return;
         }
         
         if (selectionMode) {
@@ -129,7 +131,6 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
         } else { //else mouseOverMode
             mouseOverEntities.emplace_back(selectableEntity);
         }
-        assert(count++==0);
      
     }
 }
@@ -351,7 +352,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
                
                 auto angle = findAngle(position->pos, velocity->vel, closest.pos, gm);
 
-                std::cout << "angle: " << angle << std::endl;
+//                std::cout << "angle: " << angle << std::endl;
                 auto &tra = entity.component<OrbitMouseHover>()->trueAnomaly;
                 auto &tttra = entity.component<OrbitMouseHover>()->timeToTrueAnomaly;
 
@@ -359,7 +360,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
                 auto oe0 = rv2oe(gm, posVel);
                 tra = fmod((oe0.tra+ angle), (2*M_PI));
                 tttra = timeUntilAnomaly(gm, oe0, tra);
-                std::cout << "Time to true anomally: " << tttra << std::endl;
+//                std::cout << "Time to true anomally: " << tttra << std::endl;
             }
             //record all subsequent deltaV orbit planning mode
             

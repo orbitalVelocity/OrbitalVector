@@ -8,6 +8,7 @@
 
 #include "collisionSystem.h"
 #include "componentTypes.h"
+#include "log.h"
 
 using namespace entityx;
 
@@ -33,8 +34,12 @@ void CollisionSystem::update(EntityManager & entities,
                 continue;
             }
             
-            //find distance between two position
-            auto distance = glm::length(left_position->pos -  right_position->pos);
+            //find the minimum distance between the two entities over the last dt
+            auto dr = left_position->pos - right_position->pos;
+            auto dv = (left_entity.has_component<Velocity>()  ? left_entity.component<Velocity>()->vel  : glm::vec3(0,0,0))
+                    - (right_entity.has_component<Velocity>() ? right_entity.component<Velocity>()->vel : glm::vec3(0,0,0));
+            auto time = glm::length(dv) != 0.0 ? -dot(dr,dv)/dot(dv,dv) : 0.0;
+            auto distance = -dt < time && time < 0.0 ? glm::length(dr+time*dv) : fmin(glm::length(dr),glm::length(dr-dv*dt));
             auto minimumDistance = left_radius->radius + right_radius->radius;
             
             //emit collision event if this is closer than the sum of their radii
@@ -47,6 +52,8 @@ void CollisionSystem::update(EntityManager & entities,
 //                events.emit<DebugEvent>(text.str());
                 std::cout << text.str() << std::endl;
                 
+                if (-dt < time && time < 0.0) log(LOG_DEBUG,"A collision was detected between frames.");
+                else log(LOG_DEBUG,"A collision was detected at the end of a frame.");
                 addCollision(left_entity);
                 addCollision(right_entity);
             }

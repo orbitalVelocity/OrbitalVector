@@ -154,7 +154,7 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
             continue;
         }
         //calculate next position/velocity for this object
-        VectorD params = convertToParams(parentPosition->pos, parentGM->gm);
+        VectorD params = convertToParams(parentPosition->pos, parentGM->gm, velocity->getAccel());
         
         t_integrator integrator = &rungeKutta4;
         t_dynamics dynamics = &twobody_perturbed;

@@ -124,7 +124,7 @@ struct Engine : public Part
         availableFuel -= fuelUsed;
         
         //thrust is lowered if less fuel available than required
-        return throttle * fuelFlowRate * isp * 9.81 * (fuelUsed/requiredFuel) * dt;
+        return throttle * fuelFlowRate * isp * 9.81 * (fuelUsed/requiredFuel);//thrust isn't dependent on frame rate, this should be in the velocity calculation in shipSystem * dt;
         
         //from Tan Zu
         //ThrustForce = ISP * 9.81 * fuel flow rate * throttle
@@ -302,7 +302,24 @@ COMPONENT(Velocity)
     Velocity() {}
     Velocity(glm::vec3 v) : vel(v) {}
     
+    /**
+     * returns acceleration and clears it as well
+     * FIXME: consider better semantics in function name
+     */
+    glm::vec3 getAccel()
+    {
+        auto temp = accel;
+        accel = glm::vec3(0);
+        return temp;
+    }
+    void setAccel(glm::vec3 a)
+    {
+        accel = a;
+    }
+    
     glm::vec3 vel;
+    private:
+    glm::vec3 accel;
 };
 
 COMPONENT(Position)

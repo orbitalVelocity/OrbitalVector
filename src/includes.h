@@ -69,6 +69,7 @@ std::string to_string_with_precision(const T a_value, const int n=6)
 
 //orbital stuff
 VectorD convertToParams (glm::vec3 pos, double gm);
+VectorD convertToParams (glm::vec3 pos, double gm, glm::vec3 accel);
 std::vector<double> toPosVelVector(glm::vec3 pos, glm::vec3 vel);
 
 template<typename T>

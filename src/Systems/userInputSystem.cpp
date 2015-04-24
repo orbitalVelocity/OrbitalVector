@@ -368,6 +368,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
         }
         //if shadow ship doesn't already exist
         //first time initializing
+        //this only creates an indication of a shadow (no orbit planning yet)
         if (not omoExists) {
             omoExists = true;
             auto thing = entities.create();

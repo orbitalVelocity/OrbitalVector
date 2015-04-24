@@ -85,14 +85,18 @@ glm::vec2 getVec2(glm::mat4 vp, glm::vec3 _pos)
 //for orbital utility
 VectorD convertToParams (glm::vec3 pos, double gm)
 {
+    return convertToParams(pos, gm, glm::vec3(0));
+}
+VectorD convertToParams (glm::vec3 pos, double gm, glm::vec3 accel)
+{
     VectorD params(7);
     params[0] = pos.x;
     params[1] = pos.y;
     params[2] = pos.z;
     params[3] = gm;
-    params[4] = 0.0;
-    params[5] = 0.0;
-    params[6] = 0.0;
+    params[4] = accel.x;
+    params[5] = accel.y;
+    params[6] = accel.z;
     return params;
 }
 

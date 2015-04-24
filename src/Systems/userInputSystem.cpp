@@ -313,6 +313,30 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
             auto onScreenDistance = getDistanceToCursor(vertex);
             closest.compare(onScreenDistance, vertex);
         }
+        //increase true anomaly resolution by 100x
+        if (entity.has_component<Position>() && entity.has_component<Velocity>() && entity.has_component<Parent>())
+        {
+            Position::Handle position = entity.component<Position>();
+            Velocity::Handle velocity = entity.component<Velocity>();
+            Parent::Handle parent = entity.component<Parent>();
+            Entity entity_parent = entities.get(parent->parent);
+            auto posVel = toPosVelVector(position->pos,velocity->vel);
+            auto gm = entity_parent.component<GM>()->gm;
+            auto oe = rv2oe(gm,posVel);
+
+            //move the true anomaly to the closest orbit vertex
+            oe.tra += findAngle(position->pos,velocity->vel,closest.pos,gm);
+
+            //find the closest point to the cursor by true anomaly
+            auto tra_end = oe.tra + M_PI/180.0;
+            for (oe.tra = oe.tra - M_PI/180.0; oe.tra < tra_end; oe.tra += 0.01*M_PI/180.0)
+            {
+                auto rv = oe2rv(gm,oe);
+                glm::vec3 vertex(rv[0],rv[1],rv[2]);
+                auto onScreenDistance = getDistanceToCursor(vertex);
+                closest.compare(onScreenDistance, vertex);
+            }
+        }
     }
     if (closest.minimumDistance < 0.02) {
 //    std::cout << "closest distance: " << closest.minimumDistance << "\n";

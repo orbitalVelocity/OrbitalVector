@@ -26,18 +26,18 @@ void CollisionSystem::update(EntityManager & entities,
     //FIXME: need a continuous collision detection method
     Position::Handle left_position, right_position;
     Radius::Handle left_radius, right_radius;
+    Velocity::Handle left_velocity, right_velocity;
     
-    for (Entity left_entity : entities.entities_with_components(left_position, left_radius)) {
+    for (Entity left_entity : entities.entities_with_components(left_position, left_radius, left_velocity)) {
     
-        for (Entity right_entity : entities.entities_with_components(right_position, right_radius)) {
+        for (Entity right_entity : entities.entities_with_components(right_position, right_radius, right_velocity)) {
             if (right_entity.id() == left_entity.id()) {
                 continue;
             }
             
             //find the minimum distance between the two entities over the last dt
             auto dr = left_position->pos - right_position->pos;
-            auto dv = (left_entity.has_component<Velocity>()  ? left_entity.component<Velocity>()->vel  : glm::vec3(0,0,0))
-                    - (right_entity.has_component<Velocity>() ? right_entity.component<Velocity>()->vel : glm::vec3(0,0,0));
+            auto dv = left_velocity->vel - right_velocity->vel;
             auto time = glm::length(dv) != 0.0 ? -dot(dr,dv)/dot(dv,dv) : 0.0;
             auto distance = -dt < time && time < 0.0 ? glm::length(dr+time*dv) : fmin(glm::length(dr),glm::length(dr-dv*dt));
             auto minimumDistance = left_radius->radius + right_radius->radius;

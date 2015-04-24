@@ -301,7 +301,10 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     Closest closest;
     //function for determining closest point the cursor is to the orbit
     //only do this for the target and myShip, or depending on the mode, just one orbit to reduce aliasing
-    for (auto entity : entities.entities_with_components(orbit))
+//    Position::Handle position;
+//    Velocity::Handle velocity;
+    Parent::Handle parent;
+    for (auto entity : entities.entities_with_components(orbit, position, velocity, parent))
     {
         auto &path = orbit->path;
         for (int i = 0; i < path.size(); i += 3)
@@ -314,11 +317,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
             closest.compare(onScreenDistance, vertex);
         }
         //increase true anomaly resolution by 100x
-        if (entity.has_component<Position>() && entity.has_component<Velocity>() && entity.has_component<Parent>())
         {
-            Position::Handle position = entity.component<Position>();
-            Velocity::Handle velocity = entity.component<Velocity>();
-            Parent::Handle parent = entity.component<Parent>();
             Entity entity_parent = entities.get(parent->parent);
             auto posVel = toPosVelVector(position->pos,velocity->vel);
             auto gm = entity_parent.component<GM>()->gm;
@@ -338,7 +337,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
             }
         }
     }
-    if (closest.minimumDistance < 0.02) {
+    if (closest.minimumDistance < 0.04) {
 //    std::cout << "closest distance: " << closest.minimumDistance << "\n";
         //spawn a missile (place holder) at that location
         OrbitMouseHover::Handle omo;
@@ -396,6 +395,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
             {
                 createShadow(entities, myShip, closest.pos);
             }
+            legacyUserInput->lmbDown = false;
         }
     }
     return selectableEntity;
@@ -414,6 +414,7 @@ void UserInputSystem::createShadow(entityx::EntityManager &entities, entityx::En
 void UserInputSystem::createShadow(entityx::EntityManager &entities, entityx::Entity myShip, glm::vec3 pos)
 {
     orbitPlanningMode = true;
+    static int count = 0;
     if (not myShip.component<PlayerControl>()->shadowEntity.valid())
     {
         //create shadow copy of myShip
@@ -437,8 +438,7 @@ void UserInputSystem::createShadow(entityx::EntityManager &entities, entityx::En
         myShip.component<PlayerControl>()->shadowEntity = shadow;
     }
     else {
-//        assert(false && "shadow already exists!");
-    std::cout <<  "shadow already exists!";
+        std::cout <<  "shadow already exists! " << count++ << endl;
     }
 }
 

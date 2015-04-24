@@ -10,8 +10,8 @@
 
 Camera::Camera() :
     position(0, 10, 10),
-    hAngle(180),
-    vAngle(-90),
+    hAngle(0),
+    vAngle(0),
     nearPlane(10e-3f),
     farPlane(10e4f),
     ratio(16.0f/9.0f),

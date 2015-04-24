@@ -47,6 +47,7 @@ public:
     bool isPressed = false;
     bool lmbPressed, rmbPressed;
     bool lmbDown = false, rmbDown = false;
+    bool lmbDownPrev = false, rmbDownPrev = false;
     
     bool altPressed = false,
         ctrlPressed = false,

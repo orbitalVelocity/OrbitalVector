@@ -166,10 +166,12 @@ void UserInput::mb(GLFWwindow* window, int button, int action, int mods)
         }
         if (button == GLFW_MOUSE_BUTTON_LEFT) {
             lmbPressed = (action == GLFW_PRESS);
-            lmbDown = lmbPressed;
+            lmbDown = lmbPressed && lmbDownPrev;
+            lmbDownPrev = true;
         }
     } else {
         lmbDown = false;
+        lmbDownPrev = false;
     }
 }
 

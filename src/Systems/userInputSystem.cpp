@@ -134,6 +134,64 @@ void UserInputSystem::updateMouseSelection(EntityManager &entities, Entity selec
     }
 }
 
+float getGM(entityx::EntityManager &entities, entityx::Entity entity) {
+    auto parentEntityID = entity.component<Parent>()->parent;
+    auto parentEntity = entities.get(parentEntityID);
+    auto gm = parentEntity.component<GM>()->gm;
+    
+    return gm;
+}
+float findAngle(glm::vec3 pos, glm::vec3 vel, glm::vec3 targetPos, float gm)
+{
+
+    //find angle
+    auto a = pos;
+    auto b = targetPos;
+    float dotAB = glm::dot(a, b);
+    float lengthALengthB = glm::length(a) * glm::length(b);
+    float angle = acos(dotAB/lengthALengthB);
+    
+    glm::vec3 vn(0, 0, 1);
+    
+    //really tempted to fuse both ifs with !=
+    //http://stackoverflow.com/questions/1596668/logical-xor-operator-in-c
+    auto sign = glm::dot(vn, glm::cross(a, b));
+    if (sign < 0) //detect if in range [Pi,2Pi]
+    {
+        angle = 2*M_PI - angle;
+    }
+    
+    sign = glm::dot(vn, glm::cross(a, vel));
+    if (sign < 0) //detect if orbiting CCW
+    {
+        angle = 2*M_PI - angle;
+    }
+    return angle;
+}
+
+glm::vec3 getVelocityAtPosition(entityx::EntityManager &entities, entityx::Entity myShip, glm::vec3 pos)
+{
+    auto myShipPos = myShip.component<Position>()->pos;
+    auto myShipVel = myShip.component<Velocity>()->vel;
+    auto posVel = toPosVelVector(myShipPos, myShipVel);
+    auto gm = getGM(entities, myShip);
+    auto oe0 = rv2oe(gm, posVel);
+    //find tra from position,
+    auto angle = findAngle(myShipPos,
+                           myShipVel,
+                           pos,
+                           gm);
+    //replace oe0.tra with new tra,
+    auto oe1 = oe0;
+    oe1.tra += angle;
+    //then reconvert back to rv,
+    auto rv = oe2rv(gm, oe1);
+    //grab v
+    glm::vec3 v(rv[3],
+                rv[4],
+                rv[5]);
+    return v;
+}
 
 entityx::Entity UserInputSystem::linePick(EntityManager & entities,
                            GLFWwindow *pWindow,
@@ -252,6 +310,8 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     };
     
     Closest closest;
+    //function for determining closest point the cursor is to the orbit
+    //only do this for the target and myShip, or depending on the mode, just one orbit to reduce aliasing
     for (auto entity : entities.entities_with_components(orbit))
     {
         auto &path = orbit->path;
@@ -287,43 +347,21 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
                 //algorithm: find angle between 2 vectors (current pos and closest pos on orbit that the mouse is hovering over
                 //find true anomaly of selected spot by adding angle to current true anomaly
                 //get time to true anomally of selected spot
-                
-                auto parentEntityID = myShip.component<Parent>()->parent;
-                auto parentEntity = entities.get(parentEntityID);
-                auto gm = parentEntity.component<GM>()->gm;
-                
-                //get my oe
-                auto posVel = toPosVelVector(position->pos, velocity->vel);
-                auto oe0 = rv2oe(gm, posVel);
-                
-                //find angle
-                auto a = position->pos;
-                auto b = closest.pos;
-                float dotAB = glm::dot(a, b);
-                float lengthALengthB = glm::length(a) * glm::length(b);
-                float angle = acos(dotAB/lengthALengthB);
-                
-                glm::vec3 vn(0, 0, 1);
-                auto sign = glm::dot(vn, glm::cross(a, b));
-                if (sign < 0) //detect if in range [Pi,2Pi]
-                {
-                    angle = 2*M_PI - angle;
-                }
-                
-                sign = glm::dot(vn, glm::cross(a, velocity->vel));
-                if (sign < 0) //detect if orbiting CCW
-                {
-                    angle = 2*M_PI - angle;
-                }
-                
+                auto gm = getGM(entities, myShip);
+               
+                auto angle = findAngle(position->pos, velocity->vel, closest.pos, gm);
+
                 std::cout << "angle: " << angle << std::endl;
                 auto &tra = entity.component<OrbitMouseHover>()->trueAnomaly;
                 auto &tttra = entity.component<OrbitMouseHover>()->timeToTrueAnomaly;
+
+                auto posVel = toPosVelVector(position->pos, velocity->vel);
+                auto oe0 = rv2oe(gm, posVel);
                 tra = fmod((oe0.tra+ angle), (2*M_PI));
                 tttra = timeUntilAnomaly(gm, oe0, tra);
                 std::cout << "Time to true anomally: " << tttra << std::endl;
             }
-            //record all subsequent deltaV until exit of planning mode
+            //record all subsequent deltaV orbit planning mode
             
             //break; this hides a potential bug
         }
@@ -370,26 +408,26 @@ void UserInputSystem::createShadow(entityx::EntityManager &entities, entityx::En
         //shadow.Ship = myShip.ship;
         ASSIGN_FROM_COPY(shadow, myShip, Ship);
         ASSIGN_FROM_COPY(shadow, myShip, Parent);
-        ASSIGN_FROM_COPY(shadow, myShip, Velocity);//FIXME: must calc velocity at designated position
         //find the angle difference, get the tra, then get velocity at tra
         ASSIGN_FROM_COPY(shadow, myShip, Orientation);
         {
-            //maybe a custom copy constructor?
             auto ho = shadow.assign<OrbitPath>();
             ho->transform = myShip.component<OrbitPath>()->transform;
         }
-        shadow.assign<Exempt>();
         shadow.assign<Position>(pos);
+        shadow.assign<Velocity>(getVelocityAtPosition(entities, myShip, pos));
+        shadow.assign<Exempt>();
         shadow.component<Exempt>()->linearDynamics = true;
         shadow.component<Exempt>()->circleMenu = true;
         assert(shadow.has_component<Ship>());
         myShip.component<PlayerControl>()->shadowEntity = shadow;
     }
-//    else {
+    else {
 //        assert(false && "shadow already exists!");
     std::cout <<  "shadow already exists!";
-//    }
+    }
 }
+
 void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::Entity myShip)
 {
     PlayerControl::Handle player;

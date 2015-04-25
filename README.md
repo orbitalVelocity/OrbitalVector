@@ -29,7 +29,10 @@ Install the following dependencies:
   - cmake .
   - make
   - sudo make install
-
+5. make sure this is in your LD LIBRARY PATH
+  - /usr/lib64 /usr/local/lib
+  - e.g.
+  - export LD_LIBRARY_PATH=/usr/lib64:/usr/local/lib:$LD_LIBRARY_PATH
 
 
 #Downloading

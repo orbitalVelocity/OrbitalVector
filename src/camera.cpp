@@ -46,7 +46,7 @@ void Camera::offsetPos(const glm::vec3 offset)
 #elif WIN32
     float scaling = 0.03f;
 #else
-    float scaling = 0.03f;
+    float scaling = 0.18f;
 #endif    
     position += offset*glm::length(position)*scaling;
     if (glm::length(position) < 4.0f) position *= 4.0f/glm::length(position);

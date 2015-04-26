@@ -21,6 +21,8 @@ find_package(GLEW	REQUIRED)
 find_package(PkgConfig	REQUIRED)
 pkg_search_module(GLFW	REQUIRED glfw3)
 
+link_directories(/usr/local/lib)
+
 # TODO: add sub-folders elegantly
 include_directories(src)
 include_directories(src/ECS)
@@ -50,8 +52,9 @@ else(LINUX)
 	target_link_libraries(${project_name} ${OPENGL_LIBRARIES} GL GLU X11)
 	target_link_libraries(${project_name} ${GLEW_LIBRARIES})
 	target_link_libraries(${project_name} glfw3 ${GLFW_LIBRARIES})
+	#target_link_libraries(${project_name} glfw3)
 	# linker errors say we need these
-	target_link_libraries(${project_name} Xxf86vm pthread Xrandr Xi)
+	target_link_libraries(${project_name} Xxf86vm pthread Xrandr Xi Xcursor Xinerama)
 endif(APPLE)
 
 add_module(physics)

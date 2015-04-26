@@ -8,6 +8,11 @@
 
 #include "userInputSystem.h"
 #include "componentTypes.h"
+#include "shipComponent.h"
+#include "missileComponent.h"
+#include "playerControlComponent.h"
+#include "velocityComponent.h"
+
 #include "ecs.h"
 #include "log.h"
 #include <limits>

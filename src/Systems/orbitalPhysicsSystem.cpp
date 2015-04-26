@@ -8,6 +8,9 @@
 
 #include "orbitalPhysicsSystem.h"
 #include "componentTypes.h"
+#include "velocityComponent.h"
+#include "shipComponent.h"
+#include "missileComponent.h"
 
 #include "entityx/Entity.h"
 
@@ -19,6 +22,7 @@
 #include "oeconvert.h"
 
 #include "includes.h"
+#include "log.h"
 
 using namespace entityx;
 
@@ -58,7 +62,11 @@ void drawOrbitalPath(int segments, std::vector<float> &path, GLdouble a, GLdoubl
 {
     path.clear();
     path.reserve(segments * 3 * 2 + 12);
-    assert(path.empty());
+    if (not path.empty())
+    {
+        std::cout << "orbit path size: " << path.size() << std::endl;
+    }
+//    assert(path.empty());
     
     tra = (tra >= M_PI) ? tra - 2*M_PI : tra;
     for(float theta = (a > 0) ? -M_PI : tra;
@@ -80,7 +88,7 @@ void drawOrbitalPath(int segments, std::vector<float> &path, GLdouble a, GLdoubl
         path.push_back(0);
     }
    
-    assert(not path.empty());
+    assert(path.size() not_eq 0);
         //pull the first vertex out and stuff it in the back
     for(int i=0; i<3; ++i)
     {

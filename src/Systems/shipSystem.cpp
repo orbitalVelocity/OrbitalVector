@@ -8,6 +8,8 @@
 
 #include "shipSystem.h"
 #include "componentTypes.h"
+#include "shipComponent.h"
+#include "velocityComponent.h"
 
 float fuelUsed, remainingFuel;
 float engineBurn(Ship::Handle ship, float dt)

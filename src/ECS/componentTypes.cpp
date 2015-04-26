@@ -11,8 +11,8 @@
 
 tag_t Tag::previous = 0;
 
-int Ship::instanceCount(0);
-int Missile::instanceCount(0);
+
+int OrbitPath::instanceCount(0);
 
 
 glm::mat4 world;

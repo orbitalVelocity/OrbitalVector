@@ -8,6 +8,8 @@
 
 #include "missileSystem.h"
 #include "componentTypes.h"
+#include "missileComponent.h"
+#include "velocityComponent.h"
 #include "includes.h"
 
 #include "vectord.h"

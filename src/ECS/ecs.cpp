@@ -15,6 +15,10 @@
 #include "debugTextSystem.h"
 #include "orbitalPhysicsSystem.h"
 #include "shipSystem.h"
+#include "shipComponent.h"
+#include "missileComponent.h"
+#include "velocityComponent.h"
+#include "playerControlComponent.h"
 
 void GameSingleton::loadEntity(entityx::Entity entity,
                     glm::vec3 pos,

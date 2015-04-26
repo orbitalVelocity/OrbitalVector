@@ -1,5 +1,7 @@
 #include "tagSystem.h"
 #include "componentTypes.h"
+#include "missileComponent.h"
+
 #include "includes.h"
 #include "log.h"
 

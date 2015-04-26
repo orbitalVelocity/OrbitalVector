@@ -8,6 +8,8 @@
 
 #include "collisionSystem.h"
 #include "componentTypes.h"
+#include "playerControlComponent.h"
+#include "velocityComponent.h"
 #include "log.h"
 
 using namespace entityx;

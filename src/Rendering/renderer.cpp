@@ -10,6 +10,9 @@
 #include "tiny_obj_loader.h"
 #include "glm/gtx/closest_point.hpp"
 #include "componentTypes.h"
+#include "shipComponent.h"
+#include "missileComponent.h"
+#include "playerControlComponent.h"
 
 using namespace entityx;
 bool showDepth = false;

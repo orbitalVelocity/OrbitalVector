@@ -36,6 +36,38 @@ void Camera::setFocus(const glm::vec3 f)
     focus= f;
 }
 
+void Camera::copy(Camera::Handle camera)
+{
+    position = camera->position;
+    fov = camera->fov;
+    hAngle = camera->hAngle;
+    vAngle = camera->vAngle;
+    nearPlane = camera->nearPlane;
+    farPlane = camera->farPlane;
+    ratio = camera->ratio;
+}
+
+void Camera::copy(Camera &camera)
+{
+    position = camera.position;
+    fov = camera.fov;
+    hAngle = camera.hAngle;
+    vAngle = camera.vAngle;
+    nearPlane = camera.nearPlane;
+    farPlane = camera.farPlane;
+    ratio = camera.ratio;
+}
+Camera::Handle Camera::getCamera(entityx::EntityManager &entities)
+{
+    Camera::Handle cameraHandle;
+    auto count = 0;
+    for (auto entity : entities.entities_with_components(cameraHandle))
+    {
+        (void)entity;
+        assert(count++ == 0 && "there should only be one camera!");
+    }
+    return cameraHandle;
+}
 
 
 void Camera::offsetPos(const glm::vec3 offset)

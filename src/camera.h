@@ -11,8 +11,9 @@
 
 #include <iostream>
 #include "includes.h"
+#include "componentTypes.h"
 
-class Camera {
+COMPONENT(Camera) {
 public:
     Camera();
     void setPosition(const glm::vec3 pos);
@@ -31,6 +32,9 @@ public:
     glm::mat4 matrix() const;
     glm::mat4 projection() const;
     glm::mat4 view() const;
+    void copy(Camera::Handle camera);
+    void copy(Camera &camera);
+
     
 public:
     glm::vec3 position;
@@ -40,5 +44,6 @@ public:
     float nearPlane, farPlane;
     float ratio;
     
+    static Camera::Handle getCamera(entityx::EntityManager &);
 };
 #endif /* defined(__GLFW3_test__camera__) */

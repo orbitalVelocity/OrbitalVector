@@ -51,13 +51,12 @@ void UserInputSystem::update(entityx::EntityManager &entities,
                              double dt,
                              UserInput *legacyUserInput,
                              entityx::Entity myShip,
-                             GLFWwindow *window,
-                             Camera &camera)
+                             GLFWwindow *window)
 {
-    auto selectableEntity = linePick(entities, window, camera);
+    auto selectableEntity = linePick(entities, window);
     
     updateMouseSelection(entities, selectableEntity);
-    
+    auto cameraHandle = Camera::getCamera(entities);
 
     //update camera, or update shiporientation should be in shipSystem and cameraSystem...
     double mx, my;
@@ -70,7 +69,7 @@ void UserInputSystem::update(entityx::EntityManager &entities,
     double mouseScale = .005;
 
     if (legacyUserInput->rmbPressed) {
-        camera.rotate(_y*mouseScale, _x*mouseScale);
+        cameraHandle->rotate(_y*mouseScale, _x*mouseScale);
     } else if (legacyUserInput->lmbPressed && not selectableEntity.valid()) {
         assert(myShip.valid());
         auto orientationHandle = myShip.component<Orientation>();
@@ -78,7 +77,7 @@ void UserInputSystem::update(entityx::EntityManager &entities,
     }
 
     //scroll behavior
-    camera.offsetPos(glm::vec3(0,0, -legacyUserInput->yScroll));
+    cameraHandle->offsetPos(glm::vec3(0,0, -legacyUserInput->yScroll));
     legacyUserInput->yScroll = 0;
     
     //process actions
@@ -183,14 +182,14 @@ glm::vec3 getVelocityAtPosition(entityx::EntityManager &entities, entityx::Entit
 }
 
 entityx::Entity UserInputSystem::linePick(EntityManager & entities,
-                           GLFWwindow *pWindow,
-                           Camera &camera)
+                           GLFWwindow *pWindow)
 {
     //construct mouse/cursor casted ray
     double mouseX, mouseY;
     int screenWidth, screenHeight;
     glfwGetCursorPos(pWindow, &mouseX, &mouseY);
     glfwGetWindowSize(pWindow, &screenWidth, &screenHeight);
+    auto cameraHandle = Camera::getCamera(entities);
     
     //convert coordinate system from [0,1] to [-1, 1] for both x and y
     mouseY = screenHeight - mouseY; //for some reason, mouseY is flipped from tutorial
@@ -200,7 +199,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
    
     auto getDistanceToCursor = [&](glm::vec3 pos)
     {
-        auto posNDC = camera.matrix() * world * glm::vec4(pos, 1.0);
+        auto posNDC = cameraHandle->matrix() * world * glm::vec4(pos, 1.0);
         posNDC /= posNDC.w;
         auto screenPosNDC = glm::vec2(posNDC.x , posNDC.y);
         return glm::length(mouse_NDC - screenPosNDC);
@@ -218,7 +217,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     {
         auto onScreenDistance = getDistanceToCursor(position->pos);
         
-        auto distanceFromCamera = glm::length(position->pos - camera.position);
+        auto distanceFromCamera = glm::length(position->pos - cameraHandle->position);
         
         float thresholdInPixels = 40/900.0; //TODO: value should be in entity
         
@@ -264,7 +263,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
             offset2d *= glm::vec2(1, 1.6); //adjust for aspect ratio
             
             auto pos = position->pos;
-            auto posNDC = camera.matrix() * world * glm::vec4(pos, 1.0);
+            auto posNDC = cameraHandle->matrix() * world * glm::vec4(pos, 1.0);
             posNDC /= posNDC.w;
             
             posNDC.x += offset2d.x; //CRUCIAL!
@@ -306,6 +305,7 @@ entityx::Entity UserInputSystem::linePick(EntityManager & entities,
     Parent::Handle parent;
     for (auto entity : entities.entities_with_components(orbit, position, velocity, parent))
     {
+        (void) entity;
         auto &path = orbit->path;
         for (int i = 0; i < path.size(); i += 3)
         {

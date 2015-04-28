@@ -11,7 +11,7 @@
 #include "includes.h"
 #include "entityx/entityx.h"
 #include "componentTypes.h"
-#include "camera.h"
+#include "cameraComponent.h"
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "input.h"

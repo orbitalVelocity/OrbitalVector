@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 #include "componentTypes.h"
-#include "camera.h"
+#include "cameraComponent.h"
 
 tag_t Tag::previous = 0;
 

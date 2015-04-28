@@ -41,14 +41,14 @@ public:
                 double dt,
                 UserInput *ui,
                 entityx::Entity e,
-                GLFWwindow *w, Camera &);
+                GLFWwindow *w);
     
     void  update(entityx::EntityManager & entities,
                 entityx::EventManager & events,
                 double dt) override {}
 
     entityx::Entity linePick(entityx::EntityManager & entities,
-                  GLFWwindow *w, Camera &c);
+                             GLFWwindow *w);
 
     void createShadow(entityx::EntityManager &entities, entityx::Entity myShip);
     void createShadow(entityx::EntityManager &entities, entityx::Entity myShip, glm::vec3 pos);

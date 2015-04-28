@@ -188,7 +188,11 @@ void GameSingleton::update(double dt)
     systems.update<DebugTextSystem>(dt);
     systems.system<UserInputSystem>()->update(entities, events, dt,
                                               legacyUserInput, myShip,
-                                             pWindow, camera);
+                                              pWindow);
+    
+#if OLDCAMERA
+    camera.copy(*ch.get());
+#endif
     //systems.update<TagSystem>(dt); //TODO: Do this only after unserialization.
     systems.update<MissileSystem>(dt);
     systems.update<ShipSystem>(dt);

@@ -15,7 +15,7 @@
 #include <GLFW/glfw3.h>
 
 #include "ecs.h"
-#include "camera.h"
+#include "cameraComponent.h"
 #include "scene.h"
 #include "orbit.h"
 #include "tiny_obj_loader.h"

@@ -1,5 +1,5 @@
 //
-//  camera.h
+//  cameraComponent.h
 //  GLFW3_test
 //
 //  Created by Si Li on 9/14/14.

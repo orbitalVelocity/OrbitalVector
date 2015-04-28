@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Si Li. All rights reserved.
 //
 
-#include "camera.h"
+#include "cameraComponent.h"
 
 Camera::Camera() :
     position(0, 10, 10),

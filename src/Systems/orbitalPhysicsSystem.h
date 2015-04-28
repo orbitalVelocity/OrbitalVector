@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include "entityx/System.h"
 #include "events.h"
-#include "camera.h"
+#include "cameraComponent.h"
 
 class OrbitalPhysicsSystem : public entityx::System<OrbitalPhysicsSystem>
 //public entityx::Receiver<OrbitalChangeEvent>

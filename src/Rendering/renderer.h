@@ -23,7 +23,7 @@
 //#include "fxaa.h"
 
 #include "orbit.h"
-#include "camera.h"
+#include "cameraComponent.h"
 #include "scene.h"
 
 #include "grid.h"

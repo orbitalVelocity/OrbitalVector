@@ -13,7 +13,7 @@
 #include "includes.h"
 #include "OGLShader.h"
 #include "orbit.h"
-#include "camera.h"
+#include "cameraComponent.h"
 
 #include "tiny_obj_loader.h"
 

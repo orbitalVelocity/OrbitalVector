@@ -10,7 +10,7 @@
 #define __GLFW3_test__renderableType__
 
 #include "includes.h"
-#include "camera.h"
+#include "cameraComponent.h"
 #include <iostream>
 
 class OGLShader

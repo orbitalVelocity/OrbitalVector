@@ -14,7 +14,7 @@
 #include "entityx/System.h"
 #include "events.h"
 #include "text.h"
-#include "camera.h"
+#include "cameraComponent.h"
 
 class DebugTextSystem: public entityx::System<DebugTextSystem>,
 public entityx::Receiver<DebugEvent>

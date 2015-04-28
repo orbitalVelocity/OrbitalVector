@@ -12,7 +12,7 @@
 #include <iostream>
 #include "includes.h"
 #include <GLFW/glfw3.h>
-#include "camera.h"
+#include "cameraComponent.h"
 
 
 enum class ActionType {

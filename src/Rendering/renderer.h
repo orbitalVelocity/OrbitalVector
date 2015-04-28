@@ -67,9 +67,9 @@ public:
 //invokes game logic
 class Renderer {
 public:
-    Renderer(UserInput &i, Camera &c)
+    Renderer(UserInput &i)
     :
-    userInput(i), camera(c),
+    userInput(i),
     globe(GL_TRIANGLES),
     grid(GL_LINEAR_ATTENUATION),
     orbit(GL_LINES),
@@ -139,7 +139,6 @@ public:
     float downSizeFactor;
 //    int selected, mouseHover;
     
-    Camera &camera;
 };
 
 

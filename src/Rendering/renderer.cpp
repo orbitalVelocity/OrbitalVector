@@ -262,7 +262,7 @@ void Renderer::update()
 
 void Renderer::render(entityx::EntityManager &entities)
 {
-    
+    auto cameraHandle = Camera::getCamera(entities);
     /* Set up a blank screen */
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -288,7 +288,7 @@ void Renderer::render(entityx::EntityManager &entities)
             
             depthMVP = depthProjectionMatrix * depthViewMatrix;
             //myGameSingleton.myShip.component<Orientation>()->orientation;
-            shadowMap.drawIndexed(world, camera, depthMVP);
+            shadowMap.drawIndexed(world, *cameraHandle.get(), depthMVP);
         }
         //TODO: fix glViewPort toggle in stages too!
         if (renderStage & stage2)  //regular forward rendering
@@ -444,8 +444,8 @@ void Renderer::render(entityx::EntityManager &entities)
 void Renderer::forwardRender(entityx::EntityManager &entities)
 {
     auto shipIdx = 0;//gameLogic.activeShip;
-    
-    auto _camera = camera.matrix();
+    auto cameraHandle = Camera::getCamera(entities);
+    auto _camera = cameraHandle->matrix();
     
     glm::vec3 planetColor   (0.4, 0.0, 0.0);
     glm::vec3 shipColor     (0.7, 0.7, 0.8);
@@ -497,7 +497,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
         
 		glm::mat4 depthBiasMVP = biasMatrix * depthMVP;
 		glUniformMatrix4fv(loc, 1, GL_FALSE, &depthBiasMVP[0][0]);
-        ship.drawIndexed(world, camera, lightPos, mvp, shipColor);
+        ship.drawIndexed(world, *cameraHandle.get(), lightPos, mvp, shipColor);
         check_gl_error();
     }
     
@@ -598,7 +598,7 @@ void Renderer::forwardRender(entityx::EntityManager &entities)
     {
         auto mvp = world * glm::translate(glm::mat4(), position->pos);
         
-        missile.drawIndexed(world, camera, lightPos, mvp, shipColor);
+        missile.drawIndexed(world, *cameraHandle.get(), lightPos, mvp, shipColor);
 
         check_gl_error();
     }

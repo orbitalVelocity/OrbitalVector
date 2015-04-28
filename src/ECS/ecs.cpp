@@ -155,7 +155,7 @@ void GameSingleton::load(std::string, int width, int height )
 }
 
 GameSingleton::GameSingleton(std::string filename)
-    : renderer(userInput, camera)
+    : renderer(userInput)
 {
     
     scene.init();
@@ -222,7 +222,6 @@ void GameSingleton::update(double dt)
         }
         world = glm::translate(glm::mat4(), -desiredPosition);
     }
-    //myShip.component<Position>()->pos);
     
     //TODO: update orbits only when necessary
     {

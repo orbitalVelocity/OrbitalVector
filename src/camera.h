@@ -11,8 +11,11 @@
 
 #include <iostream>
 #include "includes.h"
-#include "componentTypes.h"
+#include "entityx/Entity.h"
 
+//#include "componentTypes.h"
+
+#define COMPONENT( X ) struct X : public entityx::Component<X>
 COMPONENT(Camera) {
 public:
     Camera();

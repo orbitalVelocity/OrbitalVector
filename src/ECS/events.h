@@ -57,13 +57,14 @@ EVENT(DebugEvent)
 
 EVENT(GUITextEvent)
 {
-    GUITextEvent(entityx::Entity e, float s, std::string m)
-    : message(m), entity(e), size(s)
+    GUITextEvent(entityx::Entity e, glm::vec2 p, float s, std::string m)
+    : message(m), pos2d(p), entity(e), size(s)
     {}
     
     std::string message;
     entityx::Entity entity;
     float size;
+    glm::vec2 pos2d;
 };
 
 EVENT(FireWeaponEvent)

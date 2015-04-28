@@ -10,6 +10,7 @@
 #include "componentTypes.h"
 #include "shipComponent.h"
 #include "velocityComponent.h"
+#include "entityxHelpers.h"
 
 float fuelUsed, remainingFuel;
 float engineBurn(Ship::Handle ship, float dt)
@@ -37,7 +38,6 @@ float engineBurn(Ship::Handle ship, float dt)
     
     //update fuel tanks
     auto fuelUsedTemp = fuelUsed;
-//    for (auto &fuelTank : ship->fuelTanks.list())
     for (auto i = 0; i < ship->fuelTanks.size() && fuelUsedTemp > 0; i++)
     {
         auto &fuelTank = ship->fuelTanks[i];
@@ -51,9 +51,6 @@ float engineBurn(Ship::Handle ship, float dt)
     }
     assert(fuelUsedTemp == 0);
     return totalThrust;
-//    std::cout << "thrust: " << totalThrust
-//            << "\naccel: " << acceleration
-//            << std::endl;
 }
 
 void ShipSystem::update(entityx::EntityManager &entities, entityx::EventManager &events, double dt)
@@ -70,10 +67,7 @@ void ShipSystem::update(entityx::EntityManager &entities, entityx::EventManager 
     for (auto entity : entities.entities_with_components(ship, velocity, orientation))
     {
         (void) entity;
-        //do process actions
-        //thruster
         if (ship->thrust) {
-//        std::cout << "thrusting on " << ship->debugName << "\n";
             auto thrust = engineBurn(ship, dt);
             ship->thrust = false;
             auto forwardVector = glm::vec3(orientation->orientation * glm::vec4(0, 0, 1, 1));
@@ -87,12 +81,8 @@ void ShipSystem::update(entityx::EntityManager &entities, entityx::EventManager 
         }
         
         float vel = glm::length(velocity->vel);
-        deltav << "velocity: " << to_string_with_precision(vel);
-        events.emit<GUITextEvent>(entity, 15.0f, deltav.str());
-        deltav.str(std::string());
-
-        deltav << "remaining dv: " << dv;
-        events.emit<GUITextEvent>(entity, 15.0f, deltav.str());
+        printOE("velocity: ", vel, entity, entities, events);
+        printOE("remaining dv: ", dv, entity, entities, events);
     }
     events.emit(DebugEvent(deltav.str()));
     deltav.str(std::string());

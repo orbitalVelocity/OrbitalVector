@@ -21,7 +21,7 @@ public entityx::Receiver<DebugEvent>
 {
 public:
     
-    DebugTextSystem(TextRenderer *, Camera *, glm::mat4 *);
+    DebugTextSystem(TextRenderer *);
 //    void init(TextRenderer *text);
     
     void configure(entityx::EventManager& eventManager);
@@ -35,14 +35,10 @@ public:
     
 private:
     struct expiringMessage{
-//        expiringMessage(double t, string m) : expirationTime(t), message(m) {}
-        
         double expirationTime;
         string message;
     };
     TextRenderer *debugTextPtr = nullptr;
-    Camera *cameraPtr = nullptr;
-    glm::mat4 *worldPtr = nullptr;
     std::vector<expiringMessage> messages;
     double currentTime = 0.0;
     double lifeTime = 3;

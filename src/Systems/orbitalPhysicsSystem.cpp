@@ -21,6 +21,7 @@
 #include "orbitalelements.h"
 #include "oeconvert.h"
 
+#include "entityxHelpers.h"
 #include "includes.h"
 #include "log.h"
 
@@ -147,8 +148,6 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         //draw a flat elipse
         std::vector<double> posVel = toPosVelVector(position->pos, velocity->vel);
         auto oe = rv2oe(parentGM->gm, posVel);
-//        assert(oe.lan == oe.lan);
-//        assert(oe.aop == oe.aop);
         
         drawOrbitalPath(orbitPathSteps, orbitPath, oe.sma, oe.ecc, oe.tra);
         
@@ -157,12 +156,14 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         auto lan = glm::rotate(glm::mat4(), (float)(oe.lan), glm::vec3(0, 0, 1));
         orbit->transform  = lan * inc * aop;
         
-        if (entity.has_component<Exempt>())// and entity.component<Exempt>()->linearDynamics)
+        if (entity.has_component<Exempt>())
         {
             continue;
         }
         //calculate next position/velocity for this object
-        VectorD params = convertToParams(parentPosition->pos, parentGM->gm, velocity->getAccel());
+        VectorD params = convertToParams(parentPosition->pos,
+                                         parentGM->gm,
+                                         velocity->getAccel());
         
         t_integrator integrator = &rungeKutta4;
         t_dynamics dynamics = &twobody_perturbed;
@@ -179,11 +180,7 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
 ////////DEBUG/////////////////////////////////////
 
     //print stuff to screen
-    auto printOE = [&](std::string name, float element, entityx::Entity entity)
-    {
-        auto orbitParamString = name + to_string_with_precision(element);
-        events.emit<GUITextEvent>(entity, 15.0f, orbitParamString);
-    };
+
     
     auto UITextSetup = [&](){
         Ship::Handle ship;
@@ -196,9 +193,7 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         for (auto entity : entities.entities_with_components(ship, position, velocity, orbit))
         {
             assert(entity.has_component<Position>());
-            events.emit<GUITextEvent>(entity,
-                                      15.0f,
-                                      ship->debugName);
+            printOE(ship->debugName, entity, entities, events);
             
             //print out orbital elements
             auto parentEntityID = entity.component<Parent>()->parent;
@@ -208,20 +203,18 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
             auto posVel = toPosVelVector(position->pos, velocity->vel);
             auto oe = rv2oe(parentGM->gm, posVel);
             
-            printOE("sma: ", oe.sma, entity);
-            printOE("ecc: ", oe.ecc, entity);
-            printOE("inc: ", oe.inc, entity);
-            printOE("aop: ", oe.aop, entity);
-            printOE("lan: ", oe.lan, entity);
-            printOE("tra: ", oe.tra, entity);
+            printOE("sma: ", oe.sma, entity, entities, events);
+            printOE("ecc: ", oe.ecc, entity, entities, events);
+            printOE("inc: ", oe.inc, entity, entities, events);
+            printOE("aop: ", oe.aop, entity, entities, events);
+            printOE("lan: ", oe.lan, entity, entities, events);
+            printOE("tra: ", oe.tra, entity, entities, events);
             
         }
         for (auto entity : entities.entities_with_components(missile, position, orbit))
         {
             (void) entity;
-            events.emit<GUITextEvent>(entity,
-                                      15.0f,
-                                      missile->debugName);
+            printOE(missile->debugName, entity, entities, events);
         }
     };
     UITextSetup();

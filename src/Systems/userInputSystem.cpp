@@ -72,18 +72,13 @@ void UserInputSystem::update(entityx::EntityManager &entities,
     if (legacyUserInput->rmbPressed) {
         camera.rotate(_y*mouseScale, _x*mouseScale);
     } else if (legacyUserInput->lmbPressed && not selectableEntity.valid()) {
-        //rotate mySHip
-//        sShip[0].rotate(-_x*mouseScale, _y*mouseScale, 0.0f);
         assert(myShip.valid());
         auto orientationHandle = myShip.component<Orientation>();
         rotate(orientationHandle, -_x*mouseScale, _y*mouseScale, 0.0f);
     }
 
     //scroll behavior
-    auto modifiedScroll = legacyUserInput->yScroll;
-//    std::cout << "scroll: " << modifiedScroll << std::endl;
-//    modifiedScroll = pow(modifiedScroll, 0.5);
-    camera.offsetPos(glm::vec3(0,0, -modifiedScroll));
+    camera.offsetPos(glm::vec3(0,0, -legacyUserInput->yScroll));
     legacyUserInput->yScroll = 0;
     
     //process actions

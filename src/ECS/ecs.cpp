@@ -166,9 +166,7 @@ GameSingleton::GameSingleton(std::string filename)
     systems.add<MissileSystem>();
     systems.add<CollisionSystem>();
     
-    Camera::Handle ch = Camera::getCamera(entities);
-    systems.add<DebugTextSystem>(&textObj, ch, &world);
-//    systems.add<DebugTextSystem>(&textObj, &camera, &world);
+    systems.add<DebugTextSystem>(&textObj);
     systems.add<ShipSystem>();
     systems.add<OrbitalPhysicsSystem>();
     systems.configure();

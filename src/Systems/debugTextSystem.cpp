@@ -12,11 +12,9 @@
 
 using namespace entityx;
 
-DebugTextSystem::DebugTextSystem(TextRenderer *text, Camera *camera, glm::mat4 *world)
+DebugTextSystem::DebugTextSystem(TextRenderer *text)
 {
     debugTextPtr = text;
-    cameraPtr = camera;
-    worldPtr = world;
 }
 
 void DebugTextSystem::configure(entityx::EventManager &events)
@@ -32,14 +30,9 @@ void DebugTextSystem::receive(const DebugEvent &e)
 
 void DebugTextSystem::receive(const GUITextEvent &e)
 {
-    assert(nullptr not_eq debugTextPtr);
     entityx::Entity entity = e.entity; //get rid of const-ness
 
-    //fixme: this should happen after the world/camera updates later this frame
-    auto vp = cameraPtr->matrix() * *worldPtr;
-    auto pos = entity.component<Position>()->pos;
-    
-    auto position2d = getVec2(vp, pos);
+    auto pos2d = e.pos2d;
     
     if (not e.entity.has_component<UIText>()) {
         entity.assign<UIText>(e.size);
@@ -47,7 +40,8 @@ void DebugTextSystem::receive(const GUITextEvent &e)
     auto UIHandle = entity.component<UIText>();
     auto offset2d = UIHandle->getOffset();
 
-    debugTextPtr->guiText.push_back(Text(position2d+offset2d,
+    assert(nullptr not_eq debugTextPtr);
+    debugTextPtr->guiText.push_back(Text(pos2d+offset2d,
                                          e.size,
                                          e.message));
 }
@@ -56,11 +50,13 @@ void DebugTextSystem::update(EntityManager & entities,
                              EventManager &events,
                              double dt)
 {
+    assert(debugTextPtr);
     debugTextPtr->guiText.clear();
     
     UIText::Handle text;
     for (auto entity : entities.entities_with_components(text))
     {
+        (void) entity;
         text->clearOffset();
     }
     

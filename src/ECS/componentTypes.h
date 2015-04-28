@@ -26,6 +26,9 @@ extern glm::mat4 world;
 
 typedef unsigned int tag_t;
 
+glm::mat4 getViewProjection(entityx::EntityManager &entities);
+
+
 COMPONENT(Tag)
 {
     static tag_t previous;

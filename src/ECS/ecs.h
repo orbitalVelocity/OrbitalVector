@@ -42,7 +42,7 @@ class GameSingleton : public entityx::EntityX {
 public:
     entityx::Entity myShip;
     entityx::Entity mainGrav;
-    Camera camera;
+
     GLFWwindow *pWindow;
     UserInput *legacyUserInput;
 //    std::vector<entityx::Entity> selectedEntities;

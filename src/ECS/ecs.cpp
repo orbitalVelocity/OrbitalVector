@@ -20,7 +20,7 @@
 #include "velocityComponent.h"
 #include "playerControlComponent.h"
 
-#define OLDCAMERA true
+#define OLDCAMERA false
 
 void GameSingleton::loadEntity(entityx::Entity entity,
                     glm::vec3 pos,
@@ -102,14 +102,11 @@ void GameSingleton::initCamera(int width, int height) {
     auto cameraEntity = entities.create();
     auto cameraHandle = cameraEntity.assign<Camera>();
 
-#if OLDCAMERA
-    camera.setPosition(glm::vec3(0.0f, 0.0f, 20.0f));
-    camera.setFocus(glm::vec3(0, 0, 0.0f));
-    camera.setClip(0.01f, 2000.0f);
-    camera.setFOV(45.0f);
-    camera.setAspectRatio((float)width/(float)height);
-#endif
-    cameraHandle->copy(camera);
+    cameraHandle->setPosition(glm::vec3(0.0f, 0.0f, 20.0f));
+    cameraHandle->setFocus(glm::vec3(0, 0, 0.0f));
+    cameraHandle->setClip(0.01f, 2000.0f);
+    cameraHandle->setFOV(45.0f);
+    cameraHandle->setAspectRatio((float)width/(float)height);
 }
 
 void GameSingleton::load(std::string, int width, int height )
@@ -175,13 +172,7 @@ GameSingleton::GameSingleton(std::string filename)
 void GameSingleton::update(double dt)
 {
     dt *= legacyUserInput->timeWarp;
-   
-    
-#if OLDCAMERA
-    auto ch = Camera::getCamera(entities);
-    ch->copy(camera);
-#endif
-    
+ 
     //FIXME: no "game lost" condition yet
     assert(myShip.valid());
     
@@ -190,9 +181,6 @@ void GameSingleton::update(double dt)
                                               legacyUserInput, myShip,
                                               pWindow);
     
-#if OLDCAMERA
-    camera.copy(*ch.get());
-#endif
     //systems.update<TagSystem>(dt); //TODO: Do this only after unserialization.
     systems.update<MissileSystem>(dt);
     systems.update<ShipSystem>(dt);

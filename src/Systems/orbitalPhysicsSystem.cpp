@@ -158,6 +158,8 @@ void OrbitalPhysicsSystem::update(EntityManager & entities,
         
         if (entity.has_component<Exempt>())
         {
+            //don't update position if shadow entity
+            //velocity update handleded in ShipSystem::update()
             continue;
         }
         //calculate next position/velocity for this object

@@ -434,7 +434,6 @@ void UserInputSystem::createShadow(entityx::EntityManager &entities, entityx::En
         shadow.assign<Exempt>();
         shadow.component<Exempt>()->linearDynamics = true;
         shadow.component<Exempt>()->circleMenu = true;
-        assert(shadow.has_component<Ship>());
         myShip.component<PlayerControl>()->shadowEntity = shadow;
     }
     else {

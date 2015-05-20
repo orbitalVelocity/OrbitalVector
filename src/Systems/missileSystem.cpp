@@ -17,7 +17,9 @@
 #include "oeconvert.h"
 #include "kepler.h"
 #include "lambert.h"
+#include "PagmoLambert.h"
 
+#define PAGMO true
 using namespace entityx;
 
 MissileSystem::MissileSystem()
@@ -37,7 +39,7 @@ void MissileSystem::update(EntityManager & entities,
     {
 
         
-#if 0
+#if 1
         if (missile->done) {
             continue;
         }
@@ -68,18 +70,30 @@ void MissileSystem::update(EntityManager & entities,
             
             auto r0 = oe2r(gm, oe0);
             auto rf = oe2r(gm, oef);
-            auto rfPos = glm::vec3(rf[0],
-                                   rf[1],
-                                   rf[2]);
             //debug stuff
-            auto placeHolderEntity = entities.create();
-            placeHolderEntity.assign<Position>(rfPos);
-            placeHolderEntity.assign<Ship>();
-            placeHolderEntity.assign<Orientation>();
+//            auto rfPos = glm::vec3(rf[0],
+//                                   rf[1],
+//                                   rf[2]);
+//            auto placeHolderEntity = entities.create();
+//            placeHolderEntity.assign<Position>(rfPos);
+//            placeHolderEntity.assign<Ship>();
+//            placeHolderEntity.assign<Orientation>();
+#if PAGMO
+            double v1[3], v2[3];
+            double a, p, theta;
+            int iter;
+            //must convert all to double first!
+            LambertI(r0.data(), rf.data(), dt2, gm, false,
+                     v1, v2, a, p, theta, iter);
+            iv.x = v1[0];
+            iv.y = v1[1];
+            iv.z = v1[2];
+#else
             auto velocities = boundingVelocities(gm, r0, rf, dt2, false);
             iv = glm::vec3(velocities[0],
                                    velocities[1],
                                    velocities[2]);
+#endif
             dt2 /= 2.0;
             
             if (dt2 < 0.1) {

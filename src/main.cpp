@@ -58,6 +58,7 @@ GLFWwindow* initGraphics(int width, int height)
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
     /* Create a windowed mode window and its OpenGL context */
     window = glfwCreateWindow(width, height, "Hello world", NULL, NULL);
+    /* full screen option */
 //    window = glfwCreateWindow(width, height, "Hello world", glfwGetPrimaryMonitor(), NULL);
     if (!window)
     {
@@ -256,6 +257,9 @@ int main(int argc, const char * argv[])
     log(LOG_DEBUG,"Creating window.");
 
     int width = 960, height = 540;
+    int scale = 1;
+    width *= scale;
+    height *= scale;
 
     WindowStates ws;
     ws.pWindow = initGraphics(width, height);

@@ -71,7 +71,6 @@ void ShipSystem::update(entityx::EntityManager &entities, entityx::EventManager 
             auto thrust = engineBurn(ship, dt);
             ship->thrust = false;
             auto forwardVector = glm::vec3(orientation->orientation * glm::vec4(0, 0, 1, 1));
-            std::cout << ship->debugName << " thrusting\n";
             acceleration = thrust / ship->mass;
             auto accelVector = glm::normalize(forwardVector) * acceleration;
             velocity->setAccel(accelVector);
@@ -81,8 +80,11 @@ void ShipSystem::update(entityx::EntityManager &entities, entityx::EventManager 
             
             if (entity.has_component<Exempt>()) {
                 //more explicit check for shadow
-                velocity->vel += accelVector;
+                velocity->vel += accelVector * dt;
             }
+//        float vel = glm::length(accelVector);
+            std::cout << ship->debugName << " thrusting "
+                        << acceleration*dt << " mass: " << ship->mass << ", " << ship->dryMass << "\n";
         }
         
         

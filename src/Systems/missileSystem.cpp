@@ -63,7 +63,7 @@ void MissileSystem::update(EntityManager & entities,
 
         //keep trying w/ smaller dt until a valid iv is found
         glm::vec3 iv;   //injection vector
-        double dt2 = 10;
+        double dt2 = 100;
         do{
             std::cout << "dt2: " << dt2 << std::endl;
             oef.tra = anomalyAfterTime(gm, oef, dt2);
@@ -78,7 +78,7 @@ void MissileSystem::update(EntityManager & entities,
 //            placeHolderEntity.assign<Position>(rfPos);
 //            placeHolderEntity.assign<Ship>();
 //            placeHolderEntity.assign<Orientation>();
-#if PAGMO
+    #if PAGMO
             double v1[3], v2[3];
             double a, p, theta;
             int iter;
@@ -88,12 +88,12 @@ void MissileSystem::update(EntityManager & entities,
             iv.x = v1[0];
             iv.y = v1[1];
             iv.z = v1[2];
-#else
+    #else
             auto velocities = boundingVelocities(gm, r0, rf, dt2, false);
             iv = glm::vec3(velocities[0],
                                    velocities[1],
                                    velocities[2]);
-#endif
+    #endif
             dt2 /= 2.0;
             
             if (dt2 < 0.1) {

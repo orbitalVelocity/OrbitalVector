@@ -78,6 +78,9 @@ void UserInput::key(GLFWwindow* window, int key, int scancode, int action, int m
             case GLFW_KEY_R:
                 globalReload = true;
                 break;
+            case GLFW_KEY_H:
+                actionList.push_back(ActionType::dumpCereal);
+                break;
             case GLFW_KEY_1 :
                 renderStage ^= stage1;
                 break;

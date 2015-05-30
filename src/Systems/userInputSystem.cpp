@@ -543,6 +543,15 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                     shadow.destroy();
                 }
                 break;
+            case ActionType::dumpCereal:
+                //get all entities with playerControl
+                for (auto entity : entities.entities_with_components(player))
+                {
+                    cereal::JSONOutputArchive archive( std::cout );
+                    auto pc = entity.component<PlayerControl>();
+                    archive( cereal::make_nvp("playerControl", *(pc.get()) ) );
+                }
+                break;
             default:
                 break;
         }

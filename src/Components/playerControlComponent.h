@@ -59,9 +59,9 @@ private:
     template <class Archive>
     void serialize( Archive & ar )
     {
-        ar( CEREAL_NVP(animationTime,
-                       currentTime,
-                       switchedFocus) );
+        ar( CEREAL_NVP(animationTime),
+            CEREAL_NVP(currentTime),
+            CEREAL_NVP(switchedFocus) );
     }
     
 };

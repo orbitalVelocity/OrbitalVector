@@ -33,6 +33,7 @@ enum class ActionType {
     
     newShip,
     spawnMenu,
+    dumpCereal,
     invalid
 };
 

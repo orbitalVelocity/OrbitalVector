@@ -24,6 +24,21 @@
 #include <cereal/types/vector.hpp>
 #include <cereal/types/map.hpp>
 
+namespace cereal
+{
+    template<class Archive>
+    void save( Archive &ar, entityx::Entity const & entity )
+    {
+        uint64_t id = entity.id().id();
+        ar( cereal::make_nvp("entityID", id) );
+    }
+
+    template<class Archive>
+    void load( Archive &ar, entityx::Entity & entity )
+    {
+//        ar( entity.id() );//cereal::make_nvp("entityID", entity.id()) );
+    }
+}
 COMPONENT(PlayerControl)
 {
     PlayerControl() {}
@@ -61,7 +76,11 @@ private:
     {
         ar( CEREAL_NVP(animationTime),
             CEREAL_NVP(currentTime),
-            CEREAL_NVP(switchedFocus) );
+            CEREAL_NVP(switchedFocus),
+            CEREAL_NVP(focusOnEntity),
+            CEREAL_NVP(lastEntityFocused),
+            CEREAL_NVP(selectedEntities),
+            CEREAL_NVP(mouseOverEntities));
     }
     
 };

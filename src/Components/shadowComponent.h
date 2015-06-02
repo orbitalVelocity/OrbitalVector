@@ -17,6 +17,6 @@ COMPONENT(Shadow)
     Shadow() {}
     
     
-}
+};
 
 #endif

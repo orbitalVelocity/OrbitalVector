@@ -15,6 +15,8 @@
 #include "debugTextSystem.h"
 #include "orbitalPhysicsSystem.h"
 #include "shipSystem.h"
+#include "serializationSystem.h"
+
 #include "shipComponent.h"
 #include "missileComponent.h"
 #include "velocityComponent.h"
@@ -166,6 +168,7 @@ GameSingleton::GameSingleton(std::string filename)
     systems.add<DebugTextSystem>(&textObj);
     systems.add<ShipSystem>();
     systems.add<OrbitalPhysicsSystem>();
+    systems.add<SerializationSystem>();
     systems.configure();
 }
 
@@ -216,6 +219,8 @@ void GameSingleton::update(double dt)
         renderer.orbit.update(entities);
         renderer.menuCircle.update(entities, events, dt);
     }
+    
+    systems.update<SerializationSystem>(dt);
 }
 
 

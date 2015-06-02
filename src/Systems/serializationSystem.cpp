@@ -15,22 +15,55 @@
 #include "velocityComponent.h"
 #include "componentTypes.h"
 
-#define SERIALIZE(X, T, C) if(entity.has_component<C>()) { \
-    auto chandler = entity.component<C>()->serialize(X); \
-    archive( cereal::make_nvp("T", *(chandler.get()) ) };
+#define SERIALIZE(T, C)                         \
+    if (e.has_component<C>()) {                 \
+        auto pc = e.component<C>();             \
+        ar( make_nvp(T, *(pc.get()) ) );        \
+    }
+
+namespace cereal
+{
+    template<class Archive>
+    void save( Archive &ar, entityx::Entity const & entity )
+    {
+//        uint64_t id = entity.id().id();
+//        ar( make_nvp("entityID", id) );
+        assert(entity.has_component<Tag>());
+        auto e = const_cast<entityx::Entity &>(entity);
+        auto tag = e.component<Tag>();
+        assert(entity.valid());
+        ar( cereal::make_nvp("uuid", (uint)(tag.get()->tag)) );
+        
+        //serialize over all components of each entity
+        SERIALIZE("playerControl", PlayerControl);
+
+    }
+    
+    template<class Archive>
+    void load( Archive &ar, entityx::Entity & entity )
+    {
+        //        ar( entity.id() );//cereal::make_nvp("entityID", entity.id()) );
+    }
+}
 
 void SerializationSystem::update(entityx::EntityManager &entities, entityx::EventManager &events, double dt)
 {
+    static bool run = true;
+    if (not run) {
+        return;
+    }
+    run = false;
+    
+    for (auto entity : entities.entities_for_debugging())
+    {
+        entity.assign<Tag>();
+    }
+    
+    std::cout << "printing json dump!\n";
     cereal::JSONOutputArchive archive( std::cout );
     //iterate over all entities
     for (auto entity : entities.entities_for_debugging())
     {
-    //serialize over all components of each entity
-        //need a list of all components!
-        if (entity.has_component<PlayerControl>()) {
-            auto pc = entity.component<PlayerControl>();
-            archive( cereal::make_nvp("playerControl", *(pc.get()) ) );
-        }
-        //repeat for all components???
+        archive( cereal::make_nvp("entity", entity) );
     }
 }

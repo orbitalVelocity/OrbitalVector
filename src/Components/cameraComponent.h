@@ -12,6 +12,7 @@
 #include <iostream>
 #include "includes.h"
 #include "entityx/Entity.h"
+#include "componentTypes.h"
 
 //#include "componentTypes.h"
 
@@ -48,5 +49,13 @@ public:
     float ratio;
     
     static Camera::Handle getCamera(entityx::EntityManager &);
+    
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+        ar( CEREAL_NVP(fov) );
+    }
 };
 #endif /* defined(__GLFW3_test__camera__) */

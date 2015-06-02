@@ -36,6 +36,7 @@ namespace cereal
         
         //serialize over all components of each entity
         SERIALIZE("playerControl", PlayerControl);
+//        SERIALIZE("camera", CameraComponent);
 
     }
     

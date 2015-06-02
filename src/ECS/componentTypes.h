@@ -12,6 +12,17 @@
 #include "includes.h"
 #include "entityx/Entity.h"
 
+#include <cereal/cereal.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/utility.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/complex.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/array.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/map.hpp>
+
 #define COMPONENT( X ) struct X : public entityx::Component<X>
 
 enum BodyType {
@@ -39,6 +50,7 @@ COMPONENT(Tag)
     }
 
     tag_t tag;
+
 };
 
 

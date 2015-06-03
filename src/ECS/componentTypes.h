@@ -135,18 +135,18 @@ COMPONENT(Radius)
     float radius;
 };
 
-COMPONENT(CameraComponent)
-{
-    CameraComponent () {}
-
-    glm::vec3 position;
-    glm::vec3 focus;
-    
-    float fov;
-    float hAngle, vAngle;
-    float nearPlane, farPlane;
-    float ratio;
-};
+//COMPONENT(CameraComponent)
+//{
+//    CameraComponent () {}
+//
+//    glm::vec3 position;
+//    glm::vec3 focus;
+//    
+//    float fov;
+//    float hAngle, vAngle;
+//    float nearPlane, farPlane;
+//    float ratio;
+//};
 
 COMPONENT(OrbitPath)
 {

@@ -14,8 +14,8 @@ void CameraSystem::update(EntityManager & entities,
                                   EventManager &events,
                                   double dt)
 {
-    CameraComponent::Handle camera;
-    for (Entity entity: entities.entities_with_components(camera))
+//    Camera::Handle camera;
+//    for (Entity entity: entities.entities_with_components(camera))
     {
         //call a function to get stuff
         //update position/velocity of self, ignore effects on parent?

@@ -16,7 +16,7 @@
 
 //#include "componentTypes.h"
 
-#define COMPONENT( X ) struct X : public entityx::Component<X>
+//#define COMPONENT( X ) struct X : public entityx::Component<X>
 COMPONENT(Camera) {
 public:
     Camera();

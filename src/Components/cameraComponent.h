@@ -55,7 +55,15 @@ private:
     template <class Archive>
     void serialize( Archive & ar )
     {
-        ar( CEREAL_NVP(fov) );
+        ar( CEREAL_NVP(position),
+            CEREAL_NVP(focus),
+            CEREAL_NVP(fov),
+            CEREAL_NVP(hAngle),
+            CEREAL_NVP(vAngle),
+            CEREAL_NVP(nearPlane),
+            CEREAL_NVP(farPlane),
+            CEREAL_NVP(ratio)
+        );
     }
 };
 #endif /* defined(__GLFW3_test__camera__) */

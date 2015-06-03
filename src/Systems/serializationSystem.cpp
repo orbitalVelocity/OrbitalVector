@@ -14,6 +14,7 @@
 #include "shadowComponent.h"
 #include "velocityComponent.h"
 #include "componentTypes.h"
+#include "cerealHelper.h"
 
 #define SERIALIZE(T, C)                         \
     if (e.has_component<C>()) {                 \
@@ -37,10 +38,6 @@ namespace cereal
         //serialize over all components of each entity
         SERIALIZE("playerControl", PlayerControl);
         SERIALIZE("camera", Camera);
-
-        
-//        auto cc = e.component<Camera>();
-//        ar( make_nvp("camera", *(cc.get()) ) );
     }
     
     template<class Archive>

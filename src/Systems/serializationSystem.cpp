@@ -38,6 +38,7 @@ namespace cereal
         //serialize over all components of each entity
         SERIALIZE("playerControl", PlayerControl);
         SERIALIZE("camera", Camera);
+        SERIALIZE("orbitPath", OrbitPath);
     }
     
     template<class Archive>
@@ -49,11 +50,9 @@ namespace cereal
 
 void SerializationSystem::update(entityx::EntityManager &entities, entityx::EventManager &events, double dt)
 {
-    static bool run = true;
-    if (not run) {
+    if (dt != 0) {
         return;
     }
-    run = false;
     
     for (auto entity : entities.entities_for_debugging())
     {

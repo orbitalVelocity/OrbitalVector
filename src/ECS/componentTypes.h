@@ -158,6 +158,19 @@ COMPONENT(OrbitPath)
     GLuint vbo;
     std::string debugName;
     static int instanceCount;
+    
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+        ar( CEREAL_NVP(transform),
+            CEREAL_NVP(vao),
+            CEREAL_NVP(vbo),
+            CEREAL_NVP(debugName),
+            CEREAL_NVP(instanceCount)
+           );
+    }
 };
 
 struct Animation

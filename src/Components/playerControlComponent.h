@@ -13,7 +13,36 @@
 #include "entityx/Entity.h"
 #include "componentTypes.h"
 
+class entityVector : public std::vector<entityx::Entity> {
+//private:
+//    friend class cereal::access;
+//    template <class Archive>
+//    void serialize( Archive & ar )
+//    {
+//        for (auto i = 0; i < size(); i++)// data())
+//        {
+//            ar( CEREAL_NVP(data()[i].id().id()) );
+//        }
+//    }
+};
 
+namespace cereal
+{
+    template<class Archive>
+    void save( Archive &ar, entityVector const & vec)
+    {
+        for (auto &entity : vec)
+        {
+            ar( CEREAL_NVP(entity.id().id()) );
+        }
+    }
+    
+    template<class Archive>
+    void load( Archive &ar, entityVector & vec)
+    {
+        //        ar( entity.id() );//cereal::make_nvp("entityID", entity.id()) );
+    }
+}
 
 COMPONENT(PlayerControl)
 {
@@ -41,23 +70,22 @@ COMPONENT(PlayerControl)
     float currentTime = 0;
     bool switchedFocus;
     entityx::Entity focusOnEntity, lastEntityFocused;
-    std::vector<entityx::Entity> selectedEntities;
-    std::vector<entityx::Entity> mouseOverEntities;
-    
     entityx::Entity shadowEntity; //for orbit planning
+    entityVector selectedEntities, mouseOverEntities;
+    
 private:
     friend class cereal::access;
     template <class Archive>
+#define CEREAL_ENTITY(X) cereal::make_nvp("X", X.id().id())
     void serialize( Archive & ar )
     {
         ar( CEREAL_NVP(animationTime),
             CEREAL_NVP(currentTime),
-            CEREAL_NVP(switchedFocus)
-//           ,
-//            CEREAL_NVP(focusOnEntity),
-//            CEREAL_NVP(lastEntityFocused),
-//            CEREAL_NVP(selectedEntities),
-//            CEREAL_NVP(mouseOverEntities)
+            CEREAL_NVP(switchedFocus),
+            CEREAL_NVP(selectedEntities),
+            CEREAL_NVP(mouseOverEntities),
+            CEREAL_ENTITY(focusOnEntity),
+            CEREAL_ENTITY(lastEntityFocused)
            );
     }
     

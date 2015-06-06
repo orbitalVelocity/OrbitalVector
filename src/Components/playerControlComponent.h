@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "entityx/Entity.h"
 #include "componentTypes.h"
+#include "cerealHelper.h"
 
 class entityVector : public std::vector<entityx::Entity> {
 //private:

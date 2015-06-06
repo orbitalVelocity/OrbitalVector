@@ -13,6 +13,7 @@
 #include <vector>
 #include "entityx/Entity.h"
 #include "componentTypes.h"
+#include "cerealHelper.h"
 
 struct Part
 {
@@ -28,6 +29,18 @@ struct Sensor : public Part
     float powerDemand;
     float heatOutput;
     float heat; //heat += heatOutput * powerDemand
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+        ar( CEREAL_NVP(uid),
+            CEREAL_NVP(sensitivity),
+            CEREAL_NVP(powerDemand),
+            CEREAL_NVP(heatOutput),
+            CEREAL_NVP(heat)
+           );
+    };
 };
 
 struct Engine : public Part
@@ -63,6 +76,20 @@ struct Engine : public Part
         //impulse = avg thrust * dt
         //ISP = func(thrust)
     }
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+        ar( CEREAL_NVP(uid),
+           CEREAL_NVP(fuelFlowRate),
+           CEREAL_NVP(isp),
+           CEREAL_NVP(mass),
+           CEREAL_NVP(throttle),
+           CEREAL_NVP(heatOutput),
+           CEREAL_NVP(heat)
+           );
+    };
 };
 
 enum class FuelType
@@ -85,6 +112,18 @@ struct FuelTank : public Part
     FuelType fuelType;
     float fuelMass;
     float dryMass;
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+        ar( CEREAL_NVP(uid),
+           CEREAL_NVP(capacity),
+           CEREAL_NVP(fuel),
+           CEREAL_NVP(fuelType),
+           CEREAL_NVP(dryMass)
+           );
+    };
 };
 
 struct Physics
@@ -182,5 +221,18 @@ COMPONENT(Ship)
     
     //actions
     bool thrust;    //thrust for this frame;
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize( Archive & ar )
+    {
+        ar(
+           CEREAL_NVP(meshID),
+           CEREAL_NVP(debugName),
+           CEREAL_NVP(instanceCount),
+           CEREAL_NVP(mass),
+           CEREAL_NVP(dryMass)
+           );
+    };
 };
 #endif /* defined(__OrbitalVector__shipComponent__) */

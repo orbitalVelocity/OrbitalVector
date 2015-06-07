@@ -31,8 +31,14 @@ public entityx::Receiver<SerializationSystem>
 public:
     SerializationSystem() {}
     
+    void configure(entityx::EventManager& events);
+    
+    void receive(const SerializeEvent &e);
+    
     void update(entityx::EntityManager &entities,
                 entityx::EventManager &events,
                 double dt);
+private:
+    bool serializeFlag = false;
 };
 #endif /* defined(__OrbitalVector__serializationSystem__) */

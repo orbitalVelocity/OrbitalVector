@@ -14,6 +14,11 @@
 #include "glm/glm.hpp"
 #define EVENT( X ) struct X : public entityx::Event<X>
 
+EVENT(SerializeEvent)
+{
+    SerializeEvent() {}
+};
+
 EVENT(UserInputEvent)
 {
     UserInputEvent() {}

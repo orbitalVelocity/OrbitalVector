@@ -34,7 +34,7 @@ namespace cereal
     {
         for (auto &entity : vec)
         {
-            ar( CEREAL_NVP(entity.id().id()) );
+            ar( make_nvp("id", entity.id().id()) );
         }
     }
     
@@ -77,7 +77,6 @@ COMPONENT(PlayerControl)
 private:
     friend class cereal::access;
     template <class Archive>
-#define CEREAL_ENTITY(X) cereal::make_nvp("X", X.id().id())
     void serialize( Archive & ar )
     {
         ar( CEREAL_NVP(animationTime),

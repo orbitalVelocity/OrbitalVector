@@ -22,6 +22,8 @@
 
 #include "includes.h"
 
+#define CEREAL_ENTITY(X) cereal::make_nvp(#X, X.id().id())
+
 namespace cereal {
     template<class Archive>
     void save(Archive & ar, glm::vec2 const & vec)

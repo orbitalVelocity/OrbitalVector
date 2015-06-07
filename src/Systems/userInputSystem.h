@@ -28,7 +28,7 @@
  *      TODO: implement commandProcessorSystem; for now, keep that in this class as AI doesn't exist yet
  */
 class UserInputSystem : public entityx::System<UserInputSystem>
-//                        public entityx::Receiver<PotentialSelectEvent>
+//                        public entityx::Receiver<UserInputSystem>
 {
 public:
     UserInputSystem(UserInput *ui);
@@ -56,7 +56,7 @@ public:
     
     void updateCamera();
 
-    void processAction(entityx::EntityManager &entities, entityx::Entity myShip);
+    void processAction(entityx::EntityManager &entities, entityx::EventManager &events, entityx::Entity myShip);
 
 private:
 bool orbitPlanningMode = false;

@@ -82,7 +82,7 @@ void UserInputSystem::update(entityx::EntityManager &entities,
     
     //process actions
     //refactor: make its own system, so AI can use it too
-    processAction(entities, myShip);
+    processAction(entities, events, myShip);
 }
 
 
@@ -441,7 +441,7 @@ void UserInputSystem::createShadow(entityx::EntityManager &entities, entityx::En
     }
 }
 
-void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::Entity myShip)
+void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::EventManager &events, entityx::Entity myShip)
 {
     PlayerControl::Handle player;
     auto count = 0;
@@ -545,12 +545,13 @@ void UserInputSystem::processAction(entityx::EntityManager &entities, entityx::E
                 break;
             case ActionType::dumpCereal:
                 //get all entities with playerControl
-                for (auto entity : entities.entities_with_components(player))
-                {
-                    cereal::JSONOutputArchive archive( std::cout );
-                    auto pc = entity.component<PlayerControl>();
-                    archive( cereal::make_nvp("playerControl", *(pc.get()) ) );
-                }
+//                for (auto entity : entities.entities_with_components(player))
+//                {
+//                    cereal::JSONOutputArchive archive( std::cout );
+//                    auto pc = entity.component<PlayerControl>();
+//                    archive( cereal::make_nvp("playerControl", *(pc.get()) ) );
+//                }
+                events.emit<SerializeEvent>();
                 break;
             default:
                 break;

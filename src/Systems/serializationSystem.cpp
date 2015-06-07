@@ -48,14 +48,30 @@ namespace cereal
     }
 }
 
+void SerializationSystem::configure(entityx::EventManager& eventManager)
+{
+    eventManager.subscribe<SerializeEvent>(*this);
+}
+
+void SerializationSystem::receive(const SerializeEvent &e)
+{
+    serializeFlag = true;
+}
+
 void SerializationSystem::update(entityx::EntityManager &entities, entityx::EventManager &events, double dt)
 {
-    if (dt != 0) {
+    if (not serializeFlag) {
         return;
     }
+    serializeFlag = false;
     
     for (auto entity : entities.entities_for_debugging())
     {
+        if(entity.has_component<Tag>()) {
+            // already did this (saved game before,
+            // don't need to do it again
+            break;
+        }
         entity.assign<Tag>();
     }
     

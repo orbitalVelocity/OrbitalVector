@@ -27,8 +27,8 @@ namespace cereal
     template<class Archive>
     void save( Archive &ar, entityx::Entity const & entity )
     {
-//        uint64_t id = entity.id().id();
-//        ar( make_nvp("entityID", id) );
+        //        uint64_t id = entity.id().id();
+        //        ar( make_nvp("entityID", id) );
         assert(entity.has_component<Tag>());
         auto e = const_cast<entityx::Entity &>(entity);
         auto tag = e.component<Tag>();
@@ -43,6 +43,42 @@ namespace cereal
     
     template<class Archive>
     void load( Archive &ar, entityx::Entity & entity )
+    {
+        //        ar( entity.id() );//cereal::make_nvp("entityID", entity.id()) );
+    }
+    
+    template<class Archive>
+    void save( Archive &ar, entityx::EntityManager const & em)
+    {
+        //get rid of const in em
+        const entityx::EntityManager *pEntities = &em;
+        entityx::EntityManager *pE = const_cast<entityx::EntityManager*>(pEntities);
+        entityx::EntityManager &entities = *pE;
+        for (auto entity : entities.entities_for_debugging())
+        {
+            if(entity.has_component<Tag>()) {
+                // already did this (saved game before,
+                // don't need to do it again
+                break;
+            }
+            entity.assign<Tag>();
+        }
+        
+        //serialize over all components of each entity
+        std::cout << "printing json dump!\n";
+        std::ofstream saveFile;
+        saveFile.open("save.json");
+        cereal::JSONOutputArchive archive( saveFile );
+        //    cereal::JSONOutputArchive archive( std::cout );
+        //iterate over all entities
+        for (auto entity : entities.entities_for_debugging())
+        {
+            archive( cereal::make_nvp("entity", entity) );
+        }
+    }
+    
+    template<class Archive>
+    void load( Archive &ar, entityx::EntityManager & entity )
     {
         //        ar( entity.id() );//cereal::make_nvp("entityID", entity.id()) );
     }
@@ -76,10 +112,26 @@ void SerializationSystem::update(entityx::EntityManager &entities, entityx::Even
     }
     
     std::cout << "printing json dump!\n";
-    cereal::JSONOutputArchive archive( std::cout );
+    std::ofstream saveFile;
+    saveFile.open("save.json");
+    cereal::JSONOutputArchive archive( saveFile );
+//    cereal::JSONOutputArchive archive( std::cout );
     //iterate over all entities
     for (auto entity : entities.entities_for_debugging())
     {
         archive( cereal::make_nvp("entity", entity) );
     }
+    
+    
+    std::cout << "deleting all entities\n";
+    for (auto entity : entities.entities_for_debugging())
+    {
+        entity.destroy();
+    }
+    std::cout << "reloading entities\n";
+    std::ifstream loadFile;
+    loadFile.open("save.json");
+    cereal::JSONInputArchive archive2( loadFile );
+    
+    
 }

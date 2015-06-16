@@ -25,6 +25,12 @@
 #include "entityx/System.h"
 #include "events.h"
 
+class CerealEntityManager {
+public:
+    entityx::EntityManager &em;
+
+};
+
 class SerializationSystem: public entityx::System<SerializationSystem>,
 public entityx::Receiver<SerializationSystem>
 {
